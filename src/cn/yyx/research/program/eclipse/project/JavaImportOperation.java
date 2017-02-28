@@ -15,7 +15,7 @@ import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
-import cn.yyx.research.program.analysis.monitor.WaitOverMonitor;
+import cn.yyx.research.program.eclipse.monitor.WaitOverMonitor;
 
 public class JavaImportOperation {
 	

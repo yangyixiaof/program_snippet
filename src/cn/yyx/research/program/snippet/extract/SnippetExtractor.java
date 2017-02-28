@@ -5,10 +5,10 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
 import cn.yyx.research.logger.DebugLogger;
-import cn.yyx.research.program.analysis.exception.WrongArgumentException;
-import cn.yyx.research.program.analysis.jdtutil.JDTParser;
-import cn.yyx.research.program.analysis.loadproject.AnalysisEnvironment;
-import cn.yyx.research.program.analysis.loadproject.ProjectInfo;
+import cn.yyx.research.program.eclipse.exception.WrongArgumentException;
+import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
+import cn.yyx.research.program.eclipse.project.AnalysisEnvironment;
+import cn.yyx.research.program.eclipse.project.ProjectInfo;
 import cn.yyx.research.program.systemutil.SystemUtil;
 
 public class SnippetExtractor implements IApplication {

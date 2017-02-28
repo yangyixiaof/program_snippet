@@ -20,7 +20,7 @@ import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.LibraryLocation;
 
-import cn.yyx.research.program.analysis.exception.ProjectAlreadyExistsException;
+import cn.yyx.research.program.eclipse.exception.ProjectAlreadyExistsException;
 
 public class JavaProjectManager {
 
