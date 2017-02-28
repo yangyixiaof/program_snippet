@@ -13,4 +13,9 @@ public class DebugLogger {
 		
 	}
 	
+	public static void Log(String additioninfo)
+	{
+		System.out.println("Debug " + additioninfo);
+	}
+	
 }
