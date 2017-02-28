@@ -10,7 +10,6 @@ public class DebugLogger {
 			sb.append("arr["+i+"]"+":"+infos[i]+";");
 		}
 		System.out.println("Debug " + additioninfo + ":" + sb);
-		
 	}
 	
 	public static void Log(String additioninfo)
