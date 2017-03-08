@@ -26,7 +26,7 @@ public class ModifiedCompilationUnitCache {
 			full_qualified_class_queue.add(full_qualified_class);
 			String poll_qualified_class = full_qualified_class_queue.poll();
 			Integer poll_count = full_qualified_class_count.get(poll_qualified_class);
-			poll_count -= 2;
+			poll_count -= 1;
 			if (poll_count <= 0)
 			{
 				modified_compilation_unit.remove(poll_qualified_class);

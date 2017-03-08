@@ -11,6 +11,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jface.text.IDocument;
 
 import cn.yyx.research.program.fileutil.FileUtil;
 import cn.yyx.research.program.systemutil.SystemUtil;
@@ -42,8 +43,15 @@ public class JDTParser {
 	
 	public CompilationUnit ParseJavaFile(File f)
 	{
-		parser.setUnitName(f.getName());
+		// parser.setUnitName(f.getName());
 		parser.setSource(FileUtil.ReadFromFile(f).toCharArray());
+		CompilationUnit compilationUnit = (CompilationUnit) parser.createAST(null);
+		return compilationUnit;
+	}
+	
+	public CompilationUnit ParseJavaFile(IDocument doc)
+	{
+		parser.setSource(doc.get().toCharArray());
 		CompilationUnit compilationUnit = (CompilationUnit) parser.createAST(null);
 		return compilationUnit;
 	}
