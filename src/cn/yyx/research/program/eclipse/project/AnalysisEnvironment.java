@@ -30,13 +30,13 @@ public class AnalysisEnvironment {
 		{
 			throw new NoAnalysisSourceException();
 		}
-		FileIterator fi = new FileIterator(dir.getAbsolutePath(), ".+(?<!-copy)\\.java$");
+		FileIterator fi = new FileIterator(dir.getAbsolutePath(), ".+(?<!-yyx-copy)\\.java$");
 		Iterator<File> fitr = fi.EachFileIterator();
 		while (fitr.hasNext())
 		{
 			File f = fitr.next();
 			String f_norm_path = f.getAbsolutePath().trim().replace('\\', '/');
-			FileUtil.CopyFile(f, new File(f_norm_path.substring(0, f_norm_path.lastIndexOf(".java")) + "-copy" + ".java"));
+			FileUtil.CopyFile(f, new File(f_norm_path.substring(0, f_norm_path.lastIndexOf(".java")) + "-yyx-copy" + ".java"));
 			JDTParser unique_parser = JDTParser.GetUniqueEmptyParser();
 			CompilationUnit cu = unique_parser.ParseJavaFile(f);
 			CompilationUnit modified_cu = PreProcessCompilationUnitHelper.EntirePreProcessCompilationUnit(cu, unique_parser);
