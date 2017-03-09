@@ -11,10 +11,12 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 
+import cn.yyx.research.program.analysis.prepare.PreProcessCompilationUnitHelper;
 import cn.yyx.research.program.eclipse.exception.NoAnalysisSourceException;
 import cn.yyx.research.program.eclipse.exception.ProjectAlreadyExistsException;
 import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
 import cn.yyx.research.program.fileutil.FileIterator;
+import cn.yyx.research.program.fileutil.FileUtil;
 
 public class AnalysisEnvironment {
 	
@@ -28,14 +30,17 @@ public class AnalysisEnvironment {
 		{
 			throw new NoAnalysisSourceException();
 		}
-		FileIterator fi = new FileIterator(dir.getAbsolutePath(), ".+(\\.java)$");
+		FileIterator fi = new FileIterator(dir.getAbsolutePath(), ".+(?<!-copy)\\.java$");
 		Iterator<File> fitr = fi.EachFileIterator();
 		while (fitr.hasNext())
 		{
 			File f = fitr.next();
 			String f_norm_path = f.getAbsolutePath().trim().replace('\\', '/');
-			JDTParser jp = JDTParser.GetUniqueEmptyParser();
-			CompilationUnit cu = jp.ParseJavaFile(f);
+			FileUtil.CopyFile(f, new File(f_norm_path.substring(0, f_norm_path.lastIndexOf(".java")) + "-copy" + ".java"));
+			JDTParser unique_parser = JDTParser.GetUniqueEmptyParser();
+			CompilationUnit cu = unique_parser.ParseJavaFile(f);
+			CompilationUnit modified_cu = PreProcessCompilationUnitHelper.EntirePreProcessCompilationUnit(cu, unique_parser);
+			FileUtil.WriteToFile(f, modified_cu.toString());
 			PackageDeclaration pack = cu.getPackage();
 			if (pack != null)
 			{

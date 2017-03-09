@@ -2,6 +2,7 @@ package cn.yyx.research.program.eclipse.jdtutil;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,6 +70,11 @@ public class JDTParser {
 
 	public IJavaProject GetJavaProject() {
 		return javaProject;
+	}
+	
+	public Iterator<String> IterateEachSourceClass()
+	{
+		return source_classes.iterator();
 	}
 	
 	@Override

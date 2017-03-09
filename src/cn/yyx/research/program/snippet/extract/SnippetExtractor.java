@@ -26,6 +26,7 @@ public class SnippetExtractor implements IApplication {
 		ProjectInfo epi = new ProjectInfo(args[0], args[1]);//args[0]:no_use args[1]:D:/eclipse-workspace-pool/eclipse-rcp-neon-codecompletion/cn.yyx.research.program.snippet.extractor
 		JDTParser jdtparser = AnalysisEnvironment.CreateAnalysisEnvironment(epi);
 		
+		
 		return jdtparser;
 	}
 	

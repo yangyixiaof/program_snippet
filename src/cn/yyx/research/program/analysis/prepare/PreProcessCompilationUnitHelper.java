@@ -10,9 +10,9 @@ import org.eclipse.text.edits.TextEdit;
 
 import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
 
-public class PreProcessCompilationUnit {
+public class PreProcessCompilationUnitHelper {
 	
-	public CompilationUnit EntirePreProcessCompilationUnit(CompilationUnit cu, JDTParser parser)
+	public static CompilationUnit EntirePreProcessCompilationUnit(CompilationUnit cu, JDTParser parser)
 	{
 		IDocument doc = new Document(cu.toString());
 		cu.recordModifications();
