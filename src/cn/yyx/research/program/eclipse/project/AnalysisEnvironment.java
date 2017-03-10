@@ -34,6 +34,10 @@ public class AnalysisEnvironment {
 		{
 			File f = fitr.next();
 			String f_norm_path = f.getAbsolutePath().trim().replace('\\', '/');
+			
+			// testing
+			System.out.println("f_norm_path:" + f_norm_path);
+			
 			JDTParser unique_parser = JDTParser.GetUniqueEmptyParser();
 			CompilationUnit cu = unique_parser.ParseJavaFile(f);
 			PackageDeclaration pack = cu.getPackage();
@@ -76,7 +80,7 @@ public class AnalysisEnvironment {
 		JavaProjectManager manager = JavaProjectManager.UniqueManager();
 		IJavaProject javaProject = manager.CreateJavaProject(pi.getName());
 		
-		// Set<String> analysis_classes = JavaImportOperation.ImportFileSystem(javaProject, dir_files_map);
+		JavaImportOperation.ImportFileSystem(javaProject, dir_files_map);
 		
 		JDTParser jdtparser = new JDTParser(javaProject);
 		PreProcessHelper.EliminateAllParameterizedType(jdtparser);

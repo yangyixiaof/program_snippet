@@ -2,7 +2,6 @@ package cn.yyx.research.program.eclipse.project;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -19,8 +18,9 @@ import cn.yyx.research.program.eclipse.monitor.WaitOverMonitor;
 
 public class JavaImportOperation {
 	
-	public static Set<String> ImportFileSystem(IJavaProject javaProject, Map<String, TreeMap<String, String>> dir_files_map) throws JavaModelException {
-		Set<String> analysis_classes = new HashSet<String>();
+	// Set<String> 
+	public static void ImportFileSystem(IJavaProject javaProject, Map<String, TreeMap<String, String>> dir_files_map) throws JavaModelException {
+		// Set<String> analysis_classes = new HashSet<String>();
 		
 		IOverwriteQuery overwriteQuery = new IOverwriteQuery() {
 			public String queryOverwrite(String file) {
@@ -43,7 +43,7 @@ public class JavaImportOperation {
 			{
 				String fkey = fitr.next();
 				String fvalue = files.get(fkey);
-				analysis_classes.add(fkey);
+				// analysis_classes.add(fkey);
 				filesToImport.add(new File(fvalue));
 			}
 			
@@ -58,8 +58,7 @@ public class JavaImportOperation {
 			}
 			wom.WaitToStop();
 		}
-		
-		return analysis_classes;
+		// return analysis_classes;
 	}
 	
 }
