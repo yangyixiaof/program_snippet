@@ -27,7 +27,6 @@ public class PreProcessCompilationUnitHelper {
 //			e.printStackTrace();
 //		}
 //		CompilationUnit modified_cu = parser.ParseJavaFile(doc);
-//		System.out.println("CompilationUnit:" + modified_cu);
 //		return modified_cu;
 	}
 	

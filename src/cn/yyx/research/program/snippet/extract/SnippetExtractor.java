@@ -36,8 +36,6 @@ public class SnippetExtractor implements IApplication {
 		SystemUtil.Delay(1000);
 		
 		JDTParser jdtparser = LoadProjectAccordingToArgs((String[])context.getArguments().get(IApplicationContext.APPLICATION_ARGS));
-		// testing.
-		System.out.println(jdtparser);
 		
 		// 我想选一门机器翻译和自然语言处理的课，但是好多都不能选，只给本科生开。
 		// 你知不知道，那种，语言的语义，到另一种语义的对应？那种课

@@ -13,7 +13,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.IDocument;
 
 import cn.yyx.research.program.fileutil.FileUtil;
-import cn.yyx.research.program.systemutil.SystemUtil;
 
 public class JDTParser {
 	
@@ -75,19 +74,6 @@ public class JDTParser {
 
 	public IJavaProject GetJavaProject() {
 		return javaProject;
-	}
-	
-//	public Iterator<String> IterateEachSourceClass()
-//	{
-//		return source_classes.iterator();
-//	}
-	
-	@Override
-	public String toString() {
-		StringBuffer result = new StringBuffer("javaProject:" + javaProject);
-		result.append(SystemUtil.LINE_SEPARATOR);
-		// result.append("source_classes:" + source_classes);
-		return result.toString();
 	}
 		
 }

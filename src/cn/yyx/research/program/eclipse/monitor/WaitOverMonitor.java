@@ -15,7 +15,6 @@ public class WaitOverMonitor extends NullProgressMonitor {
 	public void done() {
 		super.done();
 		exit = true;
-		// System.out.println("Monitor done invoked!");
 	}
 	
 	public void WaitToStop()
