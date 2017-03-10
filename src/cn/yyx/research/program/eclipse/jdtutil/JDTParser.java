@@ -1,11 +1,9 @@
 package cn.yyx.research.program.eclipse.jdtutil;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
@@ -19,19 +17,19 @@ import cn.yyx.research.program.systemutil.SystemUtil;
 
 public class JDTParser {
 	
-	private static JDTParser Unique_Empty_Parser = new JDTParser(null, null);
+	private static JDTParser Unique_Empty_Parser = new JDTParser(null);// , null
 	
 	private ASTParser parser = null;
 	
 	private IJavaProject javaProject = null;
-	private Set<String> source_classes = new HashSet<String>();
+	// private Set<String> source_classes = new HashSet<String>();
 	
-	public JDTParser(IJavaProject javaProject, Set<String> source_classes) {
+	public JDTParser(IJavaProject javaProject) {// , Set<String> source_classes
 		this.javaProject = javaProject;
-		if (source_classes != null)
-		{
-			this.source_classes.addAll(source_classes);
-		}
+//		if (source_classes != null)
+//		{
+//			this.source_classes.addAll(source_classes);
+//		}
 		parser = ASTParser.newParser(AST.JLS8);
 		parser.setResolveBindings(true);
 		parser.setBindingsRecovery(true);
@@ -40,6 +38,13 @@ public class JDTParser {
 		parser.setCompilerOptions(options);
 		parser.setProject(javaProject);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+	}
+	
+	public CompilationUnit ParseICompilationUnit(ICompilationUnit icu)
+	{
+		parser.setSource(icu);
+		CompilationUnit compilationUnit = (CompilationUnit) parser.createAST(null);
+		return compilationUnit;
 	}
 	
 	public CompilationUnit ParseJavaFile(File f)
@@ -72,16 +77,16 @@ public class JDTParser {
 		return javaProject;
 	}
 	
-	public Iterator<String> IterateEachSourceClass()
-	{
-		return source_classes.iterator();
-	}
+//	public Iterator<String> IterateEachSourceClass()
+//	{
+//		return source_classes.iterator();
+//	}
 	
 	@Override
 	public String toString() {
 		StringBuffer result = new StringBuffer("javaProject:" + javaProject);
 		result.append(SystemUtil.LINE_SEPARATOR);
-		result.append("source_classes:" + source_classes);
+		// result.append("source_classes:" + source_classes);
 		return result.toString();
 	}
 		

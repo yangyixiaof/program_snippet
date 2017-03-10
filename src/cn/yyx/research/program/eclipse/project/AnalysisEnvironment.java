@@ -3,7 +3,6 @@ package cn.yyx.research.program.eclipse.project;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
@@ -11,12 +10,11 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 
-import cn.yyx.research.program.analysis.prepare.PreProcessCompilationUnitHelper;
+import cn.yyx.research.program.analysis.prepare.PreProcessHelper;
 import cn.yyx.research.program.eclipse.exception.NoAnalysisSourceException;
 import cn.yyx.research.program.eclipse.exception.ProjectAlreadyExistsException;
 import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
 import cn.yyx.research.program.fileutil.FileIterator;
-import cn.yyx.research.program.fileutil.FileUtil;
 
 public class AnalysisEnvironment {
 	
@@ -36,11 +34,8 @@ public class AnalysisEnvironment {
 		{
 			File f = fitr.next();
 			String f_norm_path = f.getAbsolutePath().trim().replace('\\', '/');
-			FileUtil.CopyFile(f, new File(f_norm_path.substring(0, f_norm_path.lastIndexOf(".java")) + "-yyx-copy" + ".java"));
 			JDTParser unique_parser = JDTParser.GetUniqueEmptyParser();
 			CompilationUnit cu = unique_parser.ParseJavaFile(f);
-			CompilationUnit modified_cu = PreProcessCompilationUnitHelper.EntirePreProcessCompilationUnit(cu, unique_parser);
-			FileUtil.WriteToFile(f, modified_cu.toString());
 			PackageDeclaration pack = cu.getPackage();
 			if (pack != null)
 			{
@@ -80,9 +75,11 @@ public class AnalysisEnvironment {
 		// Create and fill the source folder of the project.
 		JavaProjectManager manager = JavaProjectManager.UniqueManager();
 		IJavaProject javaProject = manager.CreateJavaProject(pi.getName());
-		Set<String> analysis_classes = JavaImportOperation.ImportFileSystem(javaProject, dir_files_map);
 		
-		JDTParser jdtparser = new JDTParser(javaProject, analysis_classes);
+		// Set<String> analysis_classes = JavaImportOperation.ImportFileSystem(javaProject, dir_files_map);
+		
+		JDTParser jdtparser = new JDTParser(javaProject);
+		PreProcessHelper.EliminateAllParameterizedType(jdtparser);
 		return jdtparser;
 	}
 	
