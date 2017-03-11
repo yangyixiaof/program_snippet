@@ -27,7 +27,7 @@ public class PreProcessHelper {
 //				System.err.println("ModifiedCompilationUnit is null, something must be wrong!");
 //				System.exit(1);
 //			}
-			compilation_resource.save(null, true);
+			compilation_resource.save(null, false);
 			
 			// testing
 			// System.out.println("CompilationUnit:" + cu);

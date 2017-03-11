@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
@@ -39,9 +40,9 @@ public class JavaSearch {
 		return units;
 	}
 	
-	public static void SearchForWhereTheMethodIsInvoked(String method_pattern) throws CoreException {// "foo"
-		SearchPattern pattern = SearchPattern.createPattern(method_pattern, IJavaSearchConstants.METHOD,
-				IJavaSearchConstants.REFERENCES, SearchPattern.R_EXACT_MATCH);
+	public static void SearchForWhereTheMethodIsInvoked(IMethod method) throws CoreException {// "foo"
+	    // Create search pattern
+	    SearchPattern pattern = SearchPattern.createPattern(method, IJavaSearchConstants.REFERENCES);
 		SearchRequestor requestor = new SearchRequestor() {
 			@Override
 			public void acceptSearchMatch(SearchMatch match) throws CoreException {

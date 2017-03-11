@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
+import cn.yyx.research.program.eclipse.searchutil.SearchIMethodVisitor;
 
 public class TestJavaSearch {
 	
@@ -26,6 +27,7 @@ public class TestJavaSearch {
 		for (ICompilationUnit unit : units)
 		{
 			CompilationUnit cu = jdtparser.ParseICompilationUnit(unit);
+			
 			@SuppressWarnings("unchecked")
 			List<AbstractTypeDeclaration> tps = cu.types();
 			Iterator<AbstractTypeDeclaration> titr = tps.iterator();
@@ -38,8 +40,12 @@ public class TestJavaSearch {
 					MethodDeclaration[] methods = td.getMethods();
 					for (MethodDeclaration md : methods)
 					{
+						SearchIMethodVisitor smv = new SearchIMethodVisitor(md);
+						cu.accept(smv);
 						System.out.println("MethodDeclaration:" + md);
-						System.out.println("MethodBinding:" + md.getName());
+						System.out.println("MethodBinding:" + md.resolveBinding());
+						System.out.println("IMethod:" + smv.getImethod());
+						// JavaSearch.SearchForWhereTheMethodIsInvoked(md);
 					}
 				}
 			}

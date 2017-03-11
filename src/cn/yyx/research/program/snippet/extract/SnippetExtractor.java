@@ -52,12 +52,12 @@ public class SnippetExtractor implements IApplication {
 		// 我想做的这个有点像机器翻译
 		// 你看，代码里面不是有很多字符串码？这些自然语言可以用一种。
 		
-		DebugLogger.Log("Normal Stop is invoked!");
-		try {
-			AnalysisEnvironment.DeleteAllAnalysisEnvironment();
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
+//		DebugLogger.Log("Normal Stop is invoked!");
+//		try {
+//			AnalysisEnvironment.DeleteAllAnalysisEnvironment();
+//		} catch (CoreException e) {
+//			e.printStackTrace();
+//		}
 		
 		SystemUtil.Delay(1000);
 		return IApplication.EXIT_OK;
