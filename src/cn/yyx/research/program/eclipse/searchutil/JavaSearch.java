@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
@@ -18,7 +19,8 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 
 public class JavaSearch {
 	
-	public static List<ICompilationUnit> SearchForAllICompilationUnits(IPackageFragmentRoot[] package_roots) throws JavaModelException  {
+	public static List<ICompilationUnit> SearchForAllICompilationUnits(IJavaProject java_project) throws JavaModelException  {
+		IPackageFragmentRoot[] package_roots = java_project.getPackageFragmentRoots();
 		List<ICompilationUnit> units = new LinkedList<ICompilationUnit>();
 		for (IPackageFragmentRoot package_root : package_roots) {
 			// System.err.println("package_root:"+package_root);
@@ -37,8 +39,8 @@ public class JavaSearch {
 		return units;
 	}
 	
-	public static void SearchForWhereTheMethodIsInvoked() throws CoreException {
-		SearchPattern pattern = SearchPattern.createPattern("foo", IJavaSearchConstants.METHOD,
+	public static void SearchForWhereTheMethodIsInvoked(String method_pattern) throws CoreException {// "foo"
+		SearchPattern pattern = SearchPattern.createPattern(method_pattern, IJavaSearchConstants.METHOD,
 				IJavaSearchConstants.REFERENCES, SearchPattern.R_EXACT_MATCH);
 		SearchRequestor requestor = new SearchRequestor() {
 			@Override
