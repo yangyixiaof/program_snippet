@@ -1,15 +1,24 @@
 package cn.yyx.research.program.eclipse.searchutil;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchRequestor;
 
 public class SearchResultRequestor extends SearchRequestor {
 	
+	CompilationUnit unit = null;
+	
+	public SearchResultRequestor(CompilationUnit unit) {
+		this.unit = unit;
+	}
+	
 	@Override
 	public void acceptSearchMatch(SearchMatch match) throws CoreException {
 		System.out.println("matches:" + match.toString());
 		System.out.println("matche element class:" + match.getElement().getClass());
+		String searched_content = unit.getTypeRoot().getBuffer().getText(match.getOffset(), match.getLength());
+		System.out.println("searched_content:" + searched_content);
 //		ResolvedSourceMethod rsm = (ResolvedSourceMethod)match.getElement();
 //		System.out.println("key:"+rsm.getKey());
 	}
