@@ -27,7 +27,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 			IMethod imethod = (IMethod)ibinding.getJavaElement();
 			try {
 				// testing.
-				System.out.println("Search for references.");
+				System.out.println("MethodInvocation:" + node.getName() + " Search for references.");
 				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, false, new SearchResultRequestor(cu));
 			} catch (CoreException e) {
 				e.printStackTrace();
@@ -39,16 +39,16 @@ public class SearchIMethodVisitor extends ASTVisitor {
 	
 	@Override
 	public boolean visit(MethodInvocation node) {
-		if (!node.getName().toString().startsWith("haha"))
-		{
-			return false;
-		}
+//		if (!node.getName().toString().startsWith("haha"))
+//		{
+//			return false;
+//		}
 		IMethodBinding ibinding = node.resolveMethodBinding();
 		if (ibinding != null)
 		{
 			IMethod imethod = (IMethod)ibinding.getJavaElement();
 			try {
-				System.err.println("Search for declarations.");
+				System.out.println("MethodInvocation:" + node.getName() + " Search for declarations.");
 				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, true, new SearchResultRequestor(cu));
 			} catch (CoreException e) {
 				e.printStackTrace();
