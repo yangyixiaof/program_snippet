@@ -26,7 +26,8 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		{
 			IMethod imethod = (IMethod)ibinding.getJavaElement();
 			try {
-				System.err.println("Search for references.");
+				// testing.
+				System.out.println("Search for references.");
 				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, false, new SearchResultRequestor(cu));
 			} catch (CoreException e) {
 				e.printStackTrace();
