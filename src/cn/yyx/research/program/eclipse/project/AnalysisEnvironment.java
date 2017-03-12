@@ -18,7 +18,7 @@ import cn.yyx.research.program.fileutil.FileIterator;
 
 public class AnalysisEnvironment {
 	
-	public static JDTParser CreateAnalysisEnvironment(ProjectInfo pi) throws NoAnalysisSourceException, ProjectAlreadyExistsException, CoreException
+	public static IJavaProject CreateAnalysisEnvironment(ProjectInfo pi) throws NoAnalysisSourceException, ProjectAlreadyExistsException, CoreException
 	{
 		// Map<String, String> all_need_handle_files = new TreeMap<String, String>();
 		// Iterate all files to fill the specific structure.
@@ -78,13 +78,12 @@ public class AnalysisEnvironment {
 		
 		// Create and fill the source folder of the project.
 		JavaProjectManager manager = JavaProjectManager.UniqueManager();
-		IJavaProject javaProject = manager.CreateJavaProject(pi.getName());
+		IJavaProject java_project = manager.CreateJavaProject(pi.getName());
 		
-		JavaImportOperation.ImportFileSystem(javaProject, dir_files_map);
+		JavaImportOperation.ImportFileSystem(java_project, dir_files_map);
 		
-		JDTParser jdtparser = new JDTParser(javaProject);
-		PreProcessHelper.EliminateAllParameterizedType(jdtparser);
-		return jdtparser;
+		PreProcessHelper.EliminateAllParameterizedType(java_project);
+		return java_project;
 	}
 	
 	public static void DeleteAnalysisEnvironment(ProjectInfo pi) throws CoreException

@@ -13,7 +13,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
@@ -40,21 +39,11 @@ public class JavaSearch {
 		return units;
 	}
 	
-	public static void SearchForWhereTheMethodIsInvoked(IMethod method) throws CoreException {// "foo"
+	public static void SearchForWhereTheMethodIsInvoked(IMethod method, boolean is_declaration, SearchRequestor requestor) throws CoreException {// "foo"
 	    // Create search pattern
-	    SearchPattern pattern = SearchPattern.createPattern(method, IJavaSearchConstants.REFERENCES);
-		SearchRequestor requestor = new SearchRequestor() {
-			@Override
-			public void acceptSearchMatch(SearchMatch match) throws CoreException {
-				System.out.println(match.toString());
-			}
-		};
+	    SearchPattern pattern = SearchPattern.createPattern(method, (is_declaration ? IJavaSearchConstants.DECLARATIONS : IJavaSearchConstants.REFERENCES));
 		new SearchEngine().search(pattern, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
 				SearchEngine.createWorkspaceScope(), requestor, null);
 	}
 	
-	public static void SearchForTheMethodDeclaration() throws CoreException {
-		
-	}
-
 }

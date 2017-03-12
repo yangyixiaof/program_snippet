@@ -12,8 +12,8 @@ import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 
 public class PreProcessHelper {
 
-	public static void EliminateAllParameterizedType(JDTParser jdtparser) throws JavaModelException {
-		IJavaProject java_project = jdtparser.GetJavaProject();
+	public static void EliminateAllParameterizedType(IJavaProject java_project) throws JavaModelException {
+		JDTParser jdtparser = new JDTParser(java_project);
 		List<ICompilationUnit> units = JavaSearch.SearchForAllICompilationUnits(java_project);
 		// System.err.println("unit_size:" + units.size());
 		for (final ICompilationUnit compilation_resource : units) {
@@ -34,6 +34,7 @@ public class PreProcessHelper {
 			// testing
 			// System.out.println("ICompilationUnit:" + compilation_resource.getSource());
 		}
+		java_project.save(null, false);
 	}
 
 }

@@ -1,6 +1,5 @@
 package cn.yyx.research.program.snippet.extract;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jdt.core.IJavaProject;
@@ -15,7 +14,7 @@ import cn.yyx.research.test.TestJavaSearch;
 
 public class SnippetExtractor implements IApplication {
 	
-	public static JDTParser LoadProjectAccordingToArgs(String[] args) throws Exception 
+	public static IJavaProject LoadProjectAccordingToArgs(String[] args) throws Exception 
 	{
 		if (args.length != 2)
 		{
@@ -26,9 +25,9 @@ public class SnippetExtractor implements IApplication {
 		
 		// load projects
 		ProjectInfo epi = new ProjectInfo(args[0], args[1]);//args[0]:no_use args[1]:D:/eclipse-workspace-pool/eclipse-rcp-neon-codecompletion/cn.yyx.research.program.snippet.extractor
-		JDTParser jdtparser = AnalysisEnvironment.CreateAnalysisEnvironment(epi);
+		IJavaProject jproj = AnalysisEnvironment.CreateAnalysisEnvironment(epi);
 		
-		return jdtparser;
+		return jproj;
 	}
 	
 	@Override
@@ -36,13 +35,10 @@ public class SnippetExtractor implements IApplication {
 		DebugLogger.Log("Start is invoked!");
 		SystemUtil.Delay(1000);
 		
-		JDTParser jdtparser = LoadProjectAccordingToArgs((String[])context.getArguments().get(IApplicationContext.APPLICATION_ARGS));
-		
-		IJavaProject java_project = jdtparser.GetJavaProject();
-		
+		IJavaProject java_project = LoadProjectAccordingToArgs((String[])context.getArguments().get(IApplicationContext.APPLICATION_ARGS));
+				
 		// testing.
-		TestJavaSearch tjs = new TestJavaSearch();
-		tjs.TestJavaSearchMehodInvocation(jdtparser);
+		TestJavaSearch.TestInAll(new JDTParser(java_project));
 		
 		// 我想选一门机器翻译和自然语言处理的课，但是好多都不能选，只给本科生开。
 		// 你知不知道，那种，语言的语义，到另一种语义的对应？那种课
@@ -65,12 +61,12 @@ public class SnippetExtractor implements IApplication {
 	
 	@Override
 	public void stop() {
-		DebugLogger.Log("Force Stop is invoked!");
-		try {
-			AnalysisEnvironment.DeleteAllAnalysisEnvironment();
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
+//		DebugLogger.Log("Force Stop is invoked!");
+//		try {
+//			AnalysisEnvironment.DeleteAllAnalysisEnvironment();
+//		} catch (CoreException e) {
+//			e.printStackTrace();
+//		}
 	}
 	
 }
