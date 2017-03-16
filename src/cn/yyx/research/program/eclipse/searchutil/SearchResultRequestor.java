@@ -20,7 +20,7 @@ public class SearchResultRequestor extends SearchRequestor {
 		if (match.getElement() instanceof ResolvedSourceMethod)
 		{
 			System.out.println("matches:" + match.toString());
-			System.out.println("matche element class:" + match.getElement().getClass());
+			System.out.println("match element class:" + match.getElement().getClass());
 			String searched_content = unit.getTypeRoot().getBuffer().getText(match.getOffset(), match.getLength());
 			System.out.println("searched_content:" + searched_content);
 //			ResolvedSourceMethod rsm = (ResolvedSourceMethod)match.getElement();
