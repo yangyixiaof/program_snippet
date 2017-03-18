@@ -10,16 +10,17 @@ public class IRTask {
 	private int idx = -1;
 	private IRForOneMethod irfom = null;
 	
-	public IRTask(IMethod im, int idx) {
+	public IRTask(IMethod im, int idx, IRForOneMethod irfom) {
 		this.setIm(im);
 		this.setIdx(idx);
+		this.setIrfom(irfom);
 	}
 
 	public IMethod getIm() {
 		return im;
 	}
 
-	public void setIm(IMethod im) {
+	private void setIm(IMethod im) {
 		this.im = im;
 	}
 
@@ -27,8 +28,16 @@ public class IRTask {
 		return idx;
 	}
 
-	public void setIdx(int idx) {
+	private void setIdx(int idx) {
 		this.idx = idx;
+	}
+
+	public IRForOneMethod getIrfom() {
+		return irfom;
+	}
+
+	private void setIrfom(IRForOneMethod irfom) {
+		this.irfom = irfom;
 	}
 	
 }

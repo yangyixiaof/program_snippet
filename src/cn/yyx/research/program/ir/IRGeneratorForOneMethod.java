@@ -1,6 +1,9 @@
 package cn.yyx.research.program.ir;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IMethod;
@@ -110,6 +113,8 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	
 	private IRForOneMethod irfom = null;
 	
+	private Queue<IRTask> undone_tasks = new LinkedList<IRTask>();
+	
 	public IRGeneratorForOneMethod(IMethod im) {
 		this.irfom = new IRForOneMethod(im);
 	}
@@ -117,6 +122,11 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	public IRGeneratorForOneMethod(int max_level, IMethod im) {
 		this.max_level = max_level;
 		this.irfom = new IRForOneMethod(im);
+	}
+	
+	public Queue<IRTask> GetUndoneTasks()
+	{
+		return undone_tasks;
 	}
 	
 	// post handling statements.
@@ -127,6 +137,18 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 			temp_statement_set.clear();
 		}
 		super.postVisit(node);
+	}
+	
+	@Override
+	public boolean visit(MethodDeclaration node) {
+		// TODO Auto-generated method stub
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(MethodInvocation node) {
+		// TODO Auto-generated method stub
+		return super.visit(node);
 	}
 	
 	// handling statements.
@@ -364,31 +386,7 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 		// TODO Auto-generated method stub
 		return super.visit(node);
 	}
-	
-	@Override
-	public boolean visit(MethodInvocation node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-	
-	@Override
-	public boolean visit(MethodDeclaration node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-	
-	@Override
-	public boolean visit(MemberValuePair node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-	
-	@Override
-	public boolean visit(MemberRef node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-	
+		
 	@Override
 	public boolean visit(InstanceofExpression node) {
 		// TODO Auto-generated method stub
@@ -665,6 +663,19 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 		// will do in the future.
 		return super.visit(node);
 	}
+	
+	@Override
+	public boolean visit(MemberValuePair node) {
+		// will do in the future.
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(MemberRef node) {
+		// will do in the future.
+		return super.visit(node);
+	}
+
 
 	@Override
 	public boolean visit(SingleMemberAnnotation node) {
