@@ -6,8 +6,8 @@ public class IRForOneExtension extends IRForOneUnit {
 	
 	private IRForOneMethod method = null;
 	
-	public IRForOneExtension(IMethod im, int start, int end, IRForOneMethod method) {
-		super(im, start, end);
+	public IRForOneExtension(IMethod im, int start, int end, IRForOneMethod method, IRInstrKind ir_kind) {
+		super(im, start, end, ir_kind);
 		this.setMethod(method);
 	}
 

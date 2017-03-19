@@ -7,11 +7,13 @@ public class IRForOneUnit {
 	private IMethod im = null;
 	private int start = -1;
 	private int end = -1;
+	private IRInstrKind ir_kind = IRInstrKind.Weak;
 	
-	public IRForOneUnit(IMethod im, int start, int end) {
+	public IRForOneUnit(IMethod im, int start, int end, IRInstrKind ir_kind) {
 		this.setIm(im);
 		this.setStart(start);
 		this.setEnd(end);
+		this.setIr_kind(ir_kind);
 	}
 	
 	public IMethod getIm() {
@@ -36,6 +38,14 @@ public class IRForOneUnit {
 
 	public void setEnd(int end) {
 		this.end = end;
+	}
+
+	public IRInstrKind getIr_kind() {
+		return ir_kind;
+	}
+
+	public void setIr_kind(IRInstrKind ir_kind) {
+		this.ir_kind = ir_kind;
 	}
 	
 }

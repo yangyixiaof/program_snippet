@@ -1,10 +1,11 @@
 package cn.yyx.research.program.ir;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -42,6 +43,9 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -107,9 +111,10 @@ import cn.yyx.research.program.ir.method.IRForOneMethod;
 
 public class IRGeneratorForOneMethod extends ASTVisitor {
 	
-	private int max_level = -1; // -1 means infinite.
+	private static int max_level = -1; // -1 means infinite.
 	
-	private Set<ASTNode> temp_statement_set = new HashSet<ASTNode>();
+	// name must be resolved and ensure it is a variable, a global variable or a type.
+	private Map<IBinding, Integer> temp_statement_set = new HashMap<IBinding, Integer>();
 	
 	private IRForOneMethod irfom = null;
 	
@@ -120,7 +125,7 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	}
 	
 	public IRGeneratorForOneMethod(int max_level, IMethod im) {
-		this.max_level = max_level;
+		IRGeneratorForOneMethod.max_level = max_level;
 		this.irfom = new IRForOneMethod(im);
 	}
 	
@@ -141,14 +146,37 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		// TODO Auto-generated method stub
+		@SuppressWarnings("unchecked")
+		List<SingleVariableDeclaration> svds = node.parameters();
+		Iterator<SingleVariableDeclaration> itr = svds.iterator();
+		int idx = 0;
+		while (itr.hasNext())
+		{
+			idx++;
+			SingleVariableDeclaration svd = itr.next();
+			SimpleName sn = svd.getName();
+			IBinding ib = sn.resolveBinding();
+			if ((ib != null) && (ib instanceof IVariableBinding))
+			{
+				IVariableBinding ivb = (IVariableBinding)ib;
+				irfom.PutParameterPrder(ivb, idx);
+			}
+		}
 		return super.visit(node);
 	}
 
 	@Override
-	public boolean visit(MethodInvocation node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
+	public void endVisit(MethodInvocation node) {
+		IMethodBinding im = node.resolveMethodBinding();
+		// TODO remember to set data_dependency in IRForOneMethod.
+		if (im == null || !im.getDeclaringClass().isFromSource()) {
+			// null or is from binary.
+			IRGeneratorHelper.GeneralGenerateIR(node, node.getName(), irfom, temp_statement_set, node.getName().toString());
+		} else {
+			// is from source.
+			// need to be handled specifically.
+			// TODO
+		}
 	}
 	
 	// handling statements.
@@ -693,6 +721,10 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	public boolean visit(MarkerAnnotation node) {
 		// will do in the future.
 		return super.visit(node);
+	}
+
+	public static int GetMaxLevel() {
+		return max_level;
 	}
 	
 }
