@@ -71,8 +71,11 @@ public class IRGeneratorHelper {
 				e.printStackTrace();
 			}
 		}
-		IRForOneExtension irfoe = new IRForOneExtension(irfom.getIm(), start, end, methods, ir_kind);
-		irfom.AddOneIRUnit(ib, irfoe);
+		if (methods != null && methods.size() > 0)
+		{
+			IRForOneExtension irfoe = new IRForOneExtension(irfom.getIm(), start, end, methods, ir_kind);
+			irfom.AddOneIRUnit(ib, irfoe);
+		}
 	}
 	
 }
