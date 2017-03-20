@@ -9,7 +9,6 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
-import cn.yyx.research.program.eclipse.searchutil.SearchResultRequestor;
 
 public class SearchIMethodVisitor extends ASTVisitor {
 	
@@ -28,7 +27,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 			try {
 				// testing.
 				System.out.println("MethodInvocation:" + node.getName() + " Search for references.");
-				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, false, new SearchResultRequestor(cu));
+				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, false, new SearchResultRequestorForTest(cu));
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -49,7 +48,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 			IMethod imethod = (IMethod)ibinding.getJavaElement();
 			try {
 				System.out.println("MethodInvocation:" + node.getName() + " Search for declarations.");
-				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, true, new SearchResultRequestor(cu));
+				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, true, new SearchResultRequestorForTest(cu));
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}

@@ -1,4 +1,4 @@
-package cn.yyx.research.program.eclipse.searchutil;
+package cn.yyx.research.test;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -7,11 +7,11 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.internal.core.ResolvedSourceMethod;
 
 @SuppressWarnings("restriction")
-public class SearchResultRequestor extends SearchRequestor {
+public class SearchResultRequestorForTest extends SearchRequestor {
 	
 	CompilationUnit unit = null;
 	
-	public SearchResultRequestor(CompilationUnit unit) {
+	public SearchResultRequestorForTest(CompilationUnit unit) {
 		this.unit = unit;
 	}
 	

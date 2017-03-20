@@ -8,104 +8,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.ArrayAccess;
-import org.eclipse.jdt.core.dom.ArrayCreation;
-import org.eclipse.jdt.core.dom.ArrayInitializer;
-import org.eclipse.jdt.core.dom.ArrayType;
-import org.eclipse.jdt.core.dom.AssertStatement;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BlockComment;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
-import org.eclipse.jdt.core.dom.BreakStatement;
-import org.eclipse.jdt.core.dom.CastExpression;
-import org.eclipse.jdt.core.dom.CatchClause;
-import org.eclipse.jdt.core.dom.CharacterLiteral;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ConditionalExpression;
-import org.eclipse.jdt.core.dom.ConstructorInvocation;
-import org.eclipse.jdt.core.dom.ContinueStatement;
-import org.eclipse.jdt.core.dom.CreationReference;
-import org.eclipse.jdt.core.dom.Dimension;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.EmptyStatement;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
-import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.ExpressionMethodReference;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.FieldAccess;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
-import org.eclipse.jdt.core.dom.IntersectionType;
-import org.eclipse.jdt.core.dom.Javadoc;
-import org.eclipse.jdt.core.dom.LabeledStatement;
-import org.eclipse.jdt.core.dom.LambdaExpression;
-import org.eclipse.jdt.core.dom.LineComment;
-import org.eclipse.jdt.core.dom.MarkerAnnotation;
-import org.eclipse.jdt.core.dom.MemberRef;
-import org.eclipse.jdt.core.dom.MemberValuePair;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.MethodRef;
-import org.eclipse.jdt.core.dom.MethodRefParameter;
-import org.eclipse.jdt.core.dom.Modifier;
-import org.eclipse.jdt.core.dom.NameQualifiedType;
-import org.eclipse.jdt.core.dom.NormalAnnotation;
-import org.eclipse.jdt.core.dom.NullLiteral;
-import org.eclipse.jdt.core.dom.NumberLiteral;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.jdt.core.dom.ParameterizedType;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.PostfixExpression;
-import org.eclipse.jdt.core.dom.PrefixExpression;
-import org.eclipse.jdt.core.dom.PrimitiveType;
-import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.QualifiedType;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SimpleType;
-import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
-import org.eclipse.jdt.core.dom.SuperFieldAccess;
-import org.eclipse.jdt.core.dom.SuperMethodInvocation;
-import org.eclipse.jdt.core.dom.SuperMethodReference;
-import org.eclipse.jdt.core.dom.SwitchCase;
-import org.eclipse.jdt.core.dom.SwitchStatement;
-import org.eclipse.jdt.core.dom.SynchronizedStatement;
-import org.eclipse.jdt.core.dom.TagElement;
-import org.eclipse.jdt.core.dom.TextElement;
-import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.ThrowStatement;
-import org.eclipse.jdt.core.dom.TryStatement;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
-import org.eclipse.jdt.core.dom.TypeLiteral;
-import org.eclipse.jdt.core.dom.TypeMethodReference;
-import org.eclipse.jdt.core.dom.TypeParameter;
-import org.eclipse.jdt.core.dom.UnionType;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.core.dom.WhileStatement;
-import org.eclipse.jdt.core.dom.WildcardType;
+import org.eclipse.jdt.core.dom.*;
 
 import cn.yyx.research.program.ir.method.IRForOneMethod;
 
@@ -167,15 +70,59 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 
 	@Override
 	public void endVisit(MethodInvocation node) {
-		IMethodBinding im = node.resolveMethodBinding();
-		// TODO remember to set data_dependency in IRForOneMethod.
-		if (im == null || !im.getDeclaringClass().isFromSource()) {
+		
+		// initialize parameters of the node.
+		Map<IBinding, Integer> invoke_parameter_order = new HashMap<IBinding, Integer>();
+		@SuppressWarnings("unchecked")
+		List<Expression> nlist = node.arguments();
+		Iterator<Expression> itr = nlist.iterator();
+		int idx = 0;
+		while (itr.hasNext())
+		{
+			idx++;
+			Expression e = itr.next();
+			if (e instanceof Name)
+			{
+				Name n = (Name)e;
+				IBinding nbind = n.resolveBinding();
+				if (nbind != null && nbind instanceof ITypeBinding && nbind instanceof IVariableBinding)
+				{
+					invoke_parameter_order.put(nbind, idx);
+				}
+			}
+		}
+		
+		IBinding ib = null;
+		IMethodBinding imb = node.resolveMethodBinding();
+		Expression expr = node.getExpression();
+		String code = node.getName().toString();
+		if (expr == null ) {
+			// set to meta--invoke other user defined function.
+			code = IRMeta.User_Defined_Function;
+		} else {
+			// set data_dependency in IRForOneMethod.
+			if (expr instanceof Name)
+			{
+				Name n = (Name)expr;
+				ib = n.resolveBinding();
+				if (ib instanceof ITypeBinding || ib instanceof IVariableBinding)
+				{
+					irfom.AddDataDependency(ib, invoke_parameter_order.keySet());
+				}
+			}
+		}
+		
+		if (imb == null || !imb.getDeclaringClass().isFromSource()) {
 			// null or is from binary.
-			IRGeneratorHelper.GeneralGenerateIR(node, node.getName(), irfom, temp_statement_set, node.getName().toString());
+			IRGeneratorHelper.GenerateGeneralIR(node, node.getName(), irfom, temp_statement_set, code);
 		} else {
 			// is from source.
 			// need to be handled specifically.
-			// TODO
+			if (ib != null)
+			{
+				code = IRMeta.User_Defined_Function;
+				IRGeneratorHelper.GenerateSourceMethodInvocationIR(ib, imb, node, node.getName(), irfom, invoke_parameter_order, code);
+			}
 		}
 	}
 	
@@ -374,12 +321,6 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	}
 	
 	@Override
-	public boolean visit(ParameterizedType node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-	
-	@Override
 	public boolean visit(PackageDeclaration node) {
 		// TODO Auto-generated method stub
 		return super.visit(node);
@@ -393,24 +334,6 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	
 	@Override
 	public boolean visit(NullLiteral node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-	
-	@Override
-	public boolean visit(NormalAnnotation node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-	
-	@Override
-	public boolean visit(MethodRefParameter node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-	
-	@Override
-	public boolean visit(MethodRef node) {
 		// TODO Auto-generated method stub
 		return super.visit(node);
 	}
@@ -632,6 +555,13 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	}
 	
 	// do nothing.
+
+	@Override
+	public boolean visit(ParameterizedType node) {
+		// it won't happen.
+		return super.visit(node);
+	}
+	
 	@Override
 	public boolean visit(BlockComment node) {
 		// do not need to handle.
@@ -646,6 +576,24 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	
 	@Override
 	public boolean visit(Javadoc node) {
+		// do not need to handle.
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(NormalAnnotation node) {
+		// do not need to handle.
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(MethodRefParameter node) {
+		// do not need to handle.
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(MethodRef node) {
 		// do not need to handle.
 		return super.visit(node);
 	}

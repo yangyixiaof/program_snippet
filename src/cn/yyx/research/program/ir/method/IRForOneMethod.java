@@ -2,17 +2,12 @@ package cn.yyx.research.program.ir.method;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.IBinding;
-
-import cn.yyx.research.program.ir.IRTask;
 
 public class IRForOneMethod {
 	
@@ -24,22 +19,34 @@ public class IRForOneMethod {
 	private Map<IBinding, Integer> parameters_order = new HashMap<IBinding, Integer>();
 	
 	// this is set when handling a MethodInvocation.
-	private Map<IRForOneExtension, HashMap<IBinding, Integer>> variable_parameter_map = new HashMap<IRForOneExtension, HashMap<IBinding, Integer>>();
+	private Map<IRForOneExtension, HashMap<IBinding, Integer>> variable_parameter_order = new HashMap<IRForOneExtension, HashMap<IBinding, Integer>>();
 	
 	private Map<IBinding, LinkedList<IRForOneUnit>> irs = new HashMap<IBinding, LinkedList<IRForOneUnit>>();
+	
+	// only three situations could lead to data_dependency key: first var_bind in method invocation(exclude cascade)/left value in assignment.
 	private Map<IBinding, HashSet<IBinding>> data_dependency = new HashMap<IBinding, HashSet<IBinding>>();
 	// private List<IRForOneUnit> units = new LinkedList<IRForOneUnit>();
 	
 	public IRForOneMethod(IMethod im) {
 		this.setIm(im);
 	}
-
+	
 	public IMethod getIm() {
 		return im;
 	}
-
+	
 	private void setIm(IMethod im) {
 		this.im = im;
+	}
+	
+	public void AddDataDependency(IBinding key, Set<IBinding> value)
+	{
+		data_dependency.put(key, new HashSet<IBinding>(value));
+	}
+	
+	public void AddVariableParameterOrder(IRForOneExtension irfoe, HashMap<IBinding, Integer> order)
+	{
+		variable_parameter_order.put(irfoe, order);
 	}
 	
 	public void AddOneIRUnit(IBinding ivb, IRForOneUnit irfou)
