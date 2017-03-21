@@ -19,12 +19,14 @@ public class TestJavaSearch {
 	{
 		IJavaProject java_project = jdtparser.GetJavaProject();
 		List<ICompilationUnit> units = JavaSearch.SearchForAllICompilationUnits(java_project);
+		System.out.println("All ICompilationUnit Size:" + units.size());
 		for (ICompilationUnit unit : units)
 		{
 			CompilationUnit cu = jdtparser.ParseICompilationUnit(unit);
 			
 			cu.accept(new SearchIMethodVisitor(jdtparser));
 			
+			System.out.println("==================== One Round Over ====================");
 //			@SuppressWarnings("unchecked")
 //			List<AbstractTypeDeclaration> tps = cu.types();
 //			Iterator<AbstractTypeDeclaration> titr = tps.iterator();
