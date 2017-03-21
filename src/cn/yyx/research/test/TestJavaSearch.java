@@ -15,16 +15,15 @@ public class TestJavaSearch {
 	public TestJavaSearch() {
 	}
 	
-	public void TestJavaSearchMehodInvocation(JDTParser jdtparser) throws CoreException
+	public void TestJavaSearchMehodInvocation(IJavaProject java_project) throws CoreException
 	{
-		IJavaProject java_project = jdtparser.GetJavaProject();
 		List<ICompilationUnit> units = JavaSearch.SearchForAllICompilationUnits(java_project);
 		System.out.println("All ICompilationUnit Size:" + units.size());
 		for (ICompilationUnit unit : units)
 		{
-			CompilationUnit cu = jdtparser.ParseICompilationUnit(unit);
+			CompilationUnit cu = JDTParser.CreateJDTParser(java_project).ParseICompilationUnit(unit);
 			
-			cu.accept(new SearchIMethodVisitor(jdtparser));
+			cu.accept(new SearchIMethodVisitor(java_project));
 			
 			System.out.println("==================== One Round Over ====================");
 //			@SuppressWarnings("unchecked")
@@ -50,10 +49,10 @@ public class TestJavaSearch {
 		}
 	}
 	
-	public static void TestInAll(JDTParser jdtparser) throws CoreException
+	public static void TestInAll(IJavaProject java_project) throws CoreException
 	{
 		TestJavaSearch tjs = new TestJavaSearch();
-		tjs.TestJavaSearchMehodInvocation(jdtparser);
+		tjs.TestJavaSearchMehodInvocation(java_project);
 	}
 	
 }

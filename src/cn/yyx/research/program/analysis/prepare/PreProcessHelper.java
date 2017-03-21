@@ -7,18 +7,16 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.text.edits.TextEdit;
 
-import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 
 public class PreProcessHelper {
 
 	public static void EliminateAllParameterizedType(IJavaProject java_project) throws JavaModelException {
-		JDTParser jdtparser = new JDTParser(java_project);
 		List<ICompilationUnit> units = JavaSearch.SearchForAllICompilationUnits(java_project);
 		// System.err.println("unit_size:" + units.size());
 		for (final ICompilationUnit compilation_resource : units) {
 			TextEdit edit = PreProcessCompilationUnitHelper.EntirePreProcessCompilationUnit(compilation_resource,
-					jdtparser);
+					java_project);
 			compilation_resource.applyTextEdit(edit, null);
 			compilation_resource.reconcile(ICompilationUnit.NO_AST, false, compilation_resource.getOwner(), null);
 //			CompilationUnit cu = 

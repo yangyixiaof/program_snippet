@@ -6,7 +6,6 @@ import org.eclipse.jdt.core.IJavaProject;
 
 import cn.yyx.research.logger.DebugLogger;
 import cn.yyx.research.program.eclipse.exception.WrongArgumentException;
-import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
 import cn.yyx.research.program.eclipse.project.AnalysisEnvironment;
 import cn.yyx.research.program.eclipse.project.ProjectInfo;
 import cn.yyx.research.program.systemutil.SystemUtil;
@@ -38,7 +37,7 @@ public class SnippetExtractor implements IApplication {
 		IJavaProject java_project = LoadProjectAccordingToArgs((String[])context.getArguments().get(IApplicationContext.APPLICATION_ARGS));
 				
 		// testing.
-		TestJavaSearch.TestInAll(new JDTParser(java_project));
+		TestJavaSearch.TestInAll(java_project);
 		
 		// 我想选一门机器翻译和自然语言处理的课，但是好多都不能选，只给本科生开。
 		// 你知不知道，那种，语言的语义，到另一种语义的对应？那种课

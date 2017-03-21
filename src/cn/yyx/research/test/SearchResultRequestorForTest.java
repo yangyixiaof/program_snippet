@@ -1,6 +1,7 @@
 package cn.yyx.research.test;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -13,10 +14,10 @@ import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
 @SuppressWarnings("restriction")
 public class SearchResultRequestorForTest extends SearchRequestor {
 
-	JDTParser jdtparser = null;
+	IJavaProject java_project = null;
 	
-	public SearchResultRequestorForTest(JDTParser jdtparser) {
-		this.jdtparser = jdtparser;
+	public SearchResultRequestorForTest(IJavaProject java_project ) {
+		this.java_project = java_project;
 	}
 	
 	@Override
@@ -31,7 +32,7 @@ public class SearchResultRequestorForTest extends SearchRequestor {
 				System.out.println("IType:" + type);
 				System.out.println("matches:" + match.toString());
 				System.out.println("match element class:" + match.getElement().getClass());
-				CompilationUnit cu = jdtparser.ParseICompilationUnit(method.getCompilationUnit());
+				CompilationUnit cu = JDTParser.CreateJDTParser(java_project).ParseICompilationUnit(method.getCompilationUnit());
 				String searched_content = cu.getTypeRoot().getBuffer().getText(match.getOffset(), match.getLength());
 				System.out.println("searched_content:" + searched_content);
 			}

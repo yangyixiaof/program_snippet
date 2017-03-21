@@ -23,7 +23,12 @@ public class JDTParser {
 	private IJavaProject javaProject = null;
 	// private Set<String> source_classes = new HashSet<String>();
 	
-	public JDTParser(IJavaProject javaProject) {// , Set<String> source_classes
+	public static JDTParser CreateJDTParser(IJavaProject java_project)
+	{
+		return new JDTParser(java_project);
+	}
+	
+	private JDTParser(IJavaProject javaProject) {// , Set<String> source_classes
 		this.javaProject = javaProject;
 //		if (source_classes != null)
 //		{

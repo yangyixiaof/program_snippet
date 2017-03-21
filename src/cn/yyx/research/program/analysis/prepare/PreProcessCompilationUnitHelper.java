@@ -1,6 +1,7 @@
 package cn.yyx.research.program.analysis.prepare;
 
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jface.text.Document;
@@ -30,9 +31,9 @@ public class PreProcessCompilationUnitHelper {
 //		return modified_cu;
 	}
 	
-	public static TextEdit EntirePreProcessCompilationUnit(ICompilationUnit icu, JDTParser parser)
+	public static TextEdit EntirePreProcessCompilationUnit(ICompilationUnit icu, IJavaProject java_project)
 	{
-		CompilationUnit cu = parser.ParseICompilationUnit(icu);
+		CompilationUnit cu = JDTParser.CreateJDTParser(java_project).ParseICompilationUnit(icu);
 		IDocument doc = new Document(cu.toString());
 		cu.recordModifications();
 		final ASTRewrite rewrite = ASTRewrite.create(cu.getAST());
