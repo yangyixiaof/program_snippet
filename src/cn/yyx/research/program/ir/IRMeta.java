@@ -15,5 +15,8 @@ public class IRMeta {
 	public static final String LeftHandAssign = "@LeftHandAssign";
 	public static final String RightHandAssign = "@RightHandAssign";
 	public static final String Switch = "@Switch";
+	public static final String Switch_Case_Default = "@Switch_Case_Default";
+	public static final String Switch_Case_Cause = "@Switch_Case_";
+	public static final String Switch_Case_Relation = "@Switch_Relate_";
 	
 }

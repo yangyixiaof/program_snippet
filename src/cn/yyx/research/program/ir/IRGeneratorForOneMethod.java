@@ -401,6 +401,12 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	}
 	
 	@Override
+	public void endVisit(SwitchCase node) {
+		IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irfom, temp_statement_set, IRMeta.Switch_Case_Cause);
+		super.endVisit(node);
+	}
+	
+	@Override
 	public void endVisit(SwitchStatement node) {
 		HashSet<IBinding> binds = switch_case_bind.pop();
 		LinkedList<ASTNode> slist = switch_case.pop();
@@ -872,6 +878,8 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 		// will do in the future. The current structure does not recognize such minor but close relation.
 		return super.visit(node);
 	}
+	
+	// switch such branch, how to model?
 
 	public static int GetMaxLevel() {
 		return max_level;

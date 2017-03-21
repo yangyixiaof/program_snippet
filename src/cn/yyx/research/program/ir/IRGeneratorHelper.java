@@ -26,10 +26,10 @@ public class IRGeneratorHelper {
 	
 	public static void GenerateSwitchCaseIR(ASTNode node, ASTNode sc, IRForOneMethod irfom, HashSet<IBinding> binds)
 	{
-		String code = "@Switch_Default";
+		String code = IRMeta.Switch_Case_Default;
 		if (!sc.toString().startsWith("default")) {
 			SwitchCase r_sc = (SwitchCase)sc;
-			code = "@Switch_" + r_sc.getExpression().toString();
+			code = IRMeta.Switch_Case_Relation + r_sc.getExpression().toString();
 		}
 		IRGeneratorHelper.GenerateNoVariableBindingIR(node.getParent(), node, irfom, binds, code);
 	}
