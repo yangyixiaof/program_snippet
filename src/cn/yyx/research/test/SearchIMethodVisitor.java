@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -32,6 +33,9 @@ public class SearchIMethodVisitor extends ASTVisitor {
 	public boolean visit(SuperFieldAccess node) {
 		IVariableBinding ivb = node.resolveFieldBinding();
 		System.out.println("SuperFieldAccess Binding:" + ivb + ";JavaElement:" + ivb.getJavaElement());
+		System.out.println("==================== its name ====================");
+		IBinding nivb = node.getName().resolveBinding();
+		System.out.println("SuperFieldAccess Binding:" + nivb + ";JavaElement:" + nivb.getJavaElement());
 		return super.visit(node);
 	}
 	
