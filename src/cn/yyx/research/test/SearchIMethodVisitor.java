@@ -37,6 +37,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 	
 	@Override
 	public boolean visit(MethodDeclaration node) {
+		System.out.println(node.getName());
 		IMethodBinding ibinding = node.resolveBinding();
 		if (ibinding != null)
 		{
@@ -55,6 +56,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 	
 	@Override
 	public boolean visit(MethodInvocation node) {
+		System.out.println(node.getName());
 //		if (!node.getName().toString().startsWith("haha"))
 //		{
 //			return false;
