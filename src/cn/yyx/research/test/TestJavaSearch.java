@@ -23,7 +23,7 @@ public class TestJavaSearch {
 		{
 			CompilationUnit cu = jdtparser.ParseICompilationUnit(unit);
 			
-			cu.accept(new SearchIMethodVisitor(cu));
+			cu.accept(new SearchIMethodVisitor(jdtparser));
 			
 //			@SuppressWarnings("unchecked")
 //			List<AbstractTypeDeclaration> tps = cu.types();

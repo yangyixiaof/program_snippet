@@ -8,13 +8,15 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.internal.core.ResolvedSourceMethod;
 
+import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
+
 @SuppressWarnings("restriction")
 public class SearchResultRequestorForTest extends SearchRequestor {
+
+	JDTParser jdtparser = null;
 	
-	CompilationUnit unit = null;
-	
-	public SearchResultRequestorForTest(CompilationUnit unit) {
-		this.unit = unit;
+	public SearchResultRequestorForTest(JDTParser jdtparser) {
+		this.jdtparser = jdtparser;
 	}
 	
 	@Override
@@ -29,7 +31,8 @@ public class SearchResultRequestorForTest extends SearchRequestor {
 				System.out.println("IType:" + type);
 				System.out.println("matches:" + match.toString());
 				System.out.println("match element class:" + match.getElement().getClass());
-				String searched_content = unit.getTypeRoot().getBuffer().getText(match.getOffset(), match.getLength());
+				CompilationUnit cu = jdtparser.ParseICompilationUnit(method.getCompilationUnit());
+				String searched_content = cu.getTypeRoot().getBuffer().getText(match.getOffset(), match.getLength());
 				System.out.println("searched_content:" + searched_content);
 			}
 //			ResolvedSourceMethod rsm = (ResolvedSourceMethod)match.getElement();
