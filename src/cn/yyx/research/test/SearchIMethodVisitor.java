@@ -30,6 +30,8 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		System.out.println("node:"+node);
 		System.out.println("Constant Value:"+node.resolveConstantExpressionValue());
 		System.out.println("TypeBinding:"+node.resolveTypeBinding());
+		System.out.println("TypeBinding not null:"+node.resolveTypeBinding() != null);
+		System.out.println("Constant Value not null:"+node.resolveTypeBinding() != null);
 		return super.visit(node);
 	}
 	
@@ -38,6 +40,8 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		System.out.println("node:"+node);
 		System.out.println("Constant Value:"+node.resolveConstantExpressionValue());
 		System.out.println("TypeBinding:"+node.resolveTypeBinding());
+		System.out.println("TypeBinding not null:"+node.resolveTypeBinding() != null);
+		System.out.println("Constant Value not null:"+node.resolveTypeBinding() != null);
 		return super.visit(node);
 	}
 
@@ -46,6 +50,8 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		System.out.println("node:"+node);
 		System.out.println("Constant Value:"+node.resolveConstantExpressionValue());
 		System.out.println("TypeBinding:"+node.resolveTypeBinding());
+		System.out.println("TypeBinding not null:"+node.resolveTypeBinding() != null);
+		System.out.println("Constant Value not null:"+node.resolveTypeBinding() != null);
 		return super.visit(node);
 	}
 	
