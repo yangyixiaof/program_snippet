@@ -512,31 +512,31 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 
 	@Override
 	public boolean visit(ArrayType node) {
-		// TODO Auto-generated method stub
+		HandleBinding(node.resolveBinding());
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(SimpleType node) {
-		// TODO Auto-generated method stub
+		HandleBinding(node.resolveBinding());
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(PrimitiveType node) {
-		// TODO Auto-generated method stub
+		HandleBinding(node.resolveBinding());
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(QualifiedType node) {
-		// TODO Auto-generated method stub
+		HandleBinding(node.resolveBinding());
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(QualifiedName node) {
-		// TODO Auto-generated method stub
+		HandleBinding(node.resolveBinding());
 		return super.visit(node);
 	}
 
