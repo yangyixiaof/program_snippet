@@ -195,6 +195,27 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	}
 
 	@Override
+	public boolean visit(DoStatement node) {
+		loop_bind.put(node, new HashSet<IBinding>());
+
+		post_visit_task.put(node.getExpression(), new Runnable() {
+			@Override
+			public void run() {
+				IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irfom, temp_statement_set,
+						IRMeta.DoWhile);
+				StatementOverHandle();
+			}
+		});
+		return super.visit(node);
+	}
+
+	@Override
+	public void endVisit(DoStatement node) {
+		loop_bind.remove(node);
+		super.endVisit(node);
+	}
+
+	@Override
 	public boolean visit(ForStatement node) {
 		loop_bind.put(node, new HashSet<IBinding>());
 
@@ -427,8 +448,7 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	private void HandleBinding(IBinding ib) {
 		// handle loop_bind, just for no variable bind statements such as
 		// break and continue.
-		if (!BindingManager.QualifiedBinding(ib))
-		{
+		if (!BindingManager.QualifiedBinding(ib)) {
 			return;
 		}
 		Set<ASTNode> ks = loop_bind.keySet();
@@ -470,46 +490,58 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	}
 
 	@Override
-	public boolean visit(SuperConstructorInvocation node) {
+	public void endVisit(SuperConstructorInvocation node) {
 		@SuppressWarnings("unchecked")
 		List<Expression> nlist = (List<Expression>) node.arguments();
 		HandleMethodInvocation(nlist, node.resolveConstructorBinding(), null, "super", node);
-		return super.visit(node);
+	}
+	
+	@Override
+	public void endVisit(ConstructorInvocation node) {
+		@SuppressWarnings("unchecked")
+		List<Expression> nlist = (List<Expression>) node.arguments();
+		HandleMethodInvocation(nlist, node.resolveConstructorBinding(), null, "this", node);
 	}
 
 	@Override
 	public boolean visit(StringLiteral node) {
-		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(), node.resolveConstantExpressionValue()));
+		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(),
+				node.resolveConstantExpressionValue()));
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(NumberLiteral node) {
-		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(), node.resolveConstantExpressionValue()));
+		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(),
+				node.resolveConstantExpressionValue()));
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(NullLiteral node) {
-		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(), node.resolveConstantExpressionValue()));
+		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(),
+				node.resolveConstantExpressionValue()));
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(CharacterLiteral node) {
-		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(), node.resolveConstantExpressionValue()));
+		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(),
+				node.resolveConstantExpressionValue()));
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(BooleanLiteral node) {
-		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(), node.resolveConstantExpressionValue()));
+		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(),
+				node.resolveConstantExpressionValue()));
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(TypeLiteral node) {
-		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(), node.resolveConstantExpressionValue()));
+		HandleBinding(new YConstantBinding(node.toString(), node.resolveTypeBinding(),
+				node.resolveConstantExpressionValue()));
 		return super.visit(node);
 	}
 
@@ -544,20 +576,21 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	}
 
 	@Override
-	public boolean visit(PrefixExpression node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
+	public void endVisit(PrefixExpression node) {
+		IRGeneratorHelper.GenerateGeneralIR(node, node.getOperand(), irfom, temp_statement_set,
+				IRMeta.Prefix + node.getOperator().toString());
 	}
 
 	@Override
 	public boolean visit(PostfixExpression node) {
-		// TODO Auto-generated method stub
+		IRGeneratorHelper.GenerateGeneralIR(node, node.getOperand(), irfom, temp_statement_set,
+				IRMeta.Postfix + node.getOperator().toString());
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(ParenthesizedExpression node) {
-		// TODO Auto-generated method stub
+		// no need to do anything.
 		return super.visit(node);
 	}
 
@@ -569,37 +602,45 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 
 	@Override
 	public boolean visit(InstanceofExpression node) {
-		// TODO Auto-generated method stub
+		post_visit_task.put(node.getLeftOperand(), new Runnable() {
+			@Override
+			public void run() {
+				IRGeneratorHelper.GenerateGeneralIR(node.getLeftOperand(), node.getLeftOperand(), irfom, temp_statement_set,
+						IRMeta.InstanceOfExpression);
+			}
+		});
 		return super.visit(node);
 	}
-
+	
+	@Override
+	public void endVisit(InstanceofExpression node) {
+		IRGeneratorHelper.GenerateGeneralIR(node.getRightOperand(), node.getRightOperand(), irfom, temp_statement_set,
+				IRMeta.InstanceOfType);
+		super.endVisit(node);
+	}
+	
 	@Override
 	public boolean visit(InfixExpression node) {
-		// TODO Auto-generated method stub
+		post_visit_task.put(node.getLeftOperand(), new Runnable() {
+			@Override
+			public void run() {
+				IRGeneratorHelper.GenerateGeneralIR(node.getLeftOperand(), node.getLeftOperand(), irfom, temp_statement_set,
+						IRMeta.InfixLeftExpression + node.getOperator().toString());
+			}
+		});
 		return super.visit(node);
+	}
+	
+	@Override
+	public void endVisit(InfixExpression node) {
+		IRGeneratorHelper.GenerateGeneralIR(node.getRightOperand(), node.getRightOperand(), irfom, temp_statement_set,
+				IRMeta.InfixRightExpression + node.getOperator().toString());
+		super.endVisit(node);
 	}
 
 	@Override
 	public boolean visit(ImportDeclaration node) {
 		// do not need to handle.
-		return super.visit(node);
-	}
-	
-	@Override
-	public boolean visit(Initializer node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-	
-	@Override
-	public boolean visit(FieldDeclaration node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(FieldAccess node) {
-		// TODO Auto-generated method stub
 		return super.visit(node);
 	}
 
@@ -611,22 +652,10 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 
 	@Override
 	public boolean visit(EnumConstantDeclaration node) {
-		// TODO Auto-generated method stub
+		HandleBinding(node.resolveVariable());
 		return super.visit(node);
 	}
-
-	@Override
-	public boolean visit(DoStatement node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(ConstructorInvocation node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
-	}
-
+	
 	@Override
 	public boolean visit(ConditionalExpression node) {
 		// TODO Auto-generated method stub
@@ -885,6 +914,27 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	public boolean visit(LabeledStatement node) {
 		// will do in the future. The current structure does not recognize such
 		// minor but close relation.
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(Initializer node) {
+		// not handled in basic generator. This should be handled in special
+		// generator invoking basic generator.
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(FieldDeclaration node) {
+		// not handled in basic generator. This should be handled in special
+		// generator invoking basic generator
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(FieldAccess node) {
+		// not handled in basic generator. This should be handled in special
+		// generator invoking basic generator
 		return super.visit(node);
 	}
 
