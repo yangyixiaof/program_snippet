@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.*;
 
 import cn.yyx.research.program.ir.ast.ASTSearch;
+import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.bind.YConstantBinding;
 import cn.yyx.research.program.ir.method.IRForOneMethod;
 
@@ -426,6 +427,10 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	private void HandleBinding(IBinding ib) {
 		// handle loop_bind, just for no variable bind statements such as
 		// break and continue.
+		if (!BindingManager.QualifiedBinding(ib))
+		{
+			return;
+		}
 		Set<ASTNode> ks = loop_bind.keySet();
 		Iterator<ASTNode> kitr = ks.iterator();
 		while (kitr.hasNext()) {
@@ -446,9 +451,7 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	@Override
 	public boolean visit(SimpleName node) {
 		IBinding ib = node.resolveBinding();
-		if (ib != null && (ib instanceof ITypeBinding || ib instanceof IVariableBinding)) {
-			HandleBinding(ib);
-		}
+		HandleBinding(ib);
 
 		return super.visit(node);
 	}
