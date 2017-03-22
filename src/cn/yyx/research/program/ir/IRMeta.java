@@ -2,7 +2,8 @@ package cn.yyx.research.program.ir;
 
 public class IRMeta {
 	
-	public static final String User_Defined_Function = "@User_Define";
+	public static final String MethodInvocation = "@MethodInvocation_";
+	public static final String User_Defined_Function = "@UserDefine";
 	public static final String If = "@If";
 	public static final String IfThen = "@IfThen";
 	public static final String IfElse = "@IfElse";

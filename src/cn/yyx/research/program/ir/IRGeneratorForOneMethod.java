@@ -138,14 +138,14 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 
 		if (imb == null || !imb.getDeclaringClass().isFromSource()) {
 			// null or is from binary.
-			IRGeneratorHelper.GenerateGeneralIR(node, node, irfom, temp_statement_set, code);
+			IRGeneratorHelper.GenerateGeneralIR(node, node, irfom, temp_statement_set, IRMeta.MethodInvocation + code);
 		} else {
 			// is from source.
 			// need to be handled specifically.
 			if (ib != null) {
 				code = IRMeta.User_Defined_Function;
 				IRGeneratorHelper.GenerateSourceMethodInvocationIR(ib, imb, node, node, irfom, invoke_parameter_order,
-						code);
+						IRMeta.MethodInvocation + code);
 			}
 		}
 	}
