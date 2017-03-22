@@ -183,16 +183,30 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	
 	@Override
 	public boolean visit(ClassInstanceCreation node) {
-		// TODO Auto-generated method stub
+		if (node.getAnonymousClassDeclaration() != null)
+		{
+			pre_visit_task.put(node, new Runnable() {
+				@Override
+				public void run() {
+					@SuppressWarnings("unchecked")
+					List<Expression> nlist = (List<Expression>) node.arguments();
+					HandleMethodInvocation(nlist, node.resolveConstructorBinding(), null, "new#"+node.getType(), node);
+				}
+			});	
+		}
 		return super.visit(node);
 	}
 	
 	@Override
-	public boolean visit(ArrayCreation node) {
-		// TODO Auto-generated method stub
-		return super.visit(node);
+	public void endVisit(ClassInstanceCreation node) {
+		if (node.getAnonymousClassDeclaration() == null)
+		{
+			@SuppressWarnings("unchecked")
+			List<Expression> nlist = (List<Expression>) node.arguments();
+			HandleMethodInvocation(nlist, node.resolveConstructorBinding(), null, "new#"+node.getType(), node);
+		}
 	}
-
+	
 	// handling statements.
 
 	@Override
@@ -759,7 +773,33 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 		IRGeneratorHelper.GenerateGeneralIR(node.getExpression(), node.getExpression(), irfom, temp_statement_set,
 				IRMeta.CastExpression);
 	}
-
+	
+	@Override
+	public boolean visit(ArrayCreation node) {
+		post_visit_task.put(node.getType(), new Runnable() {
+			@Override
+			public void run() {
+				IRGeneratorHelper.GenerateGeneralIR(node.getType(), node.getType(), irfom, temp_statement_set,
+						IRMeta.ArrayCreation);
+			}
+		});
+		@SuppressWarnings("unchecked")
+		List<Expression> nlist = node.dimensions();
+		Iterator<Expression> itr = nlist.iterator();
+		while (itr.hasNext())
+		{
+			Expression expr = itr.next();
+			post_visit_task.put(expr, new Runnable() {
+				@Override
+				public void run() {
+					IRGeneratorHelper.GenerateGeneralIR(expr, expr, irfom, temp_statement_set,
+							IRMeta.ArrayCreationIndex);
+				}
+			});
+		}
+		return super.visit(node);
+	}
+	
 	@Override
 	public boolean visit(ArrayInitializer node) {
 		IRGeneratorHelper.GenerateGeneralIR(node, node, irfom, temp_statement_set,
@@ -1022,7 +1062,9 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 
 	// switch such branch, how to model?
 
-	// re-check all codes, be sure the scope to search the bind.
+	// TODO re-check all codes, be sure the scope to search the bind.
+	
+	// TODO remember to handle unresolved type or method invocation to its raw name.
 	
 	public static int GetMaxLevel() {
 		return max_level;

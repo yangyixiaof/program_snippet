@@ -32,5 +32,7 @@ public class IRMeta {
 	public static final String CastExpression = "@CatchExpression";
 	public static final String Array = "@Array";
 	public static final String ArrayIndex = "@ArrayIndex";
+	public static final String ArrayCreation = "@ArrayCreation";
+	public static final String ArrayCreationIndex = "@ArrayCreationIndex";
 	
 }
