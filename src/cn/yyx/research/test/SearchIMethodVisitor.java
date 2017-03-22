@@ -9,6 +9,9 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.NullLiteral;
+import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 
@@ -20,6 +23,30 @@ public class SearchIMethodVisitor extends ASTVisitor {
 	
 	public SearchIMethodVisitor(IJavaProject java_project) {
 		this.java_project = java_project;
+	}
+	
+	@Override
+	public boolean visit(StringLiteral node) {
+		System.out.println("node:"+node);
+		System.out.println("Constant Value:"+node.resolveConstantExpressionValue());
+		System.out.println("TypeBinding:"+node.resolveTypeBinding());
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(NumberLiteral node) {
+		System.out.println("node:"+node);
+		System.out.println("Constant Value:"+node.resolveConstantExpressionValue());
+		System.out.println("TypeBinding:"+node.resolveTypeBinding());
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(NullLiteral node) {
+		System.out.println("node:"+node);
+		System.out.println("Constant Value:"+node.resolveConstantExpressionValue());
+		System.out.println("TypeBinding:"+node.resolveTypeBinding());
+		return super.visit(node);
 	}
 	
 	@Override
