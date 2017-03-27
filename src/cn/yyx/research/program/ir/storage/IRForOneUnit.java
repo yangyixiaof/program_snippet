@@ -1,26 +1,26 @@
-package cn.yyx.research.program.ir.method;
+package cn.yyx.research.program.ir.storage;
 
-import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IMember;
 
 public class IRForOneUnit {
 	
-	private IMethod im = null;
+	private IMember im = null;
 	private int start = -1;
 	private int end = -1;
 	private IRInstrKind ir_kind = IRInstrKind.Weak;
 	
-	public IRForOneUnit(IMethod im, int start, int end, IRInstrKind ir_kind) {
+	public IRForOneUnit(IMember im, int start, int end, IRInstrKind ir_kind) {
 		this.setIm(im);
 		this.setStart(start);
 		this.setEnd(end);
 		this.setIr_kind(ir_kind);
 	}
 	
-	public IMethod getIm() {
+	public IMember getIm() {
 		return im;
 	}
 
-	public void setIm(IMethod im) {
+	public void setIm(IMember im) {
 		this.im = im;
 	}
 

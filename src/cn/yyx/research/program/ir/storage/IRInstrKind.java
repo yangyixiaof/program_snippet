@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.method;
+package cn.yyx.research.program.ir.storage;
 
 public enum IRInstrKind {
 	

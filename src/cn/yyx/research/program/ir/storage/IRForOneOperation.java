@@ -1,12 +1,12 @@
-package cn.yyx.research.program.ir.method;
+package cn.yyx.research.program.ir.storage;
 
-import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IMember;
 
 public class IRForOneOperation extends IRForOneUnit {
 	
 	private String ir = null;
 	
-	public IRForOneOperation(IMethod im, int start, int end, String ir, IRInstrKind ir_kind) {
+	public IRForOneOperation(IMember im, int start, int end, String ir, IRInstrKind ir_kind) {
 		super(im, start, end, ir_kind);
 		this.setIr(ir);
 	}

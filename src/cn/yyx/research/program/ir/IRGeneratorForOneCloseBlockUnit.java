@@ -10,49 +10,142 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
+import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.ArrayAccess;
+import org.eclipse.jdt.core.dom.ArrayCreation;
+import org.eclipse.jdt.core.dom.ArrayInitializer;
+import org.eclipse.jdt.core.dom.ArrayType;
+import org.eclipse.jdt.core.dom.AssertStatement;
+import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.BlockComment;
+import org.eclipse.jdt.core.dom.BooleanLiteral;
+import org.eclipse.jdt.core.dom.BreakStatement;
+import org.eclipse.jdt.core.dom.CastExpression;
+import org.eclipse.jdt.core.dom.CatchClause;
+import org.eclipse.jdt.core.dom.CharacterLiteral;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ConditionalExpression;
+import org.eclipse.jdt.core.dom.ConstructorInvocation;
+import org.eclipse.jdt.core.dom.ContinueStatement;
+import org.eclipse.jdt.core.dom.CreationReference;
+import org.eclipse.jdt.core.dom.Dimension;
+import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EmptyStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ExpressionMethodReference;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
+import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.ImportDeclaration;
+import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InstanceofExpression;
+import org.eclipse.jdt.core.dom.IntersectionType;
+import org.eclipse.jdt.core.dom.Javadoc;
+import org.eclipse.jdt.core.dom.LabeledStatement;
+import org.eclipse.jdt.core.dom.LambdaExpression;
+import org.eclipse.jdt.core.dom.LineComment;
+import org.eclipse.jdt.core.dom.MarkerAnnotation;
+import org.eclipse.jdt.core.dom.MemberRef;
+import org.eclipse.jdt.core.dom.MemberValuePair;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.MethodRef;
+import org.eclipse.jdt.core.dom.MethodRefParameter;
+import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NameQualifiedType;
+import org.eclipse.jdt.core.dom.NormalAnnotation;
+import org.eclipse.jdt.core.dom.NullLiteral;
+import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.ParameterizedType;
+import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.PostfixExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.PrimitiveType;
+import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.QualifiedType;
+import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.SimpleType;
+import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
+import org.eclipse.jdt.core.dom.SuperMethodReference;
+import org.eclipse.jdt.core.dom.SwitchCase;
+import org.eclipse.jdt.core.dom.SwitchStatement;
+import org.eclipse.jdt.core.dom.SynchronizedStatement;
+import org.eclipse.jdt.core.dom.TagElement;
+import org.eclipse.jdt.core.dom.TextElement;
+import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.jdt.core.dom.ThrowStatement;
+import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
+import org.eclipse.jdt.core.dom.TypeLiteral;
+import org.eclipse.jdt.core.dom.TypeMethodReference;
+import org.eclipse.jdt.core.dom.TypeParameter;
+import org.eclipse.jdt.core.dom.UnionType;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.jdt.core.dom.WildcardType;
 
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.bind.YConstantBinding;
-import cn.yyx.research.program.ir.method.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.IRForOneCloseBlockUnit;
+import cn.yyx.research.program.ir.task.IRTask;
 
-public class IRGeneratorForOneMethod extends ASTVisitor {
+public class IRGeneratorForOneCloseBlockUnit extends ASTVisitor {
 
-	private static int max_level = -1; // -1 means infinite.
+	public static int max_level = Integer.MAX_VALUE; // Integer.MAX_VALUE partly means infinite.
 
 	// name must be resolved and ensure it is a variable, a global variable or a
 	// type.
-	private Map<IBinding, Integer> temp_statement_set = new HashMap<IBinding, Integer>();
+	protected Map<IBinding, Integer> temp_statement_set = new HashMap<IBinding, Integer>();
 
-	private void StatementOverHandle() {
+	protected void StatementOverHandle() {
 		// no need to do that anymore.
 		temp_statement_set.clear();
 	}
 
-	private IRForOneMethod irfom = null;
+	protected IRForOneCloseBlockUnit irfom = null;
 
-	private Queue<IRTask> undone_tasks = new LinkedList<IRTask>();
+	protected Queue<IRTask> undone_tasks = new LinkedList<IRTask>();
 
-	private Map<ASTNode, Runnable> post_visit_task = new HashMap<ASTNode, Runnable>();
+	protected Map<ASTNode, Runnable> post_visit_task = new HashMap<ASTNode, Runnable>();
 
-	private Map<ASTNode, Runnable> pre_visit_task = new HashMap<ASTNode, Runnable>();
+	protected Map<ASTNode, Runnable> pre_visit_task = new HashMap<ASTNode, Runnable>();
 
-	private Map<ASTNode, HashSet<IBinding>> ast_block_bind = new HashMap<ASTNode, HashSet<IBinding>>();
+	protected Map<ASTNode, HashSet<IBinding>> ast_block_bind = new HashMap<ASTNode, HashSet<IBinding>>();
 
-	private Stack<HashSet<IBinding>> switch_case_bind = new Stack<HashSet<IBinding>>();
-	private Stack<LinkedList<ASTNode>> switch_case = new Stack<LinkedList<ASTNode>>();
+	protected Stack<HashSet<IBinding>> switch_case_bind = new Stack<HashSet<IBinding>>();
+	protected Stack<LinkedList<ASTNode>> switch_case = new Stack<LinkedList<ASTNode>>();
 
-	public IRGeneratorForOneMethod(IMethod im) {
-		this.irfom = new IRForOneMethod(im);
+	public IRGeneratorForOneCloseBlockUnit(IMember im) {
+		this.irfom = new IRForOneCloseBlockUnit(im);
 	}
-
-	public IRGeneratorForOneMethod(int max_level, IMethod im) {
-		IRGeneratorForOneMethod.max_level = max_level;
-		this.irfom = new IRForOneMethod(im);
-	}
-
+	
 	public Queue<IRTask> GetUndoneTasks() {
 		return undone_tasks;
 	}
@@ -827,12 +920,6 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 	}
 
 	@Override
-	public boolean visit(AnonymousClassDeclaration node) {
-		// TODO visit a type declaration. do when the whole structure is OK.
-		return false;
-	}
-
-	@Override
 	public boolean visit(ThisExpression node) {
 		// do not need to handle.
 		return super.visit(node);
@@ -840,7 +927,7 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 
 	@Override
 	public boolean visit(SuperMethodReference node) {
-		// TODO Auto-generated method stub
+		HandleBinding(node.resolveMethodBinding());
 		return super.visit(node);
 	}
 
@@ -868,18 +955,25 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 		return super.visit(node);
 	}
 	
+	@Override
+	public boolean visit(AnonymousClassDeclaration node) {
+		// TODO visit a type declaration. do when the whole structure is OK.
+		
+		return false;
+	}
+
+	@Override
+	public boolean visit(TypeDeclaration node) {
+		// TODO visit a type declaration.
+		return false;
+	}
+	
 	// do nothing.
 
 	@Override
 	public boolean visit(Dimension node) {
 		// do not need to handle.
 		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(TypeDeclaration node) {
-		// do not need to handle.
-		return false;
 	}
 
 	@Override
@@ -1038,28 +1132,7 @@ public class IRGeneratorForOneMethod extends ASTVisitor {
 		// minor but close relation.
 		return super.visit(node);
 	}
-
-	@Override
-	public boolean visit(Initializer node) {
-		// TODO not handled in basic generator. This should be handled in special
-		// generator invoking basic generator.
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(FieldDeclaration node) {
-		// TODO not handled in basic generator. This should be handled in special
-		// generator invoking basic generator
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(FieldAccess node) {
-		// TODO not handled in basic generator. This should be handled in special
-		// generator invoking basic generator
-		return super.visit(node);
-	}
-
+	
 	// switch such branch, how to model?
 
 	// TODO re-check all codes, be sure the scope to search the bind.

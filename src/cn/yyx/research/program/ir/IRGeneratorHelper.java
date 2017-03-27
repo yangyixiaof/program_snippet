@@ -16,15 +16,15 @@ import org.eclipse.jdt.core.dom.SwitchCase;
 
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.ast.ASTSearch;
-import cn.yyx.research.program.ir.method.IRForOneExtension;
-import cn.yyx.research.program.ir.method.IRForOneMethod;
-import cn.yyx.research.program.ir.method.IRForOneOperation;
-import cn.yyx.research.program.ir.method.IRInstrKind;
 import cn.yyx.research.program.ir.search.IRSearchRequestor;
+import cn.yyx.research.program.ir.storage.IRForOneExtension;
+import cn.yyx.research.program.ir.storage.IRForOneCloseBlockUnit;
+import cn.yyx.research.program.ir.storage.IRForOneOperation;
+import cn.yyx.research.program.ir.storage.IRInstrKind;
 
 public class IRGeneratorHelper {
 	
-	public static void GenerateSwitchCaseIR(ASTNode node, ASTNode sc, IRForOneMethod irfom, HashSet<IBinding> binds)
+	public static void GenerateSwitchCaseIR(ASTNode node, ASTNode sc, IRForOneCloseBlockUnit irfom, HashSet<IBinding> binds)
 	{
 		String code = IRMeta.Switch_Case_Default;
 		if (!sc.toString().startsWith("default")) {
@@ -34,7 +34,7 @@ public class IRGeneratorHelper {
 		IRGeneratorHelper.GenerateNoVariableBindingIR(node.getParent(), node, irfom, binds, code);
 	}
 	
-	public static void GenerateNoVariableBindingIR(ASTNode node, ASTNode exact_node, IRForOneMethod irfom,
+	public static void GenerateNoVariableBindingIR(ASTNode node, ASTNode exact_node, IRForOneCloseBlockUnit irfom,
 			HashSet<IBinding> bind_set, String code) {
 		Set<IBinding> temp_bindings = bind_set;
 		Iterator<IBinding> titr = temp_bindings.iterator();
@@ -50,7 +50,7 @@ public class IRGeneratorHelper {
 
 	}
 
-	public static void GenerateGeneralIR(ASTNode node, ASTNode exact_node, IRForOneMethod irfom,
+	public static void GenerateGeneralIR(ASTNode node, ASTNode exact_node, IRForOneCloseBlockUnit irfom,
 			Map<IBinding, Integer> temp_statement_set, String code) {
 		Set<IBinding> temp_bindings = temp_statement_set.keySet();
 		Iterator<IBinding> titr = temp_bindings.iterator();
@@ -60,7 +60,7 @@ public class IRGeneratorHelper {
 				Integer count = temp_statement_set.get(ib);
 				if (count != null && count >= 0) {
 					count++;
-					if (count > IRGeneratorForOneMethod.GetMaxLevel()) {
+					if (count > IRGeneratorForOneCloseBlockUnit.GetMaxLevel()) {
 						count = -1;
 					} else {
 						int start = exact_node.getStartPosition();
@@ -76,7 +76,7 @@ public class IRGeneratorHelper {
 	}
 
 	public static void GenerateSourceMethodInvocationIR(IBinding ib, IMethodBinding imb, ASTNode node,
-			ASTNode exact_node, IRForOneMethod irfom, Map<IBinding, Integer> temp_statement_set, String code) {
+			ASTNode exact_node, IRForOneCloseBlockUnit irfom, Map<IBinding, Integer> temp_statement_set, String code) {
 		int start = exact_node.getStartPosition();
 		int end = start + exact_node.getLength() - 1;
 		Integer count = temp_statement_set.get(ib);
@@ -84,7 +84,7 @@ public class IRGeneratorHelper {
 		IRInstrKind ir_kind = IRInstrKind.ComputeKind(count);
 		temp_statement_set.put(ib, count);
 		IJavaElement jele = imb.getJavaElement();
-		Collection<IRForOneMethod> methods = null;
+		Collection<IRForOneCloseBlockUnit> methods = null;
 		if (jele != null && jele instanceof IMethod) {
 			IMethod imethod = (IMethod) jele;
 			try {

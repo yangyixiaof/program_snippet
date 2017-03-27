@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.method;
+package cn.yyx.research.program.ir.storage;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -6,14 +6,14 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.dom.IBinding;
 
-public class IRForOneMethod {
+public class IRForOneCloseBlockUnit {
 	
 	// The entrance must be MethodDeclaration.
 	
-	private IMethod im = null;
+	private IMember im = null;
 	
 	// this is set when exploring MethodDeclaration the first time.
 	private Map<IBinding, Integer> parameters_order = new HashMap<IBinding, Integer>();
@@ -27,15 +27,15 @@ public class IRForOneMethod {
 	private Map<IBinding, HashSet<IBinding>> data_dependency = new HashMap<IBinding, HashSet<IBinding>>();
 	// private List<IRForOneUnit> units = new LinkedList<IRForOneUnit>();
 	
-	public IRForOneMethod(IMethod im) {
+	public IRForOneCloseBlockUnit(IMember im) {
 		this.setIm(im);
 	}
 	
-	public IMethod getIm() {
+	public IMember getIm() {
 		return im;
 	}
 	
-	private void setIm(IMethod im) {
+	private void setIm(IMember im) {
 		this.im = im;
 	}
 	
