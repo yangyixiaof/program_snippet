@@ -17,10 +17,10 @@ import org.eclipse.jdt.core.dom.SwitchCase;
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.search.IRSearchRequestor;
-import cn.yyx.research.program.ir.storage.IRForOneExtension;
-import cn.yyx.research.program.ir.storage.IRForOneCloseBlockUnit;
-import cn.yyx.research.program.ir.storage.IRForOneOperation;
-import cn.yyx.research.program.ir.storage.IRInstrKind;
+import cn.yyx.research.program.ir.storage.highlevel.IRForOneCloseBlockUnit;
+import cn.yyx.research.program.ir.storage.lowlevel.IRForOneExtension;
+import cn.yyx.research.program.ir.storage.lowlevel.IRForOneOperation;
+import cn.yyx.research.program.ir.storage.lowlevel.IRInstrKind;
 
 public class IRGeneratorHelper {
 	

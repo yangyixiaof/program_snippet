@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.storage;
+package cn.yyx.research.program.ir.storage.highlevel;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +8,9 @@ import java.util.Set;
 
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.dom.IBinding;
+
+import cn.yyx.research.program.ir.storage.lowlevel.IRForOneExtension;
+import cn.yyx.research.program.ir.storage.lowlevel.IRForOneUnit;
 
 public class IRForOneCloseBlockUnit {
 	

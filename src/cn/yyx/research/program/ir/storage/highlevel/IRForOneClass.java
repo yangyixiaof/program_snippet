@@ -1,14 +1,15 @@
-package cn.yyx.research.program.ir.storage;
+package cn.yyx.research.program.ir.storage.highlevel;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class IRForOneClass {
 	
 	private IRForOneCloseBlockUnit field_level = null;
-	private List<IRForOneCloseBlockUnit> method_level = new LinkedList<IRForOneCloseBlockUnit>();
+	private List<IRForOneCloseBlockUnit> method_level = null;
 	
-	public IRForOneClass() {
+	public IRForOneClass(IRForOneCloseBlockUnit field_level, List<IRForOneCloseBlockUnit> method_level) {
+		this.setField_level(field_level);
+		this.setMethod_level(method_level);
 	}
 
 	public IRForOneCloseBlockUnit getField_level() {
@@ -23,8 +24,8 @@ public class IRForOneClass {
 		return method_level;
 	}
 
-	public void AddOneMethod_level(IRForOneCloseBlockUnit one_method_level) {
-		this.method_level.add(one_method_level);
+	public void setMethod_level(List<IRForOneCloseBlockUnit> method_level) {
+		this.method_level = method_level;
 	}
 	
 }

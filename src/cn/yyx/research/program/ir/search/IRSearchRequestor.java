@@ -10,7 +10,7 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.internal.core.ResolvedSourceMethod;
 
-import cn.yyx.research.program.ir.storage.IRForOneCloseBlockUnit;
+import cn.yyx.research.program.ir.storage.highlevel.IRForOneCloseBlockUnit;
 
 @SuppressWarnings("restriction")
 public class IRSearchRequestor extends SearchRequestor {

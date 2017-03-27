@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.storage;
+package cn.yyx.research.program.ir.storage.lowlevel;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jdt.core.IMember;
+
+import cn.yyx.research.program.ir.storage.highlevel.IRForOneCloseBlockUnit;
 
 public class IRForOneExtension extends IRForOneUnit {
 	
