@@ -1,8 +1,5 @@
 package cn.yyx.research.program.ir;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -10,11 +7,9 @@ import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneClass;
-
 public class IRGeneratorForClassesInICompilationUnit extends ASTVisitor {
 	
-	List<IRForOneClass> classes = new LinkedList<IRForOneClass>();
+	// private List<IRForOneClass> classes = new LinkedList<IRForOneClass>();
 	
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
@@ -23,7 +18,7 @@ public class IRGeneratorForClassesInICompilationUnit extends ASTVisitor {
 		{
 			IRGeneratorForOneClass irfoc = new IRGeneratorForOneClass(im);
 			node.accept(irfoc);
-			classes.add(irfoc.GetClassLevelGeneration());
+			// getClasses().add(irfoc.GetClassLevelGeneration());
 		}
 		return false;
 	}
@@ -35,7 +30,7 @@ public class IRGeneratorForClassesInICompilationUnit extends ASTVisitor {
 		{
 			IRGeneratorForOneClass irfoc = new IRGeneratorForOneClass(im);
 			node.accept(irfoc);
-			classes.add(irfoc.GetClassLevelGeneration());
+			// getClasses().add(irfoc.GetClassLevelGeneration());
 		}
 		return false;
 	}
@@ -54,5 +49,13 @@ public class IRGeneratorForClassesInICompilationUnit extends ASTVisitor {
 		}
 		return null;
 	}
+
+//	public List<IRForOneClass> getClasses() {
+//		return classes;
+//	}
+//
+//	private void setClasses(List<IRForOneClass> classes) {
+//		this.classes = classes;
+//	}
 	
 }

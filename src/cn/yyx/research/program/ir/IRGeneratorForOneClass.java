@@ -46,7 +46,7 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneCloseBlockUnit {
 	
 	public IRForOneClass GetClassLevelGeneration()
 	{
-		return new IRForOneClass(irfom, methods);
+		return new IRForOneClass(irfom.getIm(), irfom, methods);
 	}
 
 }

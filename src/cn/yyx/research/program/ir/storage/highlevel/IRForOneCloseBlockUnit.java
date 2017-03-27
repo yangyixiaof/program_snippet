@@ -7,8 +7,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.IBinding;
 
+import cn.yyx.research.program.ir.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneExtension;
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneUnit;
 
@@ -32,6 +34,10 @@ public class IRForOneCloseBlockUnit {
 	
 	public IRForOneCloseBlockUnit(IMember im) {
 		this.setIm(im);
+		if (im instanceof IMethod)
+		{
+			IRGeneratorForOneProject.AddIMethodIR((IMethod)im, this);
+		}
 	}
 	
 	public IMember getIm() {
