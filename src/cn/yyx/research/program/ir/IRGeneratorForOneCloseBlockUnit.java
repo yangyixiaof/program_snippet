@@ -1039,6 +1039,8 @@ public class IRGeneratorForOneCloseBlockUnit extends ASTVisitor {
 	
 	// TODO remember to handle null resolved binding.
 	
+	// TODO undone tasks are not handled.
+	
 	public static int GetMaxLevel() {
 		return max_level;
 	}
