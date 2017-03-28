@@ -4,9 +4,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.CreationReference;
+import org.eclipse.jdt.core.dom.ExpressionMethodReference;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NullLiteral;
@@ -14,6 +18,7 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
+import org.eclipse.jdt.core.dom.TypeMethodReference;
 
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 
@@ -23,6 +28,54 @@ public class SearchIMethodVisitor extends ASTVisitor {
 	
 	public SearchIMethodVisitor(IJavaProject java_project) {
 		this.java_project = java_project;
+	}
+	
+	@Override
+	public boolean visit(LambdaExpression node) {
+		System.out.println("==================== start ====================");
+		System.out.println("node:" + node);
+		IMethodBinding im = node.resolveMethodBinding();
+		ITypeBinding it = node.resolveTypeBinding();
+		System.out.println("MethodBinding:" + im);
+		System.out.println("TypeBinding:" + it);
+		System.out.println("==================== end ====================");
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(ExpressionMethodReference node) {
+		System.out.println("==================== start ====================");
+		System.out.println("node:" + node);
+		IMethodBinding im = node.resolveMethodBinding();
+		ITypeBinding it = node.resolveTypeBinding();
+		System.out.println("MethodBinding:" + im);
+		System.out.println("TypeBinding:" + it);
+		System.out.println("==================== end ====================");
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(CreationReference node) {
+		System.out.println("==================== start ====================");
+		System.out.println("node:" + node);
+		IMethodBinding im = node.resolveMethodBinding();
+		ITypeBinding it = node.resolveTypeBinding();
+		System.out.println("MethodBinding:" + im);
+		System.out.println("TypeBinding:" + it);
+		System.out.println("==================== end ====================");
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(TypeMethodReference node) {
+		System.out.println("==================== start ====================");
+		System.out.println("node:" + node);
+		IMethodBinding im = node.resolveMethodBinding();
+		ITypeBinding it = node.resolveTypeBinding();
+		System.out.println("MethodBinding:" + im);
+		System.out.println("TypeBinding:" + it);
+		System.out.println("==================== end ====================");
+		return super.visit(node);
 	}
 	
 	@Override
