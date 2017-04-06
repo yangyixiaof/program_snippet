@@ -1,6 +1,7 @@
 package cn.yyx.research.test;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -15,6 +16,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
@@ -31,6 +33,18 @@ public class SearchIMethodVisitor extends ASTVisitor {
 	}
 	
 	IMethodBinding im = null;
+	
+	@Override
+	public boolean visit(SimpleName node) {
+		IBinding ib = node.resolveBinding();
+		if (ib instanceof IVariableBinding)
+		{
+			IVariableBinding ivb = (IVariableBinding)ib;
+			IJavaElement ij = ivb.getJavaElement();
+			System.out.println("#SimpleName:" + node + ";IJavaElement:" + ij + ";IJavaElementClass:" + ij.getClass());
+		}
+		return super.visit(node);
+	}
 	
 	@Override
 	public boolean visit(LambdaExpression node) {

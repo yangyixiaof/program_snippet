@@ -10,12 +10,12 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.internal.core.ResolvedSourceMethod;
 
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneCloseBlockUnit;
+import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
 
 @SuppressWarnings("restriction")
 public class IRSearchRequestor extends SearchRequestor {
 	
-	private List<IRForOneCloseBlockUnit> methods = new LinkedList<IRForOneCloseBlockUnit>();
+	private List<IRForOneMethod> methods = new LinkedList<IRForOneMethod>();
 	
 	public IRSearchRequestor() {
 	}
@@ -27,11 +27,11 @@ public class IRSearchRequestor extends SearchRequestor {
 		if (element instanceof ResolvedSourceMethod)
 		{
 			IMethod method = (IMethod) element;
-			methods.add(new IRForOneCloseBlockUnit(method));
+			methods.add(new IRForOneMethod(method));
 		}
 	}
 
-	public Collection<IRForOneCloseBlockUnit> GetMethods() {
+	public Collection<IRForOneMethod> GetMethods() {
 		return methods;
 	}
 	

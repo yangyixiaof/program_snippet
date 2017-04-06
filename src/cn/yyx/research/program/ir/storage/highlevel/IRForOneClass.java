@@ -10,10 +10,10 @@ import cn.yyx.research.program.ir.IRGeneratorForOneProject;
 public class IRForOneClass {
 	
 	private IMember im = null;
-	private IRForOneCloseBlockUnit field_level = null;
-	private List<IRForOneCloseBlockUnit> method_level = null;
+	private IRForOneMethod field_level = null;
+	private List<IRForOneMethod> method_level = null;
 	
-	public IRForOneClass(IMember im, IRForOneCloseBlockUnit field_level, List<IRForOneCloseBlockUnit> method_level) {
+	public IRForOneClass(IMember im, IRForOneMethod field_level, List<IRForOneMethod> method_level) {
 		this.setIm(im);
 		this.setField_level(field_level);
 		this.setMethod_level(method_level);
@@ -23,19 +23,19 @@ public class IRForOneClass {
 		}
 	}
 
-	public IRForOneCloseBlockUnit getField_level() {
+	public IRForOneMethod getField_level() {
 		return field_level;
 	}
 
-	public void setField_level(IRForOneCloseBlockUnit field_level) {
+	public void setField_level(IRForOneMethod field_level) {
 		this.field_level = field_level;
 	}
 
-	public List<IRForOneCloseBlockUnit> getMethod_level() {
+	public List<IRForOneMethod> getMethod_level() {
 		return method_level;
 	}
 
-	public void setMethod_level(List<IRForOneCloseBlockUnit> method_level) {
+	public void setMethod_level(List<IRForOneMethod> method_level) {
 		this.method_level = method_level;
 	}
 

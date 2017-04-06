@@ -7,22 +7,22 @@ import java.util.List;
 
 import org.eclipse.jdt.core.IMember;
 
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneCloseBlockUnit;
+import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
 
 public class IRForOneExtension extends IRForOneUnit {
 	
-	private List<IRForOneCloseBlockUnit> methods = new LinkedList<IRForOneCloseBlockUnit>();
+	private List<IRForOneMethod> methods = new LinkedList<IRForOneMethod>();
 	
-	public IRForOneExtension(IMember im, int start, int end, Collection<IRForOneCloseBlockUnit> methods, IRInstrKind ir_kind) {
+	public IRForOneExtension(IMember im, int start, int end, Collection<IRForOneMethod> methods, IRInstrKind ir_kind) {
 		super(im, start, end, ir_kind);
 		this.AddMethods(methods);
 	}
 
-	public Iterator<IRForOneCloseBlockUnit> MethodIterator() {
+	public Iterator<IRForOneMethod> MethodIterator() {
 		return methods.iterator();
 	}
 
-	public void AddMethods(Collection<IRForOneCloseBlockUnit> methods) {
+	public void AddMethods(Collection<IRForOneMethod> methods) {
 		this.methods.addAll(methods);
 	}
 	

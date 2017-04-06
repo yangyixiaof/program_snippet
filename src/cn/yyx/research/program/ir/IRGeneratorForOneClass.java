@@ -10,11 +10,11 @@ import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 import cn.yyx.research.program.ir.storage.highlevel.IRForOneClass;
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneCloseBlockUnit;
+import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
 
 public class IRGeneratorForOneClass extends IRGeneratorForOneCloseBlockUnit {
 	
-	List<IRForOneCloseBlockUnit> methods = new LinkedList<IRForOneCloseBlockUnit>();
+	List<IRForOneMethod> methods = new LinkedList<IRForOneMethod>();
 	
 	public IRGeneratorForOneClass(IMember im) {
 		super(im);

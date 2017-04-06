@@ -14,14 +14,14 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.storage.highlevel.IRForOneClass;
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneCloseBlockUnit;
+import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
 
 public class IRGeneratorForOneProject {
 	
 	private IJavaProject java_project = null;
 	
 	private Map<IType, IRForOneClass> class_irs = new HashMap<IType, IRForOneClass>();
-	private Map<IMethod, IRForOneCloseBlockUnit> method_irs = new HashMap<IMethod, IRForOneCloseBlockUnit>();
+	private Map<IMethod, IRForOneMethod> method_irs = new HashMap<IMethod, IRForOneMethod>();
 	
 	private static IRGeneratorForOneProject irgfop = null;
 	
@@ -50,7 +50,7 @@ public class IRGeneratorForOneProject {
 		}
 	}
 	
-	private void SelfAddToMethodIR(IMethod it, IRForOneCloseBlockUnit irfocbu)
+	private void SelfAddToMethodIR(IMethod it, IRForOneMethod irfocbu)
 	{
 		method_irs.put(it, irfocbu);
 	}
@@ -60,7 +60,7 @@ public class IRGeneratorForOneProject {
 		class_irs.put(im, irfoc);
 	}
 	
-	public static void AddToMethodIR(IMethod it, IRForOneCloseBlockUnit irfocbu)
+	public static void AddToMethodIR(IMethod it, IRForOneMethod irfocbu)
 	{
 		irgfop.SelfAddToMethodIR(it, irfocbu);
 	}
@@ -75,7 +75,7 @@ public class IRGeneratorForOneProject {
 		irgfop.SelfAddToClassIR(im, irfoc);
 	}
 	
-	public static void AddIMethodIR(IMethod im, IRForOneCloseBlockUnit irfoc)
+	public static void AddIMethodIR(IMethod im, IRForOneMethod irfoc)
 	{
 		irgfop.SelfAddIMethodIR(im, irfoc);
 	}
@@ -85,7 +85,7 @@ public class IRGeneratorForOneProject {
 		class_irs.put(it, irfoc);
 	}
 	
-	public void SelfAddIMethodIR(IMethod im, IRForOneCloseBlockUnit irfocbu)
+	public void SelfAddIMethodIR(IMethod im, IRForOneMethod irfocbu)
 	{
 		method_irs.put(im, irfocbu);
 	}

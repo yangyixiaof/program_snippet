@@ -2,22 +2,22 @@ package cn.yyx.research.program.ir.task;
 
 import org.eclipse.jdt.core.IType;
 
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneCloseBlockUnit;
+import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
 
 public class IRClassLevelTask extends IRTask {
 	
-	private IRForOneCloseBlockUnit irfom = null;
+	private IRForOneMethod irfom = null;
 	
-	public IRClassLevelTask(IType it, IRForOneCloseBlockUnit irfom) {
+	public IRClassLevelTask(IType it, IRForOneMethod irfom) {
 		super(it);
 		setIrfom(irfom);
 	}
 
-	public IRForOneCloseBlockUnit getIrfom() {
+	public IRForOneMethod getIrfom() {
 		return irfom;
 	}
 
-	public void setIrfom(IRForOneCloseBlockUnit irfom) {
+	public void setIrfom(IRForOneMethod irfom) {
 		this.irfom = irfom;
 	}
 	

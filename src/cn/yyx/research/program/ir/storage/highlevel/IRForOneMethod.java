@@ -14,11 +14,9 @@ import cn.yyx.research.program.ir.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneExtension;
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneUnit;
 
-public class IRForOneCloseBlockUnit {
+public class IRForOneMethod extends IRForOneJavaElement {
 	
 	// The entrance must be MethodDeclaration.
-	
-	private IMember im = null;
 	
 	// this is set when exploring MethodDeclaration the first time.
 	private Map<IBinding, Integer> parameters_order = new HashMap<IBinding, Integer>();
@@ -32,20 +30,12 @@ public class IRForOneCloseBlockUnit {
 	private Map<IBinding, HashSet<IBinding>> data_dependency = new HashMap<IBinding, HashSet<IBinding>>();
 	// private List<IRForOneUnit> units = new LinkedList<IRForOneUnit>();
 	
-	public IRForOneCloseBlockUnit(IMember im) {
-		this.setIm(im);
+	public IRForOneMethod(IMember im) {
+		super(im);
 		if (im instanceof IMethod)
 		{
 			IRGeneratorForOneProject.AddIMethodIR((IMethod)im, this);
 		}
-	}
-	
-	public IMember getIm() {
-		return im;
-	}
-	
-	private void setIm(IMember im) {
-		this.im = im;
 	}
 	
 	public void AddDataDependency(IBinding key, Set<IBinding> value)

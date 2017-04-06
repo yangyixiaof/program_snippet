@@ -18,7 +18,7 @@ import org.eclipse.jdt.core.dom.*;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.bind.YConstantBinding;
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneCloseBlockUnit;
+import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.task.IRTask;
 
 public class IRGeneratorForOneCloseBlockUnit extends ASTVisitor {
@@ -34,7 +34,7 @@ public class IRGeneratorForOneCloseBlockUnit extends ASTVisitor {
 		temp_statement_set.clear();
 	}
 
-	protected IRForOneCloseBlockUnit irfom = null;
+	protected IRForOneMethod irfom = null;
 
 	protected Queue<IRTask> undone_tasks = new LinkedList<IRTask>();
 
@@ -48,7 +48,7 @@ public class IRGeneratorForOneCloseBlockUnit extends ASTVisitor {
 	protected Stack<LinkedList<ASTNode>> switch_case = new Stack<LinkedList<ASTNode>>();
 
 	public IRGeneratorForOneCloseBlockUnit(IMember im) {
-		this.irfom = new IRForOneCloseBlockUnit(im);
+		this.irfom = new IRForOneMethod(im);
 	}
 	
 	public Queue<IRTask> GetUndoneTasks() {
@@ -1063,7 +1063,7 @@ public class IRGeneratorForOneCloseBlockUnit extends ASTVisitor {
 		return max_level;
 	}
 	
-	public IRForOneCloseBlockUnit GetGeneration() {
+	public IRForOneMethod GetGeneration() {
 		return irfom;
 	}
 
