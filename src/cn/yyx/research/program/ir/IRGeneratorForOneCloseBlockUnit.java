@@ -10,7 +10,9 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.*;
 
 import cn.yyx.research.program.ir.ast.ASTSearch;
@@ -835,32 +837,48 @@ public class IRGeneratorForOneCloseBlockUnit extends ASTVisitor {
 	}
 
 	@Override
-	public boolean visit(SuperMethodReference node) {
-		HandleBinding(node.resolveMethodBinding());
-		return super.visit(node);
-	}
-
-	@Override
 	public boolean visit(LambdaExpression node) {
 		// TODO Auto-generated method stub
+		IMethodBinding imb = node.resolveMethodBinding();
+		if (imb != null) {
+			IJavaElement jele = imb.getJavaElement();
+			if (jele != null && jele instanceof IMethod) {
+				IMethod im = (IMethod)jele;
+				
+			} else {
+				
+			}
+		} else {
+			
+		}
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(ExpressionMethodReference node) {
 		// TODO Auto-generated method stub
+		
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(CreationReference node) {
 		// TODO Auto-generated method stub
+		
 		return super.visit(node);
 	}
 	
 	@Override
 	public boolean visit(TypeMethodReference node) {
 		// TODO Auto-generated method stub
+		
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(SuperMethodReference node) {
+		// TODO Auto-generated method stub
+		
 		return super.visit(node);
 	}
 	

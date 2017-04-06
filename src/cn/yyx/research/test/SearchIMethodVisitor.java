@@ -30,13 +30,22 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		this.java_project = java_project;
 	}
 	
+	IMethodBinding im = null;
+	
 	@Override
 	public boolean visit(LambdaExpression node) {
 		System.out.println("==================== start ====================");
 		System.out.println("node:" + node);
 		IMethodBinding im = node.resolveMethodBinding();
+		if (this.im == null)
+		{
+			this.im = im;
+		} else {
+			System.out.println("if equals:" + this.im.equals(im));
+		}
 		ITypeBinding it = node.resolveTypeBinding();
 		System.out.println("MethodBinding:" + im);
+		System.out.println("MethodJavaElement:" + im.getJavaElement());
 		System.out.println("TypeBinding:" + it);
 		System.out.println("==================== end ====================");
 		return super.visit(node);
