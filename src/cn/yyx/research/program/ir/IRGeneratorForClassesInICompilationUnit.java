@@ -1,7 +1,7 @@
 package cn.yyx.research.program.ir;
 
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -13,10 +13,10 @@ public class IRGeneratorForClassesInICompilationUnit extends ASTVisitor {
 	
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
-		IMember im = ResolveAbstractType(node.resolveBinding());
-		if (im != null)
+		IType it = ResolveAbstractType(node.resolveBinding());
+		if (it != null)
 		{
-			IRGeneratorForOneClass irfoc = new IRGeneratorForOneClass(im);
+			IRGeneratorForOneClass irfoc = new IRGeneratorForOneClass(it);
 			node.accept(irfoc);
 			// getClasses().add(irfoc.GetClassLevelGeneration());
 		}
@@ -25,27 +25,27 @@ public class IRGeneratorForClassesInICompilationUnit extends ASTVisitor {
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
-		IMember im = ResolveAbstractType(node.resolveBinding());
-		if (im != null)
+		IType it = ResolveAbstractType(node.resolveBinding());
+		if (it != null)
 		{
-			IRGeneratorForOneClass irfoc = new IRGeneratorForOneClass(im);
+			IRGeneratorForOneClass irfoc = new IRGeneratorForOneClass(it);
 			node.accept(irfoc);
 			// getClasses().add(irfoc.GetClassLevelGeneration());
 		}
 		return false;
 	}
 	
-	private IMember ResolveAbstractType(ITypeBinding type_bind)
+	private IType ResolveAbstractType(ITypeBinding type_bind)
 	{
 		IJavaElement j_ele = null;
 		if (type_bind != null)
 		{
 			j_ele = type_bind.getJavaElement();
 		}
-		if (j_ele instanceof IMember)
+		if (j_ele instanceof IType)
 		{
-			IMember im = (IMember)j_ele;
-			return im;
+			IType it = (IType)j_ele;
+			return it;
 		}
 		return null;
 	}

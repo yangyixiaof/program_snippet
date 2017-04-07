@@ -10,7 +10,7 @@ import org.eclipse.jdt.core.IMethod;
 
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneJavaInstruction;
 
-public class IRForOneMethod extends IRForOneJavaElement {
+public class IRForOneMethod extends IRForOneJavaElement implements IRCode {
 	
 	// The entrance must be MethodDeclaration.
 	
@@ -18,7 +18,7 @@ public class IRForOneMethod extends IRForOneJavaElement {
 	private List<IMember> parameters = new LinkedList<IMember>();
 	
 	// valid index is 0, -1 means no irs.
-	private Map<IMethod, LinkedList<IRForOneJavaInstruction>> irs = new HashMap<IMethod, LinkedList<IRForOneJavaInstruction>>();
+	private Map<IMember, LinkedList<IRForOneJavaInstruction>> irs = new HashMap<IMember, LinkedList<IRForOneJavaInstruction>>();
 	
 	// only three situations could lead to data_dependency key: first var_bind in method invocation(exclude cascade)/left value in assignment.
 	// private Map<IBinding, HashSet<IBinding>> data_dependency = new HashMap<IBinding, HashSet<IBinding>>();
@@ -40,7 +40,7 @@ public class IRForOneMethod extends IRForOneJavaElement {
 //		variable_parameter_order.put(irfoe, order);
 //	}
 	
-	public void AddOneIRUnit(IMethod ivb, IRForOneJavaInstruction irfou)
+	public void AddOneIRUnit(IMember ivb, IRForOneJavaInstruction irfou)
 	{
 		LinkedList<IRForOneJavaInstruction> list = irs.get(ivb);
 		if (list == null)

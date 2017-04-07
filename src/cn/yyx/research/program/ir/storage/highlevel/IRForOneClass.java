@@ -6,7 +6,7 @@ import org.eclipse.jdt.core.IType;
 
 public class IRForOneClass extends IRForOneJavaElement {
 	
-	private IRForOneMethod field_level = null;
+	private IRForOneField field_level = null;
 	private List<IRForOneMethod> method_level = null;
 	
 	public IRForOneClass(IType it) {
@@ -14,20 +14,20 @@ public class IRForOneClass extends IRForOneJavaElement {
 //		IRGeneratorForOneProject.FetchITypeIR(it, this);
 	}
 
-	public IRForOneMethod getField_level() {
+	public IRForOneField GetFieldLevel() {
 		return field_level;
 	}
 
-	public void setField_level(IRForOneMethod field_level) {
+	public void SetFieldLevel(IRForOneField field_level) {
 		this.field_level = field_level;
 	}
 
-	public List<IRForOneMethod> getMethod_level() {
+	public List<IRForOneMethod> GetMethodLevel() {
 		return method_level;
 	}
 
-	public void AddMethod_level(List<IRForOneMethod> method_level) {
-		this.method_level = method_level;
+	public void AddMethodLevel(IRForOneMethod method_level) {
+		this.method_level.add(method_level);
 	}
 	
 }

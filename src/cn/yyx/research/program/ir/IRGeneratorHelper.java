@@ -60,7 +60,7 @@ public class IRGeneratorHelper {
 				Integer count = temp_statement_set.get(ib);
 				if (count != null && count >= 0) {
 					count++;
-					if (count > IRGeneratorForOneCloseBlockUnit.GetMaxLevel()) {
+					if (count > IRGeneratorForOneLogicBlock.GetMaxLevel()) {
 						count = -1;
 					} else {
 						int start = exact_node.getStartPosition();

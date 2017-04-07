@@ -1,29 +1,31 @@
 package cn.yyx.research.program.ir;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneClass;
+import cn.yyx.research.program.ir.storage.highlevel.IRForOneField;
 import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
 
-public class IRGeneratorForOneClass extends IRGeneratorForOneCloseBlockUnit {
+public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 	
-	List<IRForOneMethod> methods = new LinkedList<IRForOneMethod>();
+	private Initializer node = null;
+	private IType it = null;
 	
-	public IRGeneratorForOneClass(IMember im) {
-		super(im);
+	public IRGeneratorForOneClass(IType it) {
+		super(new IRForOneField(it));
 	}
 		
 	@Override
 	public boolean visit(Initializer node) {
-		// no need to do anything.
-		return super.visit(node);
+		this.node = node;
+		return false;
 	}
 
 	@Override
@@ -35,18 +37,23 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneCloseBlockUnit {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		IJavaElement im = node.resolveBinding().getJavaElement();
-		if (im instanceof IMember)
+		if (im instanceof IMethod)
 		{
-			IRGeneratorForOneCloseBlockUnit irgfocb = new IRGeneratorForOneCloseBlockUnit((IMember)im);
+			IRGeneratorForOneLogicBlock irgfocb = new IRGeneratorForOneLogicBlock(new IRForOneMethod((IMethod)im));
 			node.accept(irgfocb);
-			methods.add(irgfocb.GetGeneration());
+			IRGeneratorForOneProject.FetchITypeIR((it)).AddMethodLevel(irgfocb.GetGeneration());
 		}
 		return false;
 	}
 	
-	public IRForOneClass GetClassLevelGeneration()
-	{
-		return new IRForOneClass(irfom.getIm(), irfom, methods);
+	@Override
+	public void postVisit(ASTNode node) {
+		if (node instanceof AbstractTypeDeclaration || node instanceof AnonymousClassDeclaration)
+		{
+			this.node.accept(this);
+			IRGeneratorForOneProject.FetchITypeIR((it)).SetFieldLevel((IRForOneField)irc);
+		}
+		super.postVisit(node);
 	}
 
 }
