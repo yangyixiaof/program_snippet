@@ -18,7 +18,7 @@ import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.search.IRSearchRequestor;
 import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
-import cn.yyx.research.program.ir.storage.lowlevel.IRForOneExtension;
+import cn.yyx.research.program.ir.storage.lowlevel.IRForOneMethodInvocation;
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneOperation;
 import cn.yyx.research.program.ir.storage.lowlevel.IRInstrKind;
 
@@ -96,7 +96,7 @@ public class IRGeneratorHelper {
 			}
 		}
 		if (methods != null && methods.size() > 0) {
-			IRForOneExtension irfoe = new IRForOneExtension(irfom.getIm(), start, end, methods, ir_kind);
+			IRForOneMethodInvocation irfoe = new IRForOneMethodInvocation(irfom.getIm(), start, end, methods, ir_kind);
 			irfom.AddOneIRUnit(ib, irfoe);
 		}
 	}

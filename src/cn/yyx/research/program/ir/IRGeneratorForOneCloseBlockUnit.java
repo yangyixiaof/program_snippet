@@ -90,7 +90,7 @@ public class IRGeneratorForOneCloseBlockUnit extends ASTVisitor {
 			IBinding ib = sn.resolveBinding();
 			if ((ib != null) && (ib instanceof IVariableBinding)) {
 				IVariableBinding ivb = (IVariableBinding) ib;
-				irfom.PutParameterPrder(ivb, idx);
+				irfom.AddParameter(ivb, idx);
 			}
 		}
 		return super.visit(node);

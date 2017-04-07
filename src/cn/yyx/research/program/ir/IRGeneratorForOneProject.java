@@ -31,9 +31,27 @@ public class IRGeneratorForOneProject {
 	
 	public static void Initial(IJavaProject java_project)
 	{
+		if (irgfop != null)
+		{
+			irgfop.Clear();
+		}
+		irgfop = null;
+		System.gc();
+		try {
+			System.out.println("================= Prepare Analysis Resources =================");
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		irgfop = new IRGeneratorForOneProject(java_project);
 	}
 	
+	private void Clear() {
+		class_irs.clear();
+		method_irs.clear();
+		java_project = null;
+	}
+
 	public static void GenerateForAllICompilationUnits() throws JavaModelException
 	{
 		irgfop.SelfGenerateForAllICompilationUnits();
@@ -50,44 +68,56 @@ public class IRGeneratorForOneProject {
 		}
 	}
 	
-	private void SelfAddToMethodIR(IMethod it, IRForOneMethod irfocbu)
+//	private void SelfAddToMethodIR(IMethod it, IRForOneMethod irfocbu)
+//	{
+//		method_irs.put(it, irfocbu);
+//	}
+//	
+//	private void SelfAddToClassIR(IType im, IRForOneClass irfoc)
+//	{
+//		class_irs.put(im, irfoc);
+//	}
+//	
+//	public static void AddToMethodIR(IMethod it, IRForOneMethod irfocbu)
+//	{
+//		irgfop.SelfAddToMethodIR(it, irfocbu);
+//	}
+//	
+//	public static void AddToClassIR(IType im, IRForOneClass irfoc)
+//	{
+//		irgfop.SelfAddToClassIR(im, irfoc);
+//	}
+	
+	public static IRForOneClass FetchITypeIR(IType im)
 	{
-		method_irs.put(it, irfocbu);
+		return irgfop.SelfFetchITypeIR(im);
 	}
 	
-	private void SelfAddToClassIR(IType im, IRForOneClass irfoc)
+	public static IRForOneMethod FetchIMethodIR(IMethod im)
 	{
-		class_irs.put(im, irfoc);
+		return irgfop.SelfFetchIMethodIR(im);
 	}
 	
-	public static void AddToMethodIR(IMethod it, IRForOneMethod irfocbu)
+	public IRForOneClass SelfFetchITypeIR(IType it)
 	{
-		irgfop.SelfAddToMethodIR(it, irfocbu);
+		IRForOneClass irclass = class_irs.get(it);
+		if (irclass == null)
+		{
+			irclass = new IRForOneClass(it);
+			class_irs.put(it, irclass);
+		}
+		return irclass;
 	}
 	
-	public static void AddToClassIR(IType im, IRForOneClass irfoc)
+	public IRForOneMethod SelfFetchIMethodIR(IMethod im)
 	{
-		irgfop.SelfAddToClassIR(im, irfoc);
-	}
-	
-	public static void AddITypeIR(IType im, IRForOneClass irfoc)
-	{
-		irgfop.SelfAddToClassIR(im, irfoc);
-	}
-	
-	public static void AddIMethodIR(IMethod im, IRForOneMethod irfoc)
-	{
-		irgfop.SelfAddIMethodIR(im, irfoc);
-	}
-	
-	public void SelfAddITypeIR(IType it, IRForOneClass irfoc)
-	{
-		class_irs.put(it, irfoc);
-	}
-	
-	public void SelfAddIMethodIR(IMethod im, IRForOneMethod irfocbu)
-	{
-		method_irs.put(im, irfocbu);
+		IRForOneMethod irmethod = method_irs.get(im);
+		if (irmethod == null)
+		{
+			irmethod = new IRForOneMethod(im);
+			method_irs.put(im, irmethod);
+		}
+		return irmethod;
 	}
 	
 }

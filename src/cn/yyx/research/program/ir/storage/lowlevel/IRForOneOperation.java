@@ -6,8 +6,8 @@ public class IRForOneOperation extends IRForOneUnit {
 	
 	private String ir = null;
 	
-	public IRForOneOperation(IMember im, int start, int end, String ir, IRInstrKind ir_kind) {
-		super(im, start, end, ir_kind);
+	public IRForOneOperation(IMember im, String ir) {
+		super(im);
 		this.setIr(ir);
 	}
 

@@ -5,6 +5,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.CreationReference;
 import org.eclipse.jdt.core.dom.ExpressionMethodReference;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -33,6 +34,14 @@ public class SearchIMethodVisitor extends ASTVisitor {
 	}
 	
 	IMethodBinding im = null;
+	
+	@Override
+	public boolean visit(AnonymousClassDeclaration node) {
+		ITypeBinding it = node.resolveBinding();
+		IJavaElement ije = it.getJavaElement();
+		System.out.println("@!AnonymousClassDeclaration:" + node + ";ije:" + ije + ";ije class:" + ije.getClass());
+		return super.visit(node);
+	}
 	
 	@Override
 	public boolean visit(SimpleName node) {

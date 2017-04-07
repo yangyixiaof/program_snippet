@@ -1,59 +1,51 @@
 package cn.yyx.research.program.ir.storage.highlevel;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.dom.IBinding;
 
-import cn.yyx.research.program.ir.IRGeneratorForOneProject;
-import cn.yyx.research.program.ir.storage.lowlevel.IRForOneExtension;
-import cn.yyx.research.program.ir.storage.lowlevel.IRForOneUnit;
+import cn.yyx.research.program.ir.storage.lowlevel.IRForOneJavaInstruction;
 
 public class IRForOneMethod extends IRForOneJavaElement {
 	
 	// The entrance must be MethodDeclaration.
 	
 	// this is set when exploring MethodDeclaration the first time.
-	private Map<IBinding, Integer> parameters_order = new HashMap<IBinding, Integer>();
+	private List<IMember> parameters = new LinkedList<IMember>();
 	
-	// this is set when handling a MethodInvocation.
-	private Map<IRForOneExtension, HashMap<IBinding, Integer>> variable_parameter_order = new HashMap<IRForOneExtension, HashMap<IBinding, Integer>>();
-	
-	private Map<IBinding, LinkedList<IRForOneUnit>> irs = new HashMap<IBinding, LinkedList<IRForOneUnit>>();
+	// valid index is 0, -1 means no irs.
+	private Map<IMethod, LinkedList<IRForOneJavaInstruction>> irs = new HashMap<IMethod, LinkedList<IRForOneJavaInstruction>>();
 	
 	// only three situations could lead to data_dependency key: first var_bind in method invocation(exclude cascade)/left value in assignment.
-	private Map<IBinding, HashSet<IBinding>> data_dependency = new HashMap<IBinding, HashSet<IBinding>>();
+	// private Map<IBinding, HashSet<IBinding>> data_dependency = new HashMap<IBinding, HashSet<IBinding>>();
 	// private List<IRForOneUnit> units = new LinkedList<IRForOneUnit>();
 	
-	public IRForOneMethod(IMember im) {
+	public IRForOneMethod(IMethod im) {
 		super(im);
-		if (im instanceof IMethod)
-		{
-			IRGeneratorForOneProject.AddIMethodIR((IMethod)im, this);
-		}
+		// this statement will be moved to the places where the method is first be visited in AST.
+		// IRGeneratorForOneProject.FetchIMethodIR(im);
 	}
 	
-	public void AddDataDependency(IBinding key, Set<IBinding> value)
-	{
-		data_dependency.put(key, new HashSet<IBinding>(value));
-	}
+//	public void AddDataDependency(IBinding key, Set<IBinding> value)
+//	{
+//		data_dependency.put(key, new HashSet<IBinding>(value));
+//	}
+//	
+//	public void AddVariableParameterOrder(IRForOneMethodInvocation irfoe, HashMap<IBinding, Integer> order)
+//	{
+//		variable_parameter_order.put(irfoe, order);
+//	}
 	
-	public void AddVariableParameterOrder(IRForOneExtension irfoe, HashMap<IBinding, Integer> order)
+	public void AddOneIRUnit(IMethod ivb, IRForOneJavaInstruction irfou)
 	{
-		variable_parameter_order.put(irfoe, order);
-	}
-	
-	public void AddOneIRUnit(IBinding ivb, IRForOneUnit irfou)
-	{
-		LinkedList<IRForOneUnit> list = irs.get(ivb);
+		LinkedList<IRForOneJavaInstruction> list = irs.get(ivb);
 		if (list == null)
 		{
-			list = new LinkedList<IRForOneUnit>();
+			list = new LinkedList<IRForOneJavaInstruction>();
 			irs.put(ivb, list);
 		}
 		list.add(irfou);
@@ -69,9 +61,9 @@ public class IRForOneMethod extends IRForOneJavaElement {
 //		return units.iterator();
 //	}
 	
-	public void PutParameterPrder(IBinding key, Integer value)
+	public void AddParameter(IMember im)
 	{
-		parameters_order.put(key, value);
+		parameters.add(im);
 	}
 	
 }
