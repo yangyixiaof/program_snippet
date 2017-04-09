@@ -2,6 +2,7 @@ package cn.yyx.research.program.ir.storage.highlevel;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.core.IMember;
@@ -30,6 +31,11 @@ public class IRForOneField extends IRForOneJavaElement implements IRCode {
 	
 	public void AddParameter(IMember im)
 	{
+	}
+
+	@Override
+	public List<IRForOneJavaInstruction> GetOneAllIRUnits(IMember ivb) {
+		return irs.get(ivb);
 	}
 	
 }

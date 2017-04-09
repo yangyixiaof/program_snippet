@@ -3,10 +3,10 @@ package cn.yyx.research.program.ir;
 public class IRMeta {
 	
 	public static final String MethodInvocation = "@MethodInvocation_";
-	public static final String User_Defined_Function = "@UserDefine";
+	// public static final String User_Defined_Function = "@UserDefine";
 	public static final String If = "@If";
-	public static final String IfThen = "@IfThen";
-	public static final String IfElse = "@IfElse";
+	// public static final String IfThen = "@IfThen";
+	// public static final String IfElse = "@IfElse";
 	public static final String While = "@While";
 	public static final String DoWhile = "@Do_While";
 	public static final String For = "@For";

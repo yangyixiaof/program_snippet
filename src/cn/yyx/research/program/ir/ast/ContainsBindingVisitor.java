@@ -7,12 +7,12 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.SimpleName;
 
-public class ContainsVisitor extends ASTVisitor {
+public class ContainsBindingVisitor extends ASTVisitor {
 	
 	private IBinding ib = null;
 	private boolean do_contains = false;
 	
-	public ContainsVisitor(IBinding ib) {
+	public ContainsBindingVisitor(IBinding ib) {
 		this.ib = ib;
 	}
 	

@@ -66,4 +66,9 @@ public class IRForOneMethod extends IRForOneJavaElement implements IRCode {
 		parameters.add(im);
 	}
 	
+	@Override
+	public List<IRForOneJavaInstruction> GetOneAllIRUnits(IMember ivb) {
+		return irs.get(ivb);
+	}
+	
 }

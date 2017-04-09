@@ -1,5 +1,6 @@
 package cn.yyx.research.program.ir.ast;
 
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -8,13 +9,35 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 public class ASTSearch {
 	
+	public static boolean ASTNodeContainsAMember(ASTNode astnode, IMember im)
+	{
+		if (im == null)
+		{
+			return false;
+		}
+		ContainsMemberVisitor cv = new ContainsMemberVisitor(im);
+		astnode.accept(cv);
+		return cv.DoContains();
+	}
+	
+	public static boolean ASTNodeContainsAnASTNode(ASTNode astnode, ASTNode searched)
+	{
+		if (searched == null)
+		{
+			return false;
+		}
+		ContainsASTNodeVisitor cv = new ContainsASTNodeVisitor(searched);
+		astnode.accept(cv);
+		return cv.DoContains();
+	}
+	
 	public static boolean ASTNodeContainsABinding(ASTNode astnode, IBinding ib)
 	{
 		if (ib == null)
 		{
 			return false;
 		}
-		ContainsVisitor cv = new ContainsVisitor(ib);
+		ContainsBindingVisitor cv = new ContainsBindingVisitor(ib);
 		astnode.accept(cv);
 		return cv.DoContains();
 	}

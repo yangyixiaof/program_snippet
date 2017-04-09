@@ -2,7 +2,7 @@ package cn.yyx.research.program.ir.storage.lowlevel;
 
 import org.eclipse.jdt.core.IMember;
 
-public class IRForOneOperation extends IRForOneUnit {
+public class IRForOneOperation extends IRForOneJavaInstruction {
 	
 	private String ir = null;
 	
