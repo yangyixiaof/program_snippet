@@ -2,6 +2,7 @@ package cn.yyx.research.program.ir;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,16 +20,17 @@ import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.search.IRSearchRequestor;
 import cn.yyx.research.program.ir.storage.highlevel.IRCode;
+import cn.yyx.research.program.ir.storage.lowlevel.IRForOneJavaInstruction;
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneMethodInvocation;
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneOperation;
 
 public class IRGeneratorHelper {
 
 	// can only be invoked in end_visit_method_invocation.
-	public static void HandleMethodInvocation(IRCode irc, List<Expression> nlist, IMethodBinding imb,
+	public static void GenerateMethodInvocationIR(IRCode irc, List<Expression> nlist, IMethodBinding imb,
 			Expression expr, String identifier, ASTNode node,
 			HashMap<IMember, HashMap<ASTNode, Integer>> temp_statement_instr_order_set,
-			HashMap<IMember, Integer> temp_statement_environment_set) {
+			HashMap<IMember, Integer> temp_statement_environment_set, HashMap<IMember, Integer> branch_dependency) {
 
 		if (imb != null && imb.getDeclaringClass() != null && imb.getDeclaringClass().isFromSource()) {
 			// source method invocation.
@@ -58,34 +60,33 @@ public class IRGeneratorHelper {
 							int max = -1;
 							Set<ASTNode> astkeys = ast_order.keySet();
 							Iterator<ASTNode> aitr = astkeys.iterator();
-							while (aitr.hasNext())
-							{
+							while (aitr.hasNext()) {
 								ASTNode ast = aitr.next();
-								if (ASTSearch.ASTNodeContainsAnASTNode(nexpr, ast))
-								{
+								if (ASTSearch.ASTNodeContainsAnASTNode(nexpr, ast)) {
 									Integer aidx = ast_order.get(ast);
-									if (aidx != null)
-									{
-										if (max < aidx)
-										{
+									if (aidx != null) {
+										if (max < aidx) {
 											max = aidx;
 										}
 									}
 								}
 							}
-							if (max >= 0)
-							{
+							if (max >= 0) {
 								para_order_instr_index_map.put(idx, max);
-								IRForOneMethodInvocation irfoe = new IRForOneMethodInvocation(im, methods, para_order_instr_index_map);
-								irc.AddOneIRUnit(im, irfoe);
 							}
 						}
+						IRForOneMethodInvocation now = new IRForOneMethodInvocation(im, methods,
+								para_order_instr_index_map);
+
+						HandleNodeDependency(irc, im, now, branch_dependency);
+
+						irc.AddOneIRUnit(im, now);
 					}
 				}
 			}
 		} else {
 			IRGeneratorHelper.GenerateGeneralIR(node, node, irc, temp_statement_environment_set,
-					IRMeta.MethodInvocation + identifier);
+					IRMeta.MethodInvocation + identifier, branch_dependency);
 		}
 
 		// // initialize parameters of the node.
@@ -152,26 +153,26 @@ public class IRGeneratorHelper {
 	// IRGeneratorHelper.GenerateNoVariableBindingIR(node.getParent(), node,
 	// irfom, binds, code);
 	// }
-	//
-	// public static void GenerateNoVariableBindingIR(ASTNode node, ASTNode
-	// exact_node, IRCode irfom,
-	// HashSet<IBinding> bind_set, String code) {
-	// Set<IBinding> temp_bindings = bind_set;
-	// Iterator<IBinding> titr = temp_bindings.iterator();
-	// while (titr.hasNext()) {
-	// IBinding ib = titr.next();
-	// if (ASTSearch.ASTNodeContainsABinding(node, ib)) {
-	// // int start = exact_node.getStartPosition();
-	// // int end = start + exact_node.getLength() - 1;
-	// // IRInstrKind ir_kind = IRInstrKind.ComputeKind(1);
-	// irfom.AddOneIRUnit(ib, new IRForOneOperation(irfom.getIm(), code));
-	// }
-	// }
-	//
-	// }
 
-	public static void GenerateGeneralIR(ASTNode node, ASTNode exact_node, IRCode irfom,
-			Map<IMember, Integer> temp_statement_set, String code) {
+	public static void GenerateNoVariableBindingIR(ASTNode node, ASTNode exact_node, IRCode irc,
+			HashSet<IMember> member_set, String code, HashMap<IMember, Integer> branch_dependency) {
+		Set<IMember> temp_bindings = member_set;
+		Iterator<IMember> titr = temp_bindings.iterator();
+		while (titr.hasNext()) {
+			IMember im = titr.next();
+			if (ASTSearch.ASTNodeContainsAMember(node, im)) {
+				// int start = exact_node.getStartPosition();
+				// int end = start + exact_node.getLength() - 1;
+				// IRInstrKind ir_kind = IRInstrKind.ComputeKind(1);
+				IRForOneOperation now = new IRForOneOperation(im, code);
+				irc.AddOneIRUnit(im, now);
+				HandleNodeDependency(irc, im, now, branch_dependency);
+			}
+		}
+	}
+
+	public static void GenerateGeneralIR(ASTNode node, ASTNode exact_node, IRCode irc,
+			Map<IMember, Integer> temp_statement_set, String code, HashMap<IMember, Integer> branch_dependency) {
 		Set<IMember> temp_bindings = temp_statement_set.keySet();
 		Iterator<IMember> titr = temp_bindings.iterator();
 		while (titr.hasNext()) {
@@ -186,13 +187,33 @@ public class IRGeneratorHelper {
 						// int start = exact_node.getStartPosition();
 						// int end = start + exact_node.getLength() - 1;
 						// IRInstrKind ir_kind = IRInstrKind.ComputeKind(count);
-						irfom.AddOneIRUnit(im, new IRForOneOperation(im, code));
+						IRForOneOperation now = new IRForOneOperation(im, code);
+
+						HandleNodeDependency(irc, im, now, branch_dependency);
+
+						irc.AddOneIRUnit(im, now);
 					}
 					temp_statement_set.put(im, count);
 				}
 			}
 		}
 
+	}
+
+	private static void HandleNodeDependency(IRCode irc, IMember im, IRForOneJavaInstruction now,
+			HashMap<IMember, Integer> branch_dependency) {
+		IRForOneJavaInstruction last_instr = irc.GetLastIRUnit(im);
+		now.AddParent(last_instr);
+		Set<IMember> bkeys = branch_dependency.keySet();
+		Iterator<IMember> bitr = bkeys.iterator();
+		while (bitr.hasNext()) {
+			IMember bim = bitr.next();
+			Integer idx = branch_dependency.get(bim);
+			IRForOneJavaInstruction pt = irc.GetIRUnitByIndex(bim, idx);
+			if (pt != null) {
+				now.AddParent(pt);
+			}
+		}
 	}
 
 	// private static void GenerateSourceMethodInvocationIR(IBinding ib,

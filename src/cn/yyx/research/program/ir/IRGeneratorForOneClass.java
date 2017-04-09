@@ -41,7 +41,7 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 		{
 			IRGeneratorForOneLogicBlock irgfocb = new IRGeneratorForOneLogicBlock(new IRForOneMethod((IMethod)im));
 			node.accept(irgfocb);
-			IRGeneratorForOneProject.FetchITypeIR((it)).AddMethodLevel(irgfocb.GetGeneration());
+			IRGeneratorForOneProject.FetchITypeIR((it)).AddMethodLevel((IRForOneMethod)irgfocb.GetGeneration());
 		}
 		return false;
 	}

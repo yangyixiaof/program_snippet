@@ -71,4 +71,24 @@ public class IRForOneMethod extends IRForOneJavaElement implements IRCode {
 		return irs.get(ivb);
 	}
 	
+	@Override
+	public IRForOneJavaInstruction GetLastIRUnit(IMember ivb) {
+		LinkedList<IRForOneJavaInstruction> ii = irs.get(ivb);
+		if (ii == null)
+		{
+			return null;
+		}
+		return ii.getLast();
+	}
+
+	@Override
+	public IRForOneJavaInstruction GetIRUnitByIndex(IMember ivb, int index) {
+		LinkedList<IRForOneJavaInstruction> ii = irs.get(ivb);
+		if (ii != null && ii.size() > index)
+		{
+			return ii.get(index);
+		}
+		return null;
+	}
+	
 }

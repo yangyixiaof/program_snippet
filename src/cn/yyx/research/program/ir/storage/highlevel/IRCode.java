@@ -14,4 +14,7 @@ public interface IRCode {
 	
 	public List<IRForOneJavaInstruction> GetOneAllIRUnits(IMember ivb);
 	
+	public IRForOneJavaInstruction GetLastIRUnit(IMember ivb);
+	
+	public IRForOneJavaInstruction GetIRUnitByIndex(IMember ivb, int index);
 }
