@@ -1,7 +1,7 @@
 package cn.yyx.research.program.ir.ast;
 
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -11,10 +11,10 @@ import org.eclipse.jdt.core.dom.SimpleName;
 
 public class ContainsMemberVisitor extends ASTVisitor {
 	
-	private IMember im = null;
+	private IJavaElement im = null;
 	private boolean do_contains = false;
 	
-	public ContainsMemberVisitor(IMember im) {
+	public ContainsMemberVisitor(IJavaElement im) {
 		this.im = im;
 	}
 	
@@ -32,23 +32,23 @@ public class ContainsMemberVisitor extends ASTVisitor {
 		IBinding ib = node.resolveBinding();
 		if (ib != null)
 		{
-			IMember im = null;
+			IJavaElement im = null;
 			if (ib instanceof ITypeBinding)
 			{
 				ITypeBinding it = (ITypeBinding)ib;
 				IJavaElement ije = it.getJavaElement();
-				if (ije instanceof IMember)
+				if (ije instanceof IJavaElement)
 				{
-					im = (IMember)ije;
+					im = (IJavaElement)ije;
 				}
 			}
 			if (ib instanceof IVariableBinding)
 			{
 				IVariableBinding ivb = (IVariableBinding)ib;
 				IJavaElement ije = ivb.getJavaElement();
-				if (ije instanceof IMember)
+				if (ije instanceof IJavaElement)
 				{
-					im = (IMember)ije;
+					im = (IJavaElement)ije;
 				}
 			}
 			if (im != null)

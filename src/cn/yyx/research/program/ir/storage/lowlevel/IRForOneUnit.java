@@ -1,15 +1,15 @@
 package cn.yyx.research.program.ir.storage.lowlevel;
 
-import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IJavaElement;
 
 public class IRForOneUnit {
 	
-	private IMember im = null;
+	private IJavaElement im = null;
 	// private int start = -1;
 	// private int end = -1;
 	// private IRInstrKind ir_kind = IRInstrKind.Weak;
 	
-	public IRForOneUnit(IMember im) {
+	public IRForOneUnit(IJavaElement im) {
 		// , int start, int end, IRInstrKind ir_kind
 		this.setIm(im);
 //		this.setStart(start);
@@ -17,11 +17,11 @@ public class IRForOneUnit {
 //		this.setIr_kind(ir_kind);
 	}
 	
-	public IMember getIm() {
+	public IJavaElement getIm() {
 		return im;
 	}
 
-	public void setIm(IMember im) {
+	public void setIm(IJavaElement im) {
 		this.im = im;
 	}
 

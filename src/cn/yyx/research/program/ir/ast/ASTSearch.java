@@ -1,6 +1,6 @@
 package cn.yyx.research.program.ir.ast;
 
-import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -9,7 +9,7 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 public class ASTSearch {
 	
-	public static boolean ASTNodeContainsAMember(ASTNode astnode, IMember im)
+	public static boolean ASTNodeContainsAMember(ASTNode astnode, IJavaElement im)
 	{
 		if (im == null)
 		{

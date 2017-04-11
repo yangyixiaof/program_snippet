@@ -36,10 +36,12 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 	
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		IJavaElement im = node.resolveBinding().getJavaElement();
-		if (im instanceof IMethod)
+		IJavaElement ije = node.resolveBinding().getJavaElement();
+		if (ije instanceof IMethod)
 		{
-			IRGeneratorForOneLogicBlock irgfocb = new IRGeneratorForOneLogicBlock(new IRForOneMethod((IMethod)im));
+			IMethod im = (IMethod)ije;
+			IRForOneMethod imb = IRGeneratorForOneProject.FetchIMethodIR(im);
+			IRGeneratorForOneLogicBlock irgfocb = new IRGeneratorForOneLogicBlock(imb);
 			node.accept(irgfocb);
 			IRGeneratorForOneProject.FetchITypeIR((it)).AddMethodLevel((IRForOneMethod)irgfocb.GetGeneration());
 		}

@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneJavaInstruction;
@@ -15,10 +15,10 @@ public class IRForOneMethod extends IRForOneJavaElement implements IRCode {
 	// The entrance must be MethodDeclaration.
 	
 	// this is set when exploring MethodDeclaration the first time.
-	private List<IMember> parameters = new LinkedList<IMember>();
+	private List<IJavaElement> parameters = new LinkedList<IJavaElement>();
 	
 	// valid index is 0, -1 means no irs.
-	private Map<IMember, LinkedList<IRForOneJavaInstruction>> irs = new HashMap<IMember, LinkedList<IRForOneJavaInstruction>>();
+	private Map<IJavaElement, LinkedList<IRForOneJavaInstruction>> irs = new HashMap<IJavaElement, LinkedList<IRForOneJavaInstruction>>();
 	
 	// only three situations could lead to data_dependency key: first var_bind in method invocation(exclude cascade)/left value in assignment.
 	// private Map<IBinding, HashSet<IBinding>> data_dependency = new HashMap<IBinding, HashSet<IBinding>>();
@@ -40,7 +40,7 @@ public class IRForOneMethod extends IRForOneJavaElement implements IRCode {
 //		variable_parameter_order.put(irfoe, order);
 //	}
 	
-	public void AddOneIRUnit(IMember ivb, IRForOneJavaInstruction irfou)
+	public void AddOneIRUnit(IJavaElement ivb, IRForOneJavaInstruction irfou)
 	{
 		LinkedList<IRForOneJavaInstruction> list = irs.get(ivb);
 		if (list == null)
@@ -61,18 +61,18 @@ public class IRForOneMethod extends IRForOneJavaElement implements IRCode {
 //		return units.iterator();
 //	}
 	
-	public void AddParameter(IMember im)
+	public void AddParameter(IJavaElement im)
 	{
 		parameters.add(im);
 	}
 	
 	@Override
-	public List<IRForOneJavaInstruction> GetOneAllIRUnits(IMember ivb) {
+	public List<IRForOneJavaInstruction> GetOneAllIRUnits(IJavaElement ivb) {
 		return irs.get(ivb);
 	}
 	
 	@Override
-	public IRForOneJavaInstruction GetLastIRUnit(IMember ivb) {
+	public IRForOneJavaInstruction GetLastIRUnit(IJavaElement ivb) {
 		LinkedList<IRForOneJavaInstruction> ii = irs.get(ivb);
 		if (ii == null)
 		{
@@ -82,7 +82,7 @@ public class IRForOneMethod extends IRForOneJavaElement implements IRCode {
 	}
 
 	@Override
-	public IRForOneJavaInstruction GetIRUnitByIndex(IMember ivb, int index) {
+	public IRForOneJavaInstruction GetIRUnitByIndex(IJavaElement ivb, int index) {
 		LinkedList<IRForOneJavaInstruction> ii = irs.get(ivb);
 		if (ii != null && ii.size() > index)
 		{

@@ -2,7 +2,6 @@ package cn.yyx.research.program.ir;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
@@ -18,6 +16,7 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.ast.ASTSearch;
+import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.search.IRSearchRequestor;
 import cn.yyx.research.program.ir.storage.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneJavaInstruction;
@@ -29,8 +28,8 @@ public class IRGeneratorHelper {
 	// can only be invoked in end_visit_method_invocation.
 	public static void GenerateMethodInvocationIR(IRCode irc, List<Expression> nlist, IMethodBinding imb,
 			Expression expr, String identifier, ASTNode node,
-			HashMap<IMember, HashMap<ASTNode, Integer>> temp_statement_instr_order_set,
-			HashMap<IMember, Integer> temp_statement_environment_set, HashMap<IMember, Integer> branch_dependency) {
+			HashMap<IJavaElement, HashMap<ASTNode, Integer>> temp_statement_instr_order_set,
+			HashMap<IJavaElement, Integer> temp_statement_environment_set, HashMap<IJavaElement, Integer> branch_dependency) {
 
 		if (imb != null && imb.getDeclaringClass() != null && imb.getDeclaringClass().isFromSource()) {
 			// source method invocation.
@@ -46,10 +45,10 @@ public class IRGeneratorHelper {
 					e.printStackTrace();
 				}
 				if (methods != null && methods.size() > 0) {
-					Set<IMember> ims = temp_statement_instr_order_set.keySet();
-					Iterator<IMember> iitr = ims.iterator();
+					Set<IJavaElement> ims = temp_statement_instr_order_set.keySet();
+					Iterator<IJavaElement> iitr = ims.iterator();
 					while (iitr.hasNext()) {
-						IMember im = iitr.next();
+						IJavaElement im = iitr.next();
 						Map<Integer, Integer> para_order_instr_index_map = new HashMap<Integer, Integer>();
 						HashMap<ASTNode, Integer> ast_order = temp_statement_instr_order_set.get(im);
 						int idx = 0;
@@ -155,11 +154,11 @@ public class IRGeneratorHelper {
 	// }
 
 	public static void GenerateNoVariableBindingIR(ASTNode node, ASTNode exact_node, IRCode irc,
-			HashSet<IMember> member_set, String code, HashMap<IMember, Integer> branch_dependency) {
-		Set<IMember> temp_bindings = member_set;
-		Iterator<IMember> titr = temp_bindings.iterator();
+			Set<IJavaElement> member_set, String code, HashMap<IJavaElement, Integer> branch_dependency) {
+		Set<IJavaElement> temp_bindings = member_set;
+		Iterator<IJavaElement> titr = temp_bindings.iterator();
 		while (titr.hasNext()) {
-			IMember im = titr.next();
+			IJavaElement im = titr.next();
 			if (ASTSearch.ASTNodeContainsAMember(node, im)) {
 				// int start = exact_node.getStartPosition();
 				// int end = start + exact_node.getLength() - 1;
@@ -172,11 +171,16 @@ public class IRGeneratorHelper {
 	}
 
 	public static void GenerateGeneralIR(ASTNode node, ASTNode exact_node, IRCode irc,
-			Map<IMember, Integer> temp_statement_set, String code, HashMap<IMember, Integer> branch_dependency) {
-		Set<IMember> temp_bindings = temp_statement_set.keySet();
-		Iterator<IMember> titr = temp_bindings.iterator();
+			Map<IJavaElement, Integer> temp_statement_set, String code, HashMap<IJavaElement, Integer> branch_dependency) {
+		Set<IJavaElement> temp_bindings = temp_statement_set.keySet();
+		Iterator<IJavaElement> titr = temp_bindings.iterator();
+		if (!titr.hasNext())
+		{
+			ConstantUniqueElement.FetchConstantElement("code");
+			// TODO unique element not add to global binding? check that.
+		}
 		while (titr.hasNext()) {
-			IMember im = titr.next();
+			IJavaElement im = titr.next();
 			if (ASTSearch.ASTNodeContainsAMember(node, im)) {
 				Integer count = temp_statement_set.get(im);
 				if (count != null && count >= 0) {
@@ -200,14 +204,14 @@ public class IRGeneratorHelper {
 
 	}
 
-	private static void HandleNodeDependency(IRCode irc, IMember im, IRForOneJavaInstruction now,
-			HashMap<IMember, Integer> branch_dependency) {
+	private static void HandleNodeDependency(IRCode irc, IJavaElement im, IRForOneJavaInstruction now,
+			HashMap<IJavaElement, Integer> branch_dependency) {
 		IRForOneJavaInstruction last_instr = irc.GetLastIRUnit(im);
 		now.AddParent(last_instr);
-		Set<IMember> bkeys = branch_dependency.keySet();
-		Iterator<IMember> bitr = bkeys.iterator();
+		Set<IJavaElement> bkeys = branch_dependency.keySet();
+		Iterator<IJavaElement> bitr = bkeys.iterator();
 		while (bitr.hasNext()) {
-			IMember bim = bitr.next();
+			IJavaElement bim = bitr.next();
 			Integer idx = branch_dependency.get(bim);
 			IRForOneJavaInstruction pt = irc.GetIRUnitByIndex(bim, idx);
 			if (pt != null) {

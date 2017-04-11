@@ -9,7 +9,7 @@ public class BindingManager {
 	
 	public static boolean QualifiedBinding(IBinding ib)
 	{
-		if (ib != null && (ib instanceof ITypeBinding || ib instanceof IVariableBinding || ib instanceof YConstantBinding || ib instanceof IMethodBinding))
+		if (ib != null && (ib instanceof ITypeBinding || ib instanceof IVariableBinding || ib instanceof IMethodBinding))
 		{
 			return true;
 		}
