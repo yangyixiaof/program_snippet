@@ -697,15 +697,24 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	@Override
-	public boolean visit(FieldAccess node) {
-		// no need to do anything.
-		return super.visit(node);
+	public void endVisit(FieldAccess node) {
+		IVariableBinding ib = node.resolveFieldBinding();
+		if (ib == null || ib.getJavaElement() == null)
+		{
+			IRGeneratorHelper.GenerateGeneralIR(node, node, irc,
+					temp_statement_environment_set, IRMeta.FieldAccess + node.getName().toString(), branchs_var_instr_order.peek());
+		}
 	}
 
 	@Override
-	public boolean visit(SuperFieldAccess node) {
-		// no need to do anything.
-		return super.visit(node);
+	public void endVisit(SuperFieldAccess node) {
+		IVariableBinding ib = node.resolveFieldBinding();
+		if (ib == null || ib.getJavaElement() == null)
+		{
+			TreatSuperClassElement(node);
+			IRGeneratorHelper.GenerateGeneralIR(node, node, irc,
+					temp_statement_environment_set, IRMeta.FieldAccess + node.getName().toString(), branchs_var_instr_order.peek());
+		}
 	}
 
 	@Override
@@ -1260,15 +1269,15 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// TODO remember to handle unresolved type or method invocation to its raw
 	// name.
 
-	// TODO remember to check whether temporarily appeared variable bindings
+	// Solved. remember to check whether temporarily appeared variable bindings
 	// such as field_access/super_field_access are properly handled.
 
 	// TODO remember to handle null resolved binding.
 
-	// undone tasks are not handled. Solution: these don't need to be handled
+	// Solved. Undone tasks are not handled. Solution: these don't need to be handled
 	// anymore.
 
-	// TODO general IR needs to handle related dependency.
+	// Solved. general IR needs to handle related dependency. These situations are not handled.
 
 	// TODO assign data_dependency is not handled. assign operation should be skipped.
 

@@ -39,5 +39,6 @@ public class IRMeta {
 	public static final String ArrayCreation = "@ArrayCreation";
 	public static final String ArrayCreationIndex = "@ArrayCreationIndex";
 	public static final String MethodReference = "@MethodRef_";
+	public static final String FieldAccess = "@FieldAccess_";
 	
 }
