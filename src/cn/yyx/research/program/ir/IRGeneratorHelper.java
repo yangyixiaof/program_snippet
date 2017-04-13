@@ -2,6 +2,7 @@ package cn.yyx.research.program.ir;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,9 @@ public class IRGeneratorHelper {
 	public static void GenerateMethodInvocationIR(IRCode irc, List<Expression> nlist, IMethodBinding imb,
 			Expression expr, String identifier, ASTNode node,
 			HashMap<IJavaElement, HashMap<ASTNode, Integer>> temp_statement_instr_order_set,
-			HashMap<IJavaElement, Integer> temp_statement_environment_set, HashMap<IJavaElement, Integer> branch_dependency) {
+			Set<IJavaElement> temp_statement_environment_set,
+			Map<IJavaElement, Integer> all_count,
+			HashMap<IJavaElement, Integer> branch_dependency) {
 
 		if (imb != null && imb.getDeclaringClass() != null && imb.getDeclaringClass().isFromSource()) {
 			// source method invocation.
@@ -83,7 +86,7 @@ public class IRGeneratorHelper {
 				}
 			}
 		} else {
-			IRGeneratorHelper.GenerateGeneralIR(node, node, irc, temp_statement_environment_set,
+			IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
 					IRMeta.MethodInvocation + identifier, branch_dependency);
 		}
 
@@ -169,10 +172,20 @@ public class IRGeneratorHelper {
 		}
 	}
 
-	public static void GenerateGeneralIR(ASTNode node, ASTNode exact_node, IRCode irc,
-			Map<IJavaElement, Integer> temp_statement_set, String code, HashMap<IJavaElement, Integer> branch_dependency) {
-		Set<IJavaElement> temp_bindings = temp_statement_set.keySet();
-		Iterator<IJavaElement> titr = temp_bindings.iterator();
+	public static void GenerateGeneralIR(IRCode irc, ASTNode node, 
+			Set<IJavaElement> temp_statement_set, Map<IJavaElement, Integer> all_count, String code, HashMap<IJavaElement, Integer> branch_dependency) {
+		Set<IJavaElement> concern = new HashSet<IJavaElement>(temp_statement_set);
+		Iterator<IJavaElement> oitr = temp_statement_set.iterator();
+		while (oitr.hasNext())
+		{
+			IJavaElement ije = oitr.next();
+			Set<IJavaElement> dep = irc.GetAssignDependency(ije);
+			if (dep != null)
+			{
+				concern.addAll(dep);
+			}
+		}
+		Iterator<IJavaElement> titr = concern.iterator();
 		if (!titr.hasNext())
 		{
 			// ConstantUniqueElement.FetchConstantElement(code);
@@ -181,7 +194,7 @@ public class IRGeneratorHelper {
 		while (titr.hasNext()) {
 			IJavaElement im = titr.next();
 			if (ASTSearch.ASTNodeContainsAMember(node, im)) {
-				Integer count = temp_statement_set.get(im);
+				Integer count = all_count.get(im);
 				if (count != null && count >= 0) {
 					count++;
 					if (count > IRGeneratorForOneLogicBlock.GetMaxLevel()) {
@@ -196,7 +209,7 @@ public class IRGeneratorHelper {
 
 						irc.AddOneIRUnit(im, now);
 					}
-					temp_statement_set.put(im, count);
+					all_count.put(im, count);
 				}
 			}
 		}

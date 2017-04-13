@@ -31,12 +31,14 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// name must be resolved and ensure it is a variable, a global variable or a
 	// type.
-	protected HashMap<IJavaElement, HashMap<ASTNode, Integer>> temp_statement_instr_order_set = new HashMap<IJavaElement, HashMap<ASTNode, Integer>>();
-	protected HashMap<IJavaElement, Integer> temp_statement_environment_set = new HashMap<IJavaElement, Integer>();
+	// for method invocation's parameters.
+	protected HashMap<IJavaElement, HashMap<ASTNode, Integer>> temp_statement_instr_order = new HashMap<IJavaElement, HashMap<ASTNode, Integer>>();
+	protected HashSet<IJavaElement> temp_statement_environment_set = new HashSet<IJavaElement>();
+	protected HashMap<IJavaElement, Integer> all_count = new HashMap<IJavaElement, Integer>();
 
 	protected void StatementOverHandle() {
 		// no need to do that anymore.
-		temp_statement_instr_order_set.clear();
+		temp_statement_instr_order.clear();
 		temp_statement_environment_set.clear();
 	}
 
@@ -44,8 +46,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	protected void PushBranchInstructionOrder() {
 		HashMap<IJavaElement, Integer> t_hash = new HashMap<IJavaElement, Integer>();
-		Set<IJavaElement> tkeys = temp_statement_environment_set.keySet();
-		Iterator<IJavaElement> titr = tkeys.iterator();
+		Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
 		while (titr.hasNext()) {
 			IJavaElement im = titr.next();
 			List<IRForOneJavaInstruction> ls = irc.GetOneAllIRUnits(im);
@@ -139,7 +140,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		@SuppressWarnings("unchecked")
 		List<Expression> nlist = (List<Expression>) node.arguments();
 		IRGeneratorHelper.GenerateMethodInvocationIR(irc, nlist, node.resolveMethodBinding(), node.getExpression(),
-				node.getName().toString(), node, temp_statement_instr_order_set, temp_statement_environment_set,
+				node.getName().toString(), node, temp_statement_instr_order, temp_statement_environment_set, all_count,
 				branchs_var_instr_order.peek());
 	}
 
@@ -149,7 +150,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		@SuppressWarnings("unchecked")
 		List<Expression> nlist = (List<Expression>) node.arguments();
 		IRGeneratorHelper.GenerateMethodInvocationIR(irc, nlist, node.resolveMethodBinding(), null,
-				node.getName().toString(), node, temp_statement_instr_order_set, temp_statement_environment_set,
+				node.getName().toString(), node, temp_statement_instr_order, temp_statement_environment_set, all_count,
 				branchs_var_instr_order.peek());
 	}
 
@@ -158,7 +159,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		@SuppressWarnings("unchecked")
 		List<Expression> nlist = (List<Expression>) node.arguments();
 		IRGeneratorHelper.GenerateMethodInvocationIR(irc, nlist, node.resolveConstructorBinding(), null, "super", node,
-				temp_statement_instr_order_set, temp_statement_environment_set, branchs_var_instr_order.peek());
+				temp_statement_instr_order, temp_statement_environment_set, all_count, branchs_var_instr_order.peek());
 	}
 
 	@Override
@@ -166,7 +167,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		@SuppressWarnings("unchecked")
 		List<Expression> nlist = (List<Expression>) node.arguments();
 		IRGeneratorHelper.GenerateMethodInvocationIR(irc, nlist, node.resolveConstructorBinding(), null, "this", node,
-				temp_statement_instr_order_set, temp_statement_environment_set, branchs_var_instr_order.peek());
+				temp_statement_instr_order, temp_statement_environment_set, all_count, branchs_var_instr_order.peek());
 	}
 
 	@Override
@@ -178,8 +179,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 					@SuppressWarnings("unchecked")
 					List<Expression> nlist = (List<Expression>) node.arguments();
 					IRGeneratorHelper.GenerateMethodInvocationIR(irc, nlist, node.resolveConstructorBinding(), null,
-							"new#" + node.getType(), node, temp_statement_instr_order_set,
-							temp_statement_environment_set, branchs_var_instr_order.peek());
+							"new#" + node.getType(), node, temp_statement_instr_order, temp_statement_environment_set,
+							all_count, branchs_var_instr_order.peek());
 				}
 			});
 		}
@@ -192,8 +193,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			@SuppressWarnings("unchecked")
 			List<Expression> nlist = (List<Expression>) node.arguments();
 			IRGeneratorHelper.GenerateMethodInvocationIR(irc, nlist, node.resolveConstructorBinding(), null,
-					"new#" + node.getType(), node, temp_statement_instr_order_set, temp_statement_environment_set,
-					branchs_var_instr_order.peek());
+					"new#" + node.getType(), node, temp_statement_instr_order, temp_statement_environment_set,
+					all_count, branchs_var_instr_order.peek());
 		}
 	}
 
@@ -204,8 +205,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node.getExpression(), node.getExpression(), irc,
-						temp_statement_environment_set, IRMeta.If, branchs_var_instr_order.peek());
+				IRGeneratorHelper.GenerateGeneralIR(irc, node.getExpression(), temp_statement_environment_set,
+						all_count, IRMeta.If, branchs_var_instr_order.peek());
 				PushBranchInstructionOrder();
 				StatementOverHandle();
 			}
@@ -254,8 +255,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node.getExpression(), node.getExpression(), irc,
-						temp_statement_environment_set, IRMeta.If, branchs_var_instr_order.peek());
+				IRGeneratorHelper.GenerateGeneralIR(irc, node.getExpression(), temp_statement_environment_set,
+						all_count, IRMeta.If, branchs_var_instr_order.peek());
 				PushBranchInstructionOrder();
 			}
 		});
@@ -294,8 +295,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irc, temp_statement_environment_set,
-						IRMeta.While, branchs_var_instr_order.peek());
+				IRGeneratorHelper.GenerateGeneralIR(irc, node.getExpression(), temp_statement_environment_set,
+						all_count, IRMeta.While, branchs_var_instr_order.peek());
 				PushBranchInstructionOrder();
 				StatementOverHandle();
 			}
@@ -315,8 +316,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irc, temp_statement_environment_set,
-						IRMeta.DoWhile, branchs_var_instr_order.peek());
+				IRGeneratorHelper.GenerateGeneralIR(irc, node.getExpression(), temp_statement_environment_set,
+						all_count, IRMeta.DoWhile, branchs_var_instr_order.peek());
 				PushBranchInstructionOrder();
 				StatementOverHandle();
 			}
@@ -344,7 +345,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				post_visit_task.put(last_expr, new Runnable() {
 					@Override
 					public void run() {
-						IRGeneratorHelper.GenerateGeneralIR(node, exp, irc, temp_statement_environment_set,
+						IRGeneratorHelper.GenerateGeneralIR(irc, exp, temp_statement_environment_set, all_count,
 								IRMeta.For_Initial, branchs_var_instr_order.peek());
 						StatementOverHandle();
 					}
@@ -359,7 +360,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				post_visit_task.put(last_expr, new Runnable() {
 					@Override
 					public void run() {
-						IRGeneratorHelper.GenerateGeneralIR(node, exp, irc, temp_statement_environment_set,
+						IRGeneratorHelper.GenerateGeneralIR(irc, exp, temp_statement_environment_set, all_count,
 								IRMeta.For_Judge, branchs_var_instr_order.peek());
 						PushBranchInstructionOrder();
 						StatementOverHandle();
@@ -376,7 +377,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				post_visit_task.put(last_expr, new Runnable() {
 					@Override
 					public void run() {
-						IRGeneratorHelper.GenerateGeneralIR(node, exp, irc, temp_statement_environment_set,
+						IRGeneratorHelper.GenerateGeneralIR(irc, exp, temp_statement_environment_set, all_count,
 								IRMeta.For_Update, branchs_var_instr_order.peek());
 						StatementOverHandle();
 					}
@@ -401,7 +402,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irc, temp_statement_environment_set,
+				IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
 						IRMeta.EnhancedFor, branchs_var_instr_order.peek());
 				StatementOverHandle();
 			}
@@ -455,7 +456,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getName(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node, node.getName(), irc, temp_statement_environment_set,
+				IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
 						IRMeta.VariabledDeclare, branchs_var_instr_order.peek());
 				StatementOverHandle();
 			}
@@ -468,7 +469,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getName(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node, node.getName(), irc, temp_statement_environment_set,
+				IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
 						IRMeta.VariabledDeclare, branchs_var_instr_order.peek());
 				StatementOverHandle();
 			}
@@ -496,28 +497,34 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void endVisit(ReturnStatement node) {
-		IRGeneratorHelper.GenerateGeneralIR(node, node, irc, temp_statement_environment_set, IRMeta.Return,
+		IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count, IRMeta.Return,
 				branchs_var_instr_order.peek());
 	}
 
 	// need to handle data_dependency.
 	@Override
 	public boolean visit(Assignment node) {
-		post_visit_task.put(node.getLeftHandSide(), new Runnable() {
-			@Override
-			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node, node.getLeftHandSide(), irc, temp_statement_environment_set,
-						IRMeta.LeftHandAssign, branchs_var_instr_order.peek());
-			}
-		});
-		post_visit_task.put(node.getRightHandSide(), new Runnable() {
-			@Override
-			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node, node.getRightHandSide(), irc, temp_statement_environment_set,
-						IRMeta.RightHandAssign, branchs_var_instr_order.peek());
-			}
-		});
-		return super.visit(node);
+		node.getRightHandSide().accept(this);
+		HashSet<IJavaElement> depd = new HashSet<IJavaElement>(temp_statement_environment_set);
+		StatementOverHandle();
+		node.getLeftHandSide().accept(this);
+		IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count, IRMeta.LeftHandAssign,
+				branchs_var_instr_order.peek());
+		// add assign dependency.
+		Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
+		while (titr.hasNext()) {
+			IJavaElement ijele = titr.next();
+			irc.AddAssignDependency(ijele, new HashSet<IJavaElement>(depd));
+		}
+		// post_visit_task.put(node.getRightHandSide(), new Runnable() {
+		// @Override
+		// public void run() {
+		// IRGeneratorHelper.GenerateGeneralIR(node, node.getRightHandSide(),
+		// irc, temp_statement_environment_set,
+		// IRMeta.RightHandAssign, branchs_var_instr_order.peek());
+		// }
+		// });
+		return false;
 	}
 
 	@Override
@@ -525,7 +532,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irc, temp_statement_environment_set,
+				IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
 						IRMeta.Synchronized, branchs_var_instr_order.peek());
 				StatementOverHandle();
 			}
@@ -552,9 +559,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
-				switch_judge_members.push(new HashSet<IJavaElement>(temp_statement_environment_set.keySet()));
-				IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irc, temp_statement_environment_set,
-						IRMeta.Switch, branchs_var_instr_order.peek());
+				switch_judge_members.push(new HashSet<IJavaElement>(temp_statement_environment_set));
+				IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count, IRMeta.Switch,
+						branchs_var_instr_order.peek());
 				PushBranchInstructionOrder();
 				StatementOverHandle();
 			}
@@ -600,7 +607,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			post_visit_task.put(expr, new Runnable() {
 				@Override
 				public void run() {
-					IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irc, temp_statement_environment_set,
+					IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
 							IRMeta.Switch_Case_Cause, branchs_var_instr_order.peek());
 					PushBranchInstructionOrder();
 					StatementOverHandle();
@@ -642,15 +649,15 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// handling expressions.
 
-	private void HandleBinding(IBinding ib) {
+	private boolean HandleBinding(IBinding ib) {
 		if (!BindingManager.QualifiedBinding(ib)) {
-			return;
+			return false;
 		}
 		IJavaElement jele = ib.getJavaElement();
-		HandleIJavaElement(jele);
+		return HandleIJavaElement(jele);
 	}
 
-	private void HandleIJavaElement(IJavaElement jele) {
+	private boolean HandleIJavaElement(IJavaElement jele) {
 		// handle loop_bind, just for no variable bind statements such as
 		// break and continue.
 		// if (!BindingManager.QualifiedBinding(ib)) {
@@ -658,16 +665,17 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// }
 		// IJavaElement jele = ib.getJavaElement();
 		if (jele == null) {
-			return;
+			return false;
 		}
 		if (jele instanceof IMember) {
 			IMember im = (IMember) jele;
 			if (im.getDeclaringType().isBinary()) {
-				return;
+				return false;
 			}
 		} else {
-			if (!(jele instanceof ILocalVariable)) {
-				return;
+			if (!(jele instanceof ILocalVariable) && !(jele instanceof UnresolvedTypeElement)
+					&& !(jele instanceof UnresolvedTypeElement) && !(jele instanceof ConstantUniqueElement)) {
+				return false;
 			}
 		}
 
@@ -685,7 +693,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// }
 
 		// next isolated tasks.
-		temp_statement_environment_set.put(jele, -1);
+		all_count.put(jele, -1);
+		return true;
 	}
 
 	@Override
@@ -699,21 +708,19 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public void endVisit(FieldAccess node) {
 		IVariableBinding ib = node.resolveFieldBinding();
-		if (ib == null || ib.getJavaElement() == null)
-		{
-			IRGeneratorHelper.GenerateGeneralIR(node, node, irc,
-					temp_statement_environment_set, IRMeta.FieldAccess + node.getName().toString(), branchs_var_instr_order.peek());
+		if (ib == null || ib.getJavaElement() == null) {
+			IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
+					IRMeta.FieldAccess + node.getName().toString(), branchs_var_instr_order.peek());
 		}
 	}
 
 	@Override
 	public void endVisit(SuperFieldAccess node) {
 		IVariableBinding ib = node.resolveFieldBinding();
-		if (ib == null || ib.getJavaElement() == null)
-		{
+		if (ib == null || ib.getJavaElement() == null) {
 			TreatSuperClassElement(node);
-			IRGeneratorHelper.GenerateGeneralIR(node, node, irc,
-					temp_statement_environment_set, IRMeta.FieldAccess + node.getName().toString(), branchs_var_instr_order.peek());
+			IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
+					IRMeta.FieldAccess + node.getName().toString(), branchs_var_instr_order.peek());
 		}
 	}
 
@@ -753,51 +760,59 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return super.visit(node);
 	}
 
+	private void HandleType(IBinding ib, String represent) {
+		boolean source_resolved = HandleBinding(ib);
+		if (!source_resolved) {
+			UnresolvedTypeElement ele = UnresolvedTypeElement.FetchConstantElement(represent);
+			HandleIJavaElement(ele);
+		}
+	}
+
 	@Override
 	public boolean visit(ArrayType node) {
-		HandleBinding(node.resolveBinding());
-		return super.visit(node);
+		HandleType(node.resolveBinding(), node.toString());
+		return false;
 	}
 
 	@Override
 	public boolean visit(SimpleType node) {
-		HandleBinding(node.resolveBinding());
-		return super.visit(node);
+		HandleType(node.resolveBinding(), node.toString());
+		return false;
 	}
 
 	@Override
 	public boolean visit(PrimitiveType node) {
-		HandleBinding(node.resolveBinding());
-		return super.visit(node);
+		HandleType(node.resolveBinding(), node.toString());
+		return false;
 	}
 
 	@Override
 	public boolean visit(QualifiedType node) {
-		HandleBinding(node.resolveBinding());
-		return super.visit(node);
+		HandleType(node.resolveBinding(), node.toString());
+		return false;
 	}
 
 	@Override
 	public boolean visit(NameQualifiedType node) {
-		HandleBinding(node.resolveBinding());
-		return super.visit(node);
+		HandleType(node.resolveBinding(), node.toString());
+		return false;
 	}
 
 	@Override
 	public boolean visit(QualifiedName node) {
-		HandleBinding(node.resolveBinding());
-		return super.visit(node);
+		HandleType(node.resolveBinding(), node.toString());
+		return false;
 	}
 
 	@Override
 	public void endVisit(PrefixExpression node) {
-		IRGeneratorHelper.GenerateGeneralIR(node, node.getOperand(), irc, temp_statement_environment_set,
+		IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
 				IRMeta.Prefix + node.getOperator().toString(), branchs_var_instr_order.peek());
 	}
 
 	@Override
 	public boolean visit(PostfixExpression node) {
-		IRGeneratorHelper.GenerateGeneralIR(node, node.getOperand(), irc, temp_statement_environment_set,
+		IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
 				IRMeta.Postfix + node.getOperator().toString(), branchs_var_instr_order.peek());
 		return super.visit(node);
 	}
@@ -819,8 +834,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getLeftOperand(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node.getLeftOperand(), node.getLeftOperand(), irc,
-						temp_statement_environment_set, IRMeta.InstanceOfExpression, branchs_var_instr_order.peek());
+				IRGeneratorHelper.GenerateGeneralIR(irc, node.getLeftOperand(), temp_statement_environment_set,
+						all_count, IRMeta.InstanceOfExpression, branchs_var_instr_order.peek());
 			}
 		});
 		return super.visit(node);
@@ -828,8 +843,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void endVisit(InstanceofExpression node) {
-		IRGeneratorHelper.GenerateGeneralIR(node.getRightOperand(), node.getRightOperand(), irc,
-				temp_statement_environment_set, IRMeta.InstanceOfType, branchs_var_instr_order.peek());
+		IRGeneratorHelper.GenerateGeneralIR(irc, node.getRightOperand(), temp_statement_environment_set, all_count,
+				IRMeta.InstanceOfType, branchs_var_instr_order.peek());
 		super.endVisit(node);
 	}
 
@@ -838,8 +853,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getLeftOperand(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node.getLeftOperand(), node.getLeftOperand(), irc,
-						temp_statement_environment_set, IRMeta.InfixLeftExpression + node.getOperator().toString(),
+				IRGeneratorHelper.GenerateGeneralIR(irc, node.getLeftOperand(), temp_statement_environment_set,
+						all_count, IRMeta.InfixLeftExpression + node.getOperator().toString(),
 						branchs_var_instr_order.peek());
 			}
 		});
@@ -848,9 +863,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void endVisit(InfixExpression node) {
-		IRGeneratorHelper.GenerateGeneralIR(node.getRightOperand(), node.getRightOperand(), irc,
-				temp_statement_environment_set, IRMeta.InfixRightExpression + node.getOperator().toString(),
-				branchs_var_instr_order.peek());
+		IRGeneratorHelper.GenerateGeneralIR(irc, node.getRightOperand(), temp_statement_environment_set, all_count,
+				IRMeta.InfixRightExpression + node.getOperator().toString(), branchs_var_instr_order.peek());
 		super.endVisit(node);
 	}
 
@@ -877,8 +891,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getException(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node.getException(), node.getException(), irc,
-						temp_statement_environment_set, IRMeta.CatchClause, branchs_var_instr_order.peek());
+				IRGeneratorHelper.GenerateGeneralIR(irc, node.getException(), temp_statement_environment_set, all_count,
+						IRMeta.CatchClause, branchs_var_instr_order.peek());
 			}
 		});
 		return super.visit(node);
@@ -889,7 +903,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getType(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node.getType(), node.getType(), irc, temp_statement_environment_set,
+				IRGeneratorHelper.GenerateGeneralIR(irc, node.getType(), temp_statement_environment_set, all_count,
 						IRMeta.CastType, branchs_var_instr_order.peek());
 			}
 		});
@@ -898,8 +912,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void endVisit(CastExpression node) {
-		IRGeneratorHelper.GenerateGeneralIR(node.getExpression(), node.getExpression(), irc,
-				temp_statement_environment_set, IRMeta.CastExpression, branchs_var_instr_order.peek());
+		IRGeneratorHelper.GenerateGeneralIR(irc, node.getExpression(), temp_statement_environment_set, all_count,
+				IRMeta.CastExpression, branchs_var_instr_order.peek());
 	}
 
 	@Override
@@ -907,7 +921,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getType(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node.getType(), node.getType(), irc, temp_statement_environment_set,
+				IRGeneratorHelper.GenerateGeneralIR(irc, node.getType(), temp_statement_environment_set, all_count,
 						IRMeta.ArrayCreation, branchs_var_instr_order.peek());
 			}
 		});
@@ -919,7 +933,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			post_visit_task.put(expr, new Runnable() {
 				@Override
 				public void run() {
-					IRGeneratorHelper.GenerateGeneralIR(expr, expr, irc, temp_statement_environment_set,
+					IRGeneratorHelper.GenerateGeneralIR(irc, expr, temp_statement_environment_set, all_count,
 							IRMeta.ArrayCreationIndex, branchs_var_instr_order.peek());
 				}
 			});
@@ -929,7 +943,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(ArrayInitializer node) {
-		IRGeneratorHelper.GenerateGeneralIR(node, node, irc, temp_statement_environment_set, IRMeta.CastExpression,
+		IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count, IRMeta.CastExpression,
 				branchs_var_instr_order.peek());
 		return super.visit(node);
 	}
@@ -939,8 +953,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.put(node.getArray(), new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(node.getArray(), node.getArray(), irc,
-						temp_statement_environment_set, IRMeta.Array, branchs_var_instr_order.peek());
+				IRGeneratorHelper.GenerateGeneralIR(irc, node.getArray(), temp_statement_environment_set, all_count,
+						IRMeta.Array, branchs_var_instr_order.peek());
 			}
 		});
 		return super.visit(node);
@@ -948,7 +962,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void endVisit(ArrayAccess node) {
-		IRGeneratorHelper.GenerateGeneralIR(node, node, irc, temp_statement_environment_set, IRMeta.ArrayIndex,
+		IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count, IRMeta.ArrayIndex,
 				branchs_var_instr_order.peek());
 		super.endVisit(node);
 	}
@@ -980,42 +994,34 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 		return super.visit(node);
 	}
-	
-	private IMethod WhetherGoIntoMethodReference(IMethodBinding imb)
-	{
-		if (imb != null)
-		{
+
+	private IMethod WhetherGoIntoMethodReference(IMethodBinding imb) {
+		if (imb != null) {
 			IJavaElement jele = imb.getJavaElement();
-			if (jele != null && jele instanceof IMethod)
-			{
-				IMethod im = (IMethod)jele;
-				if (!im.getDeclaringType().isBinary())
-				{
+			if (jele != null && jele instanceof IMethod) {
+				IMethod im = (IMethod) jele;
+				if (!im.getDeclaringType().isBinary()) {
 					return im;
 				}
 			}
 		}
 		return null;
 	}
-	
-	private boolean HandleMethodReferenceStart(IMethodBinding imb)
-	{
+
+	private boolean HandleMethodReferenceStart(IMethodBinding imb) {
 		IMethod im = WhetherGoIntoMethodReference(imb);
-		if (im != null)
-		{
+		if (im != null) {
 			HandleIJavaElement(im);
 			return false;
 		}
 		return true;
 	}
-	
-	private void HandleMethodReferenceEnd(IMethodBinding imb, MethodReference mr, String code)
-	{
+
+	private void HandleMethodReferenceEnd(IMethodBinding imb, MethodReference mr, String code) {
 		IMethod im = WhetherGoIntoMethodReference(imb);
-		if (im == null)
-		{
-			IRGeneratorHelper.GenerateGeneralIR(mr, mr, irc,
-					temp_statement_environment_set, IRMeta.MethodReference + code, branchs_var_instr_order.peek());
+		if (im == null) {
+			IRGeneratorHelper.GenerateGeneralIR(irc, mr, temp_statement_environment_set, all_count,
+					IRMeta.MethodReference + code, branchs_var_instr_order.peek());
 		}
 	}
 
@@ -1023,7 +1029,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public boolean visit(ExpressionMethodReference node) {
 		return HandleMethodReferenceStart(node.resolveMethodBinding());
 	}
-	
+
 	@Override
 	public void endVisit(ExpressionMethodReference node) {
 		HandleMethodReferenceEnd(node.resolveMethodBinding(), node, node.toString());
@@ -1034,7 +1040,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public boolean visit(CreationReference node) {
 		return HandleMethodReferenceStart(node.resolveMethodBinding());
 	}
-	
+
 	@Override
 	public void endVisit(CreationReference node) {
 		HandleMethodReferenceEnd(node.resolveMethodBinding(), node, node.toString());
@@ -1045,7 +1051,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public boolean visit(TypeMethodReference node) {
 		return HandleMethodReferenceStart(node.resolveMethodBinding());
 	}
-	
+
 	@Override
 	public void endVisit(TypeMethodReference node) {
 		HandleMethodReferenceEnd(node.resolveMethodBinding(), node, node.toString());
@@ -1057,25 +1063,20 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		boolean continue_visit = HandleMethodReferenceStart(node.resolveMethodBinding());
 		return continue_visit;
 	}
-	
-	private boolean TreatSuperClassElement(ASTNode node)
-	{
+
+	private boolean TreatSuperClassElement(ASTNode node) {
 		ASTNode temp_node = ASTSearch.FindMostCloseAbstractTypeDeclaration(node);
-		if (temp_node instanceof TypeDeclaration)
-		{
+		if (temp_node instanceof TypeDeclaration) {
 			boolean source_kind = false;
-			TypeDeclaration td = (TypeDeclaration)temp_node;
+			TypeDeclaration td = (TypeDeclaration) temp_node;
 			Type tp = td.getSuperclassType();
 			ITypeBinding itb = tp.resolveBinding();
 			IType it = null;
-			if (itb != null)
-			{
+			if (itb != null) {
 				IJavaElement ijele = itb.getJavaElement();
-				if (ijele != null && ijele instanceof IType)
-				{
-					it = (IType)ijele;
-					if (!it.isBinary())
-					{
+				if (ijele != null && ijele instanceof IType) {
+					it = (IType) ijele;
+					if (!it.isBinary()) {
 						source_kind = true;
 					}
 				}
@@ -1089,7 +1090,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void endVisit(SuperMethodReference node) {
 		TreatSuperClassElement(node);
@@ -1264,22 +1265,28 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// switch such branch, how to model?
 
-	// TODO re-check all codes, be sure the scope to search the bind.
+	// Solved. re-check all codes, be sure the scope to search the bind.
 
-	// TODO remember to handle unresolved type or method invocation to its raw
+	// Solved. remember to handle unresolved type or method invocation to its
+	// raw
 	// name.
 
 	// Solved. remember to check whether temporarily appeared variable bindings
 	// such as field_access/super_field_access are properly handled.
 
-	// TODO remember to handle null resolved binding.
+	// Solved. remember to handle null resolved binding.
 
-	// Solved. Undone tasks are not handled. Solution: these don't need to be handled
+	// Solved. Undone tasks are not handled. Solution: these don't need to be
+	// handled
 	// anymore.
 
-	// Solved. general IR needs to handle related dependency. These situations are not handled.
+	// Solved. general IR needs to handle related dependency. These situations
+	// are not handled.
 
-	// TODO assign data_dependency is not handled. assign operation should be skipped.
+	// Solved. assign data_dependency is not handled. assign operation should be
+	// skipped.
+
+	// TODO are dependencies in infix operations etc. solved?
 
 	public static int GetMaxLevel() {
 		return max_level;

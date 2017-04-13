@@ -1,6 +1,7 @@
 package cn.yyx.research.program.ir.storage.highlevel;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
 
@@ -17,4 +18,9 @@ public interface IRCode {
 	public IRForOneJavaInstruction GetLastIRUnit(IJavaElement ivb);
 	
 	public IRForOneJavaInstruction GetIRUnitByIndex(IJavaElement ivb, int index);
+	
+	public void AddAssignDependency(IJavaElement ije, Set<IJavaElement> assign_depend_set);
+	
+	public Set<IJavaElement> GetAssignDependency(IJavaElement ije);
+	
 }
