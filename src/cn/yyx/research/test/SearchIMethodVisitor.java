@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.CreationReference;
@@ -34,6 +35,15 @@ public class SearchIMethodVisitor extends ASTVisitor {
 	}
 	
 	IMethodBinding im = null;
+	
+	@Override
+	public void preVisit(ASTNode node) {
+		if (node.toString().equals("super"))
+		{
+			System.out.println("@super:" + node.getClass());
+		}
+		super.preVisit(node);
+	}
 	
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {

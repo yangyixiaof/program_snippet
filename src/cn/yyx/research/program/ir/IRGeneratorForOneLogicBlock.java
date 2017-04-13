@@ -12,106 +12,14 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
-import org.eclipse.jdt.core.dom.ArrayAccess;
-import org.eclipse.jdt.core.dom.ArrayCreation;
-import org.eclipse.jdt.core.dom.ArrayInitializer;
-import org.eclipse.jdt.core.dom.ArrayType;
-import org.eclipse.jdt.core.dom.AssertStatement;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BlockComment;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
-import org.eclipse.jdt.core.dom.BreakStatement;
-import org.eclipse.jdt.core.dom.CastExpression;
-import org.eclipse.jdt.core.dom.CatchClause;
-import org.eclipse.jdt.core.dom.CharacterLiteral;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ConditionalExpression;
-import org.eclipse.jdt.core.dom.ConstructorInvocation;
-import org.eclipse.jdt.core.dom.ContinueStatement;
-import org.eclipse.jdt.core.dom.CreationReference;
-import org.eclipse.jdt.core.dom.Dimension;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.EmptyStatement;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
-import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionMethodReference;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.FieldAccess;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
-import org.eclipse.jdt.core.dom.IntersectionType;
-import org.eclipse.jdt.core.dom.Javadoc;
-import org.eclipse.jdt.core.dom.LabeledStatement;
-import org.eclipse.jdt.core.dom.LambdaExpression;
-import org.eclipse.jdt.core.dom.LineComment;
-import org.eclipse.jdt.core.dom.MarkerAnnotation;
-import org.eclipse.jdt.core.dom.MemberRef;
-import org.eclipse.jdt.core.dom.MemberValuePair;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.MethodRef;
-import org.eclipse.jdt.core.dom.MethodRefParameter;
-import org.eclipse.jdt.core.dom.Modifier;
-import org.eclipse.jdt.core.dom.NameQualifiedType;
-import org.eclipse.jdt.core.dom.NormalAnnotation;
-import org.eclipse.jdt.core.dom.NullLiteral;
-import org.eclipse.jdt.core.dom.NumberLiteral;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.jdt.core.dom.ParameterizedType;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.PostfixExpression;
-import org.eclipse.jdt.core.dom.PrefixExpression;
-import org.eclipse.jdt.core.dom.PrimitiveType;
-import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.QualifiedType;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SimpleType;
-import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
-import org.eclipse.jdt.core.dom.SuperFieldAccess;
-import org.eclipse.jdt.core.dom.SuperMethodInvocation;
-import org.eclipse.jdt.core.dom.SuperMethodReference;
-import org.eclipse.jdt.core.dom.SwitchCase;
-import org.eclipse.jdt.core.dom.SwitchStatement;
-import org.eclipse.jdt.core.dom.SynchronizedStatement;
-import org.eclipse.jdt.core.dom.TagElement;
-import org.eclipse.jdt.core.dom.TextElement;
-import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.ThrowStatement;
-import org.eclipse.jdt.core.dom.TryStatement;
-import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
-import org.eclipse.jdt.core.dom.TypeLiteral;
-import org.eclipse.jdt.core.dom.TypeMethodReference;
-import org.eclipse.jdt.core.dom.TypeParameter;
-import org.eclipse.jdt.core.dom.UnionType;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.core.dom.WhileStatement;
-import org.eclipse.jdt.core.dom.WildcardType;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.dom.*;
 
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
+import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.storage.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneJavaInstruction;
@@ -237,6 +145,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void endVisit(SuperMethodInvocation node) {
+		TreatSuperClassElement(node);
 		@SuppressWarnings("unchecked")
 		List<Expression> nlist = (List<Expression>) node.arguments();
 		IRGeneratorHelper.GenerateMethodInvocationIR(irc, nlist, node.resolveMethodBinding(), null,
@@ -1063,7 +972,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return super.visit(node);
 	}
 	
-	private IMethod GoIntoMethodReference(IMethodBinding imb)
+	private IMethod WhetherGoIntoMethodReference(IMethodBinding imb)
 	{
 		if (imb != null)
 		{
@@ -1082,7 +991,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	
 	private boolean HandleMethodReferenceStart(IMethodBinding imb)
 	{
-		IMethod im = GoIntoMethodReference(imb);
+		IMethod im = WhetherGoIntoMethodReference(imb);
 		if (im != null)
 		{
 			HandleIJavaElement(im);
@@ -1091,60 +1000,92 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return true;
 	}
 	
-	private void HandleMethodReferenceEnd(IMethodBinding imb, String code, ASTNode node)
+	private void HandleMethodReferenceEnd(IMethodBinding imb, MethodReference mr, String code)
 	{
-		IMethod im = GoIntoMethodReference(imb);
+		IMethod im = WhetherGoIntoMethodReference(imb);
 		if (im == null)
 		{
-			IRGeneratorHelper.GenerateGeneralIR(node, node, irc,
+			IRGeneratorHelper.GenerateGeneralIR(mr, mr, irc,
 					temp_statement_environment_set, IRMeta.MethodReference + code, branchs_var_instr_order.peek());
 		}
 	}
 
 	@Override
 	public boolean visit(ExpressionMethodReference node) {
-		boolean handled = false;
-		IMethodBinding imb = node.resolveMethodBinding();
-		if (imb != null)
-		{
-			IJavaElement jele = imb.getJavaElement();
-			if (jele != null && jele instanceof IMethod)
-			{
-				IMethod im = (IMethod)jele;
-				if (!im.getDeclaringType().isBinary())
-				{
-					HandleIJavaElement(im);
-					handled = true;
-					return false;
-				}
-			}
-		}
-		if (!handled)
-		{
-			
-		}
-		return super.visit(node);
+		return HandleMethodReferenceStart(node.resolveMethodBinding());
+	}
+	
+	@Override
+	public void endVisit(ExpressionMethodReference node) {
+		HandleMethodReferenceEnd(node.resolveMethodBinding(), node, node.toString());
+		super.endVisit(node);
 	}
 
 	@Override
 	public boolean visit(CreationReference node) {
-		// TODO Auto-generated method stub
-
-		return super.visit(node);
+		return HandleMethodReferenceStart(node.resolveMethodBinding());
+	}
+	
+	@Override
+	public void endVisit(CreationReference node) {
+		HandleMethodReferenceEnd(node.resolveMethodBinding(), node, node.toString());
+		super.endVisit(node);
 	}
 
 	@Override
 	public boolean visit(TypeMethodReference node) {
-		// TODO Auto-generated method stub
-
-		return super.visit(node);
+		return HandleMethodReferenceStart(node.resolveMethodBinding());
+	}
+	
+	@Override
+	public void endVisit(TypeMethodReference node) {
+		HandleMethodReferenceEnd(node.resolveMethodBinding(), node, node.toString());
+		super.endVisit(node);
 	}
 
 	@Override
 	public boolean visit(SuperMethodReference node) {
-		// TODO Auto-generated method stub
-
-		return super.visit(node);
+		boolean continue_visit = HandleMethodReferenceStart(node.resolveMethodBinding());
+		return continue_visit;
+	}
+	
+	private boolean TreatSuperClassElement(ASTNode node)
+	{
+		ASTNode temp_node = ASTSearch.FindMostCloseAbstractTypeDeclaration(node);
+		if (temp_node instanceof TypeDeclaration)
+		{
+			boolean source_kind = false;
+			TypeDeclaration td = (TypeDeclaration)temp_node;
+			Type tp = td.getSuperclassType();
+			ITypeBinding itb = tp.resolveBinding();
+			IType it = null;
+			if (itb != null)
+			{
+				IJavaElement ijele = itb.getJavaElement();
+				if (ijele != null && ijele instanceof IType)
+				{
+					it = (IType)ijele;
+					if (!it.isBinary())
+					{
+						source_kind = true;
+					}
+				}
+			}
+			if (!source_kind) {
+				HandleIJavaElement(UnresolvedTypeElement.FetchConstantElement(td.getName().toString()));
+				return true;
+			} else {
+				HandleIJavaElement(it);
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public void endVisit(SuperMethodReference node) {
+		TreatSuperClassElement(node);
+		HandleMethodReferenceEnd(node.resolveMethodBinding(), node, node.getName().toString());
+		super.endVisit(node);
 	}
 
 	// do nothing.

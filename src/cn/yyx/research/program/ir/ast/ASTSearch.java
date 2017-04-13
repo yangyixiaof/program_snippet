@@ -2,6 +2,7 @@ package cn.yyx.research.program.ir.ast;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -46,6 +47,16 @@ public class ASTSearch {
 	{
 		ASTNode temp = astnode;
 		while (temp != null && !(temp instanceof WhileStatement) && !(temp instanceof ForStatement) && !(temp instanceof EnhancedForStatement))
+		{
+			temp = temp.getParent();
+		}
+		return temp;
+	}
+	
+	public static ASTNode FindMostCloseAbstractTypeDeclaration(ASTNode astnode)
+	{
+		ASTNode temp = astnode;
+		while (temp != null && !(temp instanceof AbstractTypeDeclaration))
 		{
 			temp = temp.getParent();
 		}

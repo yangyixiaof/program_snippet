@@ -16,7 +16,6 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.ast.ASTSearch;
-import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.search.IRSearchRequestor;
 import cn.yyx.research.program.ir.storage.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.lowlevel.IRForOneJavaInstruction;
@@ -176,8 +175,8 @@ public class IRGeneratorHelper {
 		Iterator<IJavaElement> titr = temp_bindings.iterator();
 		if (!titr.hasNext())
 		{
-			ConstantUniqueElement.FetchConstantElement("code");
-			// TODO unique element not add to global binding? check that.
+			// ConstantUniqueElement.FetchConstantElement(code);
+			// do nothing.
 		}
 		while (titr.hasNext()) {
 			IJavaElement im = titr.next();
