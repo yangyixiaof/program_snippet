@@ -29,6 +29,11 @@ public class ConstantUniqueElement implements IJavaElement {
 		return yce;
 	}
 	
+	public static void Clear()
+	{
+		cache.clear();
+	}
+	
 	protected ConstantUniqueElement(String represent) {
 		this.represent = represent;
 	}

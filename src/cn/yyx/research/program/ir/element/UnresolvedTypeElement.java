@@ -29,6 +29,11 @@ public class UnresolvedTypeElement implements IJavaElement {
 		return yce;
 	}
 	
+	public static void Clear()
+	{
+		cache.clear();
+	}
+	
 	protected UnresolvedTypeElement(String represent) {
 		this.represent = represent;
 	}

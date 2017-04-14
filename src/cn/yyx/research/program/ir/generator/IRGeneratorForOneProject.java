@@ -13,6 +13,9 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
+import cn.yyx.research.program.ir.element.ConstantUniqueElement;
+import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
+import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.storage.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
 
@@ -35,6 +38,9 @@ public class IRGeneratorForOneProject {
 		{
 			irgfop.Clear();
 		}
+		ConstantUniqueElement.Clear();
+		UnresolvedLambdaUniqueElement.Clear();
+		UnresolvedTypeElement.Clear();
 		irgfop = null;
 		System.gc();
 		try {

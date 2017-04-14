@@ -43,6 +43,11 @@ public class UnresolvedLambdaUniqueElement implements IMethod {
 		return yce;
 	}
 	
+	public static void Clear()
+	{
+		cache.clear();
+	}
+	
 	protected UnresolvedLambdaUniqueElement(String represent, IMember parent_im, Map<IJavaElement, Integer> env) {
 		this.represent = represent;
 		this.parent_im = parent_im;
