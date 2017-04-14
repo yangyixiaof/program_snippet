@@ -1,5 +1,6 @@
 package cn.yyx.research.program.ir.element;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -14,6 +15,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ILocalVariable;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IOpenable;
@@ -26,21 +28,25 @@ import org.eclipse.jdt.core.JavaModelException;
 public class UnresolvedLambdaUniqueElement implements IMethod {
 	
 	String represent = null;
+	IMember parent_im = null;
+	Map<IJavaElement, Integer> env = new HashMap<IJavaElement, Integer>();
 	
 	private static Map<String, UnresolvedLambdaUniqueElement> cache = new TreeMap<String, UnresolvedLambdaUniqueElement>();
 	
-	public static UnresolvedLambdaUniqueElement FetchConstantElement(String represent)
+	public static UnresolvedLambdaUniqueElement FetchConstantElement(String represent, IMember parent_im, Map<IJavaElement, Integer> env)
 	{
 		UnresolvedLambdaUniqueElement yce = cache.get(represent);
 		if (yce == null) {
-			yce = new UnresolvedLambdaUniqueElement(represent);
+			yce = new UnresolvedLambdaUniqueElement(represent, parent_im, env);
 			cache.put(represent, yce);
 		}
 		return yce;
 	}
 	
-	protected UnresolvedLambdaUniqueElement(String represent) {
+	protected UnresolvedLambdaUniqueElement(String represent, IMember parent_im, Map<IJavaElement, Integer> env) {
 		this.represent = represent;
+		this.parent_im = parent_im;
+		this.env.putAll(env);
 	}
 	
 	@Override

@@ -18,8 +18,9 @@ public class IRForOneMethodInvocation extends IRForOneJavaInstruction {
 	// private HashMap<IJavaElement, Integer> variable_parameter_order = new HashMap<IJavaElement, Integer>();
 	// private List<HashMap<IJavaElement, Integer>> variable_parameter_orders = new LinkedList<HashMap<IJavaElement, Integer>>();
 	// parameter order starts from 1, 0 refers to the invoking object.
+	// this denotes the IJavaElement which im represents, it appers in which method parameter and its max instruction index.
 	private Map<Integer, Integer> para_order_instr_index_map = new TreeMap<Integer, Integer>();
-	
+	// this im has already contained the information about which IJavaElement this all about.
 	public IRForOneMethodInvocation(IJavaElement im, Collection<IMethod> methods, Map<Integer, Integer> para_order_instr_index_map) {
 		super(im);
 		this.AddMethods(methods);

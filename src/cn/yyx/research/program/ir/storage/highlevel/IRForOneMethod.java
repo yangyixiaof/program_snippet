@@ -1,6 +1,7 @@
 package cn.yyx.research.program.ir.storage.highlevel;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +103,24 @@ public class IRForOneMethod extends IRForOneJavaElement implements IRCode {
 	@Override
 	public Set<IJavaElement> GetAssignDependency(IJavaElement ije) {
 		return deps.get(ije);
+	}
+
+	@Override
+	public IJavaElement GetScopeIElement() {
+		return getIm();
+	}
+
+	@Override
+	public Map<IJavaElement, Integer> CopyEnvironment() {
+		Map<IJavaElement, Integer> env = new HashMap<IJavaElement, Integer>();
+		Set<IJavaElement> ikeys = irs.keySet();
+		Iterator<IJavaElement> iitr = ikeys.iterator();
+		while (iitr.hasNext())
+		{
+			IJavaElement ije = iitr.next();
+			env.put(ije, irs.get(ije).size()-1);
+		}
+		return env;
 	}
 	
 }

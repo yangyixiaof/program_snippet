@@ -991,7 +991,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			}
 		}
 		if (!handled) {
-			HandleIJavaElement(UnresolvedLambdaUniqueElement.FetchConstantElement(node.toString()));
+			HandleIJavaElement(UnresolvedLambdaUniqueElement.FetchConstantElement(node.toString(), (IMember)irc.GetScopeIElement(), irc.CopyEnvironment()));
 		}
 		return super.visit(node);
 	}

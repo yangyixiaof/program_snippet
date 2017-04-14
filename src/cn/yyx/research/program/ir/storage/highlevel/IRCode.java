@@ -1,6 +1,7 @@
 package cn.yyx.research.program.ir.storage.highlevel;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
@@ -22,5 +23,9 @@ public interface IRCode {
 	public void AddAssignDependency(IJavaElement ije, Set<IJavaElement> assign_depend_set);
 	
 	public Set<IJavaElement> GetAssignDependency(IJavaElement ije);
+	
+	public IJavaElement GetScopeIElement();
+	
+	public Map<IJavaElement, Integer> CopyEnvironment();
 	
 }
