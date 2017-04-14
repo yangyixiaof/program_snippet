@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir;
+package cn.yyx.research.program.ir.generator;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
+import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.search.IRSearchRequestor;
 import cn.yyx.research.program.ir.storage.highlevel.IRCode;

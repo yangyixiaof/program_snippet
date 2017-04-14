@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir;
+package cn.yyx.research.program.ir.generator;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;

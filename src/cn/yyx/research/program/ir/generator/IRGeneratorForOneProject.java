@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir;
+package cn.yyx.research.program.ir.generator;
 
 import java.util.HashMap;
 import java.util.List;

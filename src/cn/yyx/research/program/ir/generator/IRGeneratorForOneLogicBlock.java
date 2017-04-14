@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir;
+package cn.yyx.research.program.ir.generator;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +15,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.*;
 
+import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
@@ -1263,7 +1264,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return super.visit(node);
 	}
 
-	// switch such branch, how to model?
+	// Solved. switch such branch, how to model? dependencies on branches have been considered.
 
 	// Solved. re-check all codes, be sure the scope to search the bind.
 
@@ -1286,7 +1287,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// Solved. assign data_dependency is not handled. assign operation should be
 	// skipped.
 
-	// TODO are dependencies in infix operations etc. solved?
+	// Solved. are dependencies in infix operations etc. Solved? Yes.
 
 	public static int GetMaxLevel() {
 		return max_level;
