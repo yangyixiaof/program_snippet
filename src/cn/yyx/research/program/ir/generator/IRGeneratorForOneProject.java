@@ -126,4 +126,14 @@ public class IRGeneratorForOneProject {
 		return irmethod;
 	}
 	
+	public Map<IType, IRForOneClass> GetClassIR()
+	{
+		return class_irs;
+	}
+	
+	public Map<IMethod, IRForOneMethod> GetMethodIR()
+	{
+		return method_irs;
+	}
+	
 }
