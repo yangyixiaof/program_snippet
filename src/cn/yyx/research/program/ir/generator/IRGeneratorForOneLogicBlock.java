@@ -21,15 +21,17 @@ import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
-import cn.yyx.research.program.ir.storage.highlevel.IRCode;
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
-import cn.yyx.research.program.ir.storage.lowlevel.IRForOneJavaInstruction;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneJavaInstruction;
 
 public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	public static int max_level = Integer.MAX_VALUE; // Integer.MAX_VALUE partly
 														// means infinite.
-
+	
+	// TODO variable declarations should be removed, only assignment in it should be retained.
+	
 	// name must be resolved and ensure it is a variable, a global variable or a
 	// type.
 	// for method invocation's parameters.

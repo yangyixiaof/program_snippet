@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.storage.highlevel;
+package cn.yyx.research.program.ir.storage.node.highlevel;
 
 import java.util.List;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
 
-import cn.yyx.research.program.ir.storage.lowlevel.IRForOneJavaInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneJavaInstruction;
 
 public interface IRCode {
 	

@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.storage.highlevel;
+package cn.yyx.research.program.ir.storage.node.highlevel;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,7 +10,7 @@ import java.util.Set;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 
-import cn.yyx.research.program.ir.storage.lowlevel.IRForOneJavaInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneJavaInstruction;
 
 public class IRForOneMethod extends IRForOneJavaElement implements IRCode {
 	

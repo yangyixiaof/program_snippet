@@ -19,10 +19,10 @@ import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.search.IRSearchRequestor;
-import cn.yyx.research.program.ir.storage.highlevel.IRCode;
-import cn.yyx.research.program.ir.storage.lowlevel.IRForOneJavaInstruction;
-import cn.yyx.research.program.ir.storage.lowlevel.IRForOneMethodInvocation;
-import cn.yyx.research.program.ir.storage.lowlevel.IRForOneOperation;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneJavaInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 
 public class IRGeneratorHelper {
 

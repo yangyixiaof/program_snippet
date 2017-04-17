@@ -8,10 +8,9 @@ import java.util.Set;
 import org.eclipse.jdt.core.IType;
 
 import cn.yyx.research.program.fileutil.FileUtil;
-import cn.yyx.research.program.ir.IRResourceMeta;
 import cn.yyx.research.program.ir.IRVisualMeta;
 import cn.yyx.research.program.ir.generator.IRGeneratorForOneProject;
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneClass;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 
 public class PrintAllIRToDots {
 	
@@ -26,7 +25,15 @@ public class PrintAllIRToDots {
 			IRForOneClass irfoc = cirs.get(it);
 			
 			StringBuffer dot_content = new StringBuffer("");
+			dot_content.append("digraph {\n");
+			dot_content.append("edge[fontname=\"SimSun\",fontcolor=red];\n");
+			dot_content.append("node[fontname=\"SimSun\",size=\"20,20\"];\n");
+			dot_content.append("\n");
 			
+			dot_content.append("21->22;\n");
+			
+			
+			dot_content.append("\n}\n");
 			
 			FileUtil.WriteToFile(new File(IRVisualMeta.dot_directory + "/" + it.getFullyQualifiedName()), dot_content.toString());
 		}

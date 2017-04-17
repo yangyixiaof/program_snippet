@@ -10,8 +10,8 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneField;
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneField;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 
 public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 	

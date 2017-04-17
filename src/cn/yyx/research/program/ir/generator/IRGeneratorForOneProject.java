@@ -16,15 +16,17 @@ import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneClass;
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 
 public class IRGeneratorForOneProject {
 	
 	private IJavaProject java_project = null;
 	
-	private Map<IType, IRForOneClass> class_irs = new HashMap<IType, IRForOneClass>();
-	private Map<IMethod, IRForOneMethod> method_irs = new HashMap<IMethod, IRForOneMethod>();
+	private HashMap<IType, IRForOneClass> class_irs = new HashMap<IType, IRForOneClass>();
+	private HashMap<IMethod, IRForOneMethod> method_irs = new HashMap<IMethod, IRForOneMethod>();
+	// TODO
+	// TODO source type is dependent on unresolved operations, how to model that dependency?
 	
 	private static IRGeneratorForOneProject irgfop = null;
 	

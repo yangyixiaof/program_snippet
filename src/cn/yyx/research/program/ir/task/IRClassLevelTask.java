@@ -2,7 +2,7 @@ package cn.yyx.research.program.ir.task;
 
 import org.eclipse.jdt.core.IType;
 
-import cn.yyx.research.program.ir.storage.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 
 public class IRClassLevelTask extends IRTask {
 	

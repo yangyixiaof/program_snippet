@@ -1,8 +1,10 @@
-package cn.yyx.research.program.ir.storage.lowlevel;
+package cn.yyx.research.program.ir.storage.node.lowlevel;
 
 import org.eclipse.jdt.core.IJavaElement;
 
-public class IRForOneUnit {
+import cn.yyx.research.program.ir.storage.node.IIRNode;
+
+public abstract class IRForOneUnit implements IIRNode {
 	
 	private IJavaElement im = null;
 	// private int start = -1;
