@@ -5,26 +5,27 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMember;
 
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneJavaInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public interface IRCode {
 	
-	public void AddOneIRUnit(IJavaElement ivb, IRForOneJavaInstruction irfou);
+	public void AddOneIRUnit(IJavaElement ivb, IRForOneInstruction irfou);
 	
 	public void AddParameter(IJavaElement im);
 	
-	public List<IRForOneJavaInstruction> GetOneAllIRUnits(IJavaElement ivb);
+	public List<IRForOneInstruction> GetOneAllIRUnits(IJavaElement ivb);
 	
-	public IRForOneJavaInstruction GetLastIRUnit(IJavaElement ivb);
+	public IRForOneInstruction GetLastIRUnit(IJavaElement ivb);
 	
-	public IRForOneJavaInstruction GetIRUnitByIndex(IJavaElement ivb, int index);
+	public IRForOneInstruction GetIRUnitByIndex(IJavaElement ivb, int index);
 	
 	public void AddAssignDependency(IJavaElement ije, Set<IJavaElement> assign_depend_set);
 	
 	public Set<IJavaElement> GetAssignDependency(IJavaElement ije);
 	
-	public IJavaElement GetScopeIElement();
+	public IMember GetScopeIElement();
 	
 	public Map<IJavaElement, Integer> CopyEnvironment();
 	

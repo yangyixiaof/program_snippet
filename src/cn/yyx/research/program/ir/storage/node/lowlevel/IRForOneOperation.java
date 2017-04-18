@@ -2,7 +2,7 @@ package cn.yyx.research.program.ir.storage.node.lowlevel;
 
 import org.eclipse.jdt.core.IJavaElement;
 
-public class IRForOneOperation extends IRForOneJavaInstruction {
+public class IRForOneOperation extends IRForOneInstruction {
 	
 	private String ir = null;
 	

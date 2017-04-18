@@ -8,25 +8,26 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
 
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneJavaInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class IRForOneField extends IRForOneJavaElement implements IRCode {
 	
 	private Map<IJavaElement, Set<IJavaElement>> deps = new HashMap<IJavaElement, Set<IJavaElement>>();
-	private Map<IJavaElement, LinkedList<IRForOneJavaInstruction>> irs = new HashMap<IJavaElement, LinkedList<IRForOneJavaInstruction>>();
+	private Map<IJavaElement, LinkedList<IRForOneInstruction>> irs = new HashMap<IJavaElement, LinkedList<IRForOneInstruction>>();
 	
 	public IRForOneField(IType it) {
 		super(it);
 	}
 	
-	public void AddOneIRUnit(IJavaElement ivb, IRForOneJavaInstruction irfou)
+	public void AddOneIRUnit(IJavaElement ivb, IRForOneInstruction irfou)
 	{
-		LinkedList<IRForOneJavaInstruction> list = irs.get(ivb);
+		LinkedList<IRForOneInstruction> list = irs.get(ivb);
 		if (list == null)
 		{
-			list = new LinkedList<IRForOneJavaInstruction>();
+			list = new LinkedList<IRForOneInstruction>();
 			irs.put(ivb, list);
 		}
 		list.add(irfou);
@@ -37,13 +38,13 @@ public class IRForOneField extends IRForOneJavaElement implements IRCode {
 	}
 
 	@Override
-	public List<IRForOneJavaInstruction> GetOneAllIRUnits(IJavaElement ivb) {
+	public List<IRForOneInstruction> GetOneAllIRUnits(IJavaElement ivb) {
 		return irs.get(ivb);
 	}
 
 	@Override
-	public IRForOneJavaInstruction GetLastIRUnit(IJavaElement ivb) {
-		LinkedList<IRForOneJavaInstruction> ii = irs.get(ivb);
+	public IRForOneInstruction GetLastIRUnit(IJavaElement ivb) {
+		LinkedList<IRForOneInstruction> ii = irs.get(ivb);
 		if (ii == null)
 		{
 			return null;
@@ -52,8 +53,8 @@ public class IRForOneField extends IRForOneJavaElement implements IRCode {
 	}
 	
 	@Override
-	public IRForOneJavaInstruction GetIRUnitByIndex(IJavaElement ivb, int index) {
-		LinkedList<IRForOneJavaInstruction> ii = irs.get(ivb);
+	public IRForOneInstruction GetIRUnitByIndex(IJavaElement ivb, int index) {
+		LinkedList<IRForOneInstruction> ii = irs.get(ivb);
 		if (ii != null && ii.size() > index)
 		{
 			return ii.get(index);
@@ -72,7 +73,7 @@ public class IRForOneField extends IRForOneJavaElement implements IRCode {
 	}
 	
 	@Override
-	public IJavaElement GetScopeIElement() {
+	public IMember GetScopeIElement() {
 		return getIm();
 	}
 

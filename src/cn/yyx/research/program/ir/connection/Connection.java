@@ -56,4 +56,32 @@ public class Connection {
 		this.type = type;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+        int result = type.hashCode();
+        result = prime * result + ((source == null) ? 0 : source.hashCode());
+        result = prime * result + ((target == null) ? 0 : target.hashCode());
+        return result;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Connection)
+		{
+			Connection cnt = (Connection) obj;
+			if (type.equals(cnt.type))
+			{
+				if (source == cnt.source)
+				{
+					if (target == cnt.target)
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
 }

@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 
-public class IRForOneMethodInvocation extends IRForOneJavaInstruction {
+public class IRForOneMethodInvocation extends IRForOneInstruction {
 	
 	// private IJavaElement parent_im = null;
 	private List<IMethod> methods = new LinkedList<IMethod>();

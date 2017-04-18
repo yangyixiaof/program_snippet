@@ -19,11 +19,12 @@ import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
+import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneJavaInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
@@ -32,13 +33,18 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	
 	// TODO variable declarations should be removed, only assignment in it should be retained.
 	
+	// TODO for return statements, all node related to return should be recorded.
+	
 	// name must be resolved and ensure it is a variable, a global variable or a
 	// type.
 	// for method invocation's parameters.
 	protected HashMap<IJavaElement, HashMap<ASTNode, Integer>> temp_statement_instr_order = new HashMap<IJavaElement, HashMap<ASTNode, Integer>>();
 	protected HashSet<IJavaElement> temp_statement_environment_set = new HashSet<IJavaElement>();
 	protected HashMap<IJavaElement, Integer> all_count = new HashMap<IJavaElement, Integer>();
-
+	
+	// this variable is initialized in Construction method.
+	protected IJavaElement source_method_receiver_element = null;
+	
 	protected void StatementOverHandle() {
 		// no need to do that anymore.
 		temp_statement_instr_order.clear();
@@ -52,7 +58,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
 		while (titr.hasNext()) {
 			IJavaElement im = titr.next();
-			List<IRForOneJavaInstruction> ls = irc.GetOneAllIRUnits(im);
+			List<IRForOneInstruction> ls = irc.GetOneAllIRUnits(im);
 			if (ls != null && ls.size() > 0) {
 				int order = ls.size() - 1;
 				t_hash.put(im, order);
@@ -82,6 +88,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	public IRGeneratorForOneLogicBlock(IRCode irc) {
 		this.irc = irc;
+		this.source_method_receiver_element = new UncertainReferenceElement(irc.GetScopeIElement().getElementName());
 	}
 
 	// public Queue<IRTask> GetUndoneTasks() {
