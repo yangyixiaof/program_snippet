@@ -1,14 +1,14 @@
-package cn.yyx.research.program.ir.connection;
+package cn.yyx.research.program.ir.storage.node.connection;
 
 import cn.yyx.research.program.ir.storage.node.IIRNode;
 
 public class Connection {
 	
-	private EdgeType type = null;
+	private EdgeConnectionType type = null;
 	private IIRNode source = null;
 	private IIRNode target = null;
 	
-	public Connection(IIRNode source, IIRNode target, EdgeType type) {
+	public Connection(IIRNode source, IIRNode target, EdgeConnectionType type) {
 		this.setSource(source);
 		this.setTarget(target);
 		this.setType(type);
@@ -48,11 +48,11 @@ public class Connection {
 		this.target = target;
 	}
 
-	public EdgeType getType() {
+	public EdgeConnectionType getType() {
 		return type;
 	}
 
-	public void setType(EdgeType type) {
+	public void setType(EdgeConnectionType type) {
 		this.type = type;
 	}
 	

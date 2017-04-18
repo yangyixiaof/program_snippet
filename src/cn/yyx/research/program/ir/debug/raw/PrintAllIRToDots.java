@@ -23,6 +23,8 @@ public class PrintAllIRToDots {
 		{
 			IType it = citr.next();
 			IRForOneClass irfoc = cirs.get(it);
+			// debugging.
+			System.out.println(irfoc);
 			
 			StringBuffer dot_content = new StringBuffer("");
 			dot_content.append("digraph {\n");

@@ -13,82 +13,87 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.IMethodBinding;
 
 import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.search.IRSearchRequestor;
+import cn.yyx.research.program.ir.storage.node.connection.AllOutDirectionConnection;
+import cn.yyx.research.program.ir.storage.node.connection.Connection;
+import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.node.connection.EdgeConnectionType;
+import cn.yyx.research.program.ir.storage.node.execution.DirectParameterPassIntoMethodTask;
+import cn.yyx.research.program.ir.storage.node.execution.MethodReturnPassTask;
+import cn.yyx.research.program.ir.storage.node.execution.SkipSelfTask;
+import cn.yyx.research.program.ir.storage.node.execution.UndirectParameterPassIntoMethodTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneJavaInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 
 public class IRGeneratorHelper {
 
 	// can only be invoked in end_visit_method_invocation.
-	public static void GenerateMethodInvocationIR(IRCode irc, List<Expression> nlist, IMethodBinding imb,
+	public static void GenerateMethodInvocationIR(IRCode irc, List<Expression> nlist, IMethod im,
+			IJavaElement source_method_receiver_element,
 			Expression expr, String identifier, ASTNode node,
-			HashMap<IJavaElement, HashMap<ASTNode, Integer>> temp_statement_instr_order_set,
+			HashMap<ASTNode, Map<IJavaElement, Integer>> temp_statement_instr_order,
+			HashMap<ASTNode, Map<IJavaElement, Boolean>> temp_statement_instr_is_self,
 			Set<IJavaElement> temp_statement_environment_set,
 			Map<IJavaElement, Integer> all_count,
 			HashMap<IJavaElement, Integer> branch_dependency) {
-
-		if (imb != null && imb.getDeclaringClass() != null && imb.getDeclaringClass().isFromSource()) {
-			// source method invocation.
-			IJavaElement jele = imb.getJavaElement();
-			if (jele != null && jele instanceof IMethod) {
+		
+//		if (imb != null && imb.getDeclaringClass() != null && imb.getDeclaringClass().isFromSource()) {
+//			
+//			ITypeBinding itb = imb.getReturnType();
+//			if (itb.isPrimitive() && itb.getQualifiedName().equals("void"))
+//			{
+//				// 
+//			}
+//			IJavaElement jele = imb.getJavaElement();
+			if (im != null) {//  && jele instanceof IMethod
+				// source method invocation.
 				Collection<IMethod> methods = null;
-				IMethod imethod = (IMethod) jele;
 				try {
 					IRSearchRequestor sr = new IRSearchRequestor();
-					JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, true, sr);
+					JavaSearch.SearchForWhereTheMethodIsInvoked(im, true, sr);
 					methods = sr.GetMethods();
 				} catch (CoreException e) {
 					e.printStackTrace();
 				}
 				if (methods != null && methods.size() > 0) {
-					Set<IJavaElement> ims = temp_statement_instr_order_set.keySet();
-					Iterator<IJavaElement> iitr = ims.iterator();
-					while (iitr.hasNext()) {
-						IJavaElement im = iitr.next();
-						Map<Integer, Integer> para_order_instr_index_map = new HashMap<Integer, Integer>();
-						HashMap<ASTNode, Integer> ast_order = temp_statement_instr_order_set.get(im);
-						int idx = 0;
-						Iterator<Expression> nitr = nlist.iterator();
-						while (nitr.hasNext()) {
-							idx++;
-							Expression nexpr = nitr.next();
-							int max = -1;
-							Set<ASTNode> astkeys = ast_order.keySet();
-							Iterator<ASTNode> aitr = astkeys.iterator();
-							while (aitr.hasNext()) {
-								ASTNode ast = aitr.next();
-								if (ASTSearch.ASTNodeContainsAnASTNode(nexpr, ast)) {
-									Integer aidx = ast_order.get(ast);
-									if (aidx != null) {
-										if (max < aidx) {
-											max = aidx;
-										}
-									}
-								}
-							}
-							if (max >= 0) {
-								para_order_instr_index_map.put(idx, max);
+					Map<IRForOneInstruction, Integer> para_order_instr_index_map = new HashMap<IRForOneInstruction, Integer>();
+					IRForOneMethodInvocation now = new IRForOneMethodInvocation(irc, source_method_receiver_element, methods);
+					Iterator<Expression> nitr = nlist.iterator();
+					int idx = -1;
+					while (nitr.hasNext()) {
+						idx++;
+						Expression nexpr = nitr.next();
+						Map<IJavaElement, Integer> jele_order = temp_statement_instr_order.get(nexpr);
+						Map<IJavaElement, Boolean> jele_is_self = temp_statement_instr_is_self.get(nexpr);
+						Set<IJavaElement> ele_keys = jele_order.keySet();
+						Iterator<IJavaElement> eitr = ele_keys.iterator();
+						while (eitr.hasNext())
+						{
+							IJavaElement ije = eitr.next();
+							IRForOneInstruction source = irc.GetIRUnitByIndex(ije, jele_order.get(ije));
+							para_order_instr_index_map.put(source, idx);
+							
+							boolean is_self = jele_is_self.get(ije);
+							if (is_self) {
+								Connection conn = new Connection(source, now, new EdgeConnectionType(EdgeBaseType.Self.getType()));
+								source.PutConnectionMergeTask(conn, new DirectParameterPassIntoMethodTask());
+							} else {
+								Connection conn = new Connection(source, now, new EdgeConnectionType(EdgeBaseType.Sequential.getType()));
+								source.PutConnectionMergeTask(conn, new UndirectParameterPassIntoMethodTask());
 							}
 						}
-						IRForOneMethodInvocation now = new IRForOneMethodInvocation(im, methods,
-								para_order_instr_index_map);
-
-						HandleNodeDependency(irc, im, now, branch_dependency);
-
-						irc.AddOneIRUnit(im, now);
 					}
+					
+					HandleNodeSelfAndBranchDependency(irc, source_method_receiver_element, now, branch_dependency);
+					irc.AddOneIRUnit(source_method_receiver_element, now);
 				}
-			}
-		} else {
-			IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
-					IRMeta.MethodInvocation + identifier, branch_dependency);
+		//	}
 		}
 
 		// // initialize parameters of the node.
@@ -157,24 +162,25 @@ public class IRGeneratorHelper {
 	// }
 
 	public static void GenerateNoVariableBindingIR(ASTNode node, ASTNode exact_node, IRCode irc,
-			Set<IJavaElement> member_set, String code, HashMap<IJavaElement, Integer> branch_dependency) {
+			Set<IJavaElement> member_set, String code, HashMap<IJavaElement, Integer> branch_dependency, HashMap<IJavaElement, ASTNode> all_happen) {
 		Set<IJavaElement> temp_bindings = member_set;
 		Iterator<IJavaElement> titr = temp_bindings.iterator();
 		while (titr.hasNext()) {
 			IJavaElement im = titr.next();
-			if (ASTSearch.ASTNodeContainsAMember(node, im)) {
+			ASTNode im_node = all_happen.get(im);
+			if (im_node != null && ASTSearch.ASTNodeContainsAnASTNode(node, im_node)) {
 				// int start = exact_node.getStartPosition();
 				// int end = start + exact_node.getLength() - 1;
 				// IRInstrKind ir_kind = IRInstrKind.ComputeKind(1);
-				IRForOneOperation now = new IRForOneOperation(im, code);
+				IRForOneOperation now = new IRForOneOperation(irc, im, code);
 				irc.AddOneIRUnit(im, now);
-				HandleNodeDependency(irc, im, now, branch_dependency);
+				HandleNodeSelfAndBranchDependency(irc, im, now, branch_dependency);
 			}
 		}
 	}
 
 	public static void GenerateGeneralIR(IRCode irc, ASTNode node, 
-			Set<IJavaElement> temp_statement_set, Map<IJavaElement, Integer> all_count, String code, HashMap<IJavaElement, Integer> branch_dependency) {
+			Set<IJavaElement> temp_statement_set, Map<IJavaElement, Integer> all_count, HashMap<IJavaElement, ASTNode> all_happen, String code, HashMap<IJavaElement, Integer> branch_dependency) {
 		Set<IJavaElement> concern = new HashSet<IJavaElement>(temp_statement_set);
 		Iterator<IJavaElement> oitr = temp_statement_set.iterator();
 		while (oitr.hasNext())
@@ -194,7 +200,8 @@ public class IRGeneratorHelper {
 		}
 		while (titr.hasNext()) {
 			IJavaElement im = titr.next();
-			if (ASTSearch.ASTNodeContainsAMember(node, im)) {
+			ASTNode im_node = all_happen.get(im);
+			if (im_node != null && ASTSearch.ASTNodeContainsAnASTNode(node, im_node)) {
 				Integer count = all_count.get(im);
 				if (count != null && count >= 0) {
 					count++;
@@ -204,9 +211,9 @@ public class IRGeneratorHelper {
 						// int start = exact_node.getStartPosition();
 						// int end = start + exact_node.getLength() - 1;
 						// IRInstrKind ir_kind = IRInstrKind.ComputeKind(count);
-						IRForOneOperation now = new IRForOneOperation(im, code);
+						IRForOneOperation now = new IRForOneOperation(irc, im, code);
 
-						HandleNodeDependency(irc, im, now, branch_dependency);
+						HandleNodeSelfAndBranchDependency(irc, im, now, branch_dependency);
 
 						irc.AddOneIRUnit(im, now);
 					}
@@ -217,20 +224,38 @@ public class IRGeneratorHelper {
 
 	}
 
-	private static void HandleNodeDependency(IRCode irc, IJavaElement im, IRForOneJavaInstruction now,
+	private static void HandleNodeSelfAndBranchDependency(IRCode irc, IJavaElement im, IRForOneInstruction now,
 			HashMap<IJavaElement, Integer> branch_dependency) {
-		IRForOneJavaInstruction last_instr = irc.GetLastIRUnit(im);
-		now.AddParent(last_instr);
+		IRForOneInstruction last_instr = irc.GetLastIRUnit(im);
+		if (last_instr != null)
+		{
+			irc.AddSelfDependency(last_instr, now);
+		}
+		if (branch_dependency == null)
+		{
+			return;
+		}
 		Set<IJavaElement> bkeys = branch_dependency.keySet();
 		Iterator<IJavaElement> bitr = bkeys.iterator();
 		while (bitr.hasNext()) {
 			IJavaElement bim = bitr.next();
 			Integer idx = branch_dependency.get(bim);
-			IRForOneJavaInstruction pt = irc.GetIRUnitByIndex(bim, idx);
+			IRForOneInstruction pt = irc.GetIRUnitByIndex(bim, idx);
 			if (pt != null) {
-				now.AddParent(pt);
+				irc.AddBranchDependency(pt, now);
 			}
 		}
+	}
+	
+	// TODO
+	public static void AddMethodReturnVirtualReceiveNodeAndSelfDependency(IRCode irc, IJavaElement im, IRForOneMethodInvocation irfomi)
+	{
+		IRForOneOperation irfoo = new IRForOneOperation(irc, im, IRMeta.VirtualMethodReturn);
+		irfoo.PutConnectionMergeTask(AllOutDirectionConnection.GetAllOutDirectionConnection(), new SkipSelfTask());
+		irc.AddOneIRUnit(im, irfoo);
+		HandleNodeSelfAndBranchDependency(irc, im, irfoo, null);
+		Connection conn = new Connection(irfomi, irfoo, new EdgeConnectionType(EdgeBaseType.Self.getType()));
+		irfomi.PutConnectionMergeTask(conn, new MethodReturnPassTask());
 	}
 
 	// private static void GenerateSourceMethodInvocationIR(IBinding ib,

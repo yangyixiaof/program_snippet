@@ -30,24 +30,30 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	public static int max_level = Integer.MAX_VALUE; // Integer.MAX_VALUE partly
 														// means infinite.
-	
+	public static final int un_exist = -100;
 	// TODO variable declarations should be removed, only assignment in it should be retained.
 	
-	// TODO for return statements, all node related to return should be recorded.
+	// TODO for return statements, all nodes related to return should be recorded.
 	
-	// name must be resolved and ensure it is a variable, a global variable or a
-	// type.
+	// name must be resolved and ensure it is a variable, a global variable or a type.
 	// for method invocation's parameters.
-	protected HashMap<IJavaElement, HashMap<ASTNode, Integer>> temp_statement_instr_order = new HashMap<IJavaElement, HashMap<ASTNode, Integer>>();
+	protected HashMap<ASTNode, Map<IJavaElement, Integer>> temp_statement_instr_order = new HashMap<ASTNode, Map<IJavaElement, Integer>>();
+	protected HashMap<ASTNode, Map<IJavaElement, Boolean>> temp_statement_instr_is_self = new HashMap<ASTNode, Map<IJavaElement, Boolean>>();
 	protected HashSet<IJavaElement> temp_statement_environment_set = new HashSet<IJavaElement>();
 	protected HashMap<IJavaElement, Integer> all_count = new HashMap<IJavaElement, Integer>();
+	protected HashMap<IJavaElement, ASTNode> all_happen = new HashMap<IJavaElement, ASTNode>();
 	
-	// this variable is initialized in Construction method.
-	protected IJavaElement source_method_receiver_element = null;
+	// TODO check if all_happen is all right assigned.
+	
+	// these two variables are all be handled when encountering source method invocation.
+	// this variable is initialized in Construction method. so this is already be initialized.
+	protected IJavaElement source_method_receiver_element = null; // already assigned.
+	// TODO this should be handled.
+	protected HashMap<ASTNode, IJavaElement> source_method_return_element = new HashMap<ASTNode, IJavaElement>();
 	
 	protected void StatementOverHandle() {
 		// no need to do that anymore.
-		temp_statement_instr_order.clear();
+		// temp_statement_instr_order.clear();
 		temp_statement_environment_set.clear();
 	}
 
@@ -76,7 +82,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// protected Queue<IRTask> undone_tasks = new LinkedList<IRTask>();
 
 	protected Map<ASTNode, Runnable> post_visit_task = new HashMap<ASTNode, Runnable>();
-
 	protected Map<ASTNode, Runnable> pre_visit_task = new HashMap<ASTNode, Runnable>();
 
 	protected Map<ASTNode, HashSet<IJavaElement>> ast_block_bind = new HashMap<ASTNode, HashSet<IJavaElement>>();
@@ -144,6 +149,80 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	// method invocation.
+	
+	private void PostMethodInvocation(IMethodBinding imb, List<Expression> nlist, Expression expr, String identifier, ASTNode node,
+			HashMap<IJavaElement, HashMap<ASTNode, Integer>> temp_statement_instr_order_set,
+			Set<IJavaElement> temp_statement_environment_set,
+			Map<IJavaElement, Integer> all_count,
+			HashMap<IJavaElement, Integer> branch_dependency)
+	{
+		if (imb != null && imb.getDeclaringClass() != null && imb.getDeclaringClass().isFromSource()) {
+			// source method invocation.
+			ITypeBinding itb = imb.getReturnType();
+			if (itb.isPrimitive() && !itb.getQualifiedName().equals("void"))
+			{
+				// TODO
+				HandleIJavaElement(new UncertainReferenceElement(node.toString()), node);
+				
+			}
+			IJavaElement jele = imb.getJavaElement();
+			if (jele != null && jele instanceof IMethod) {
+				IMethod im = (IMethod)jele;
+				IRGeneratorHelper.GenerateMethodInvocationIR(irc, nlist, im, expr, identifier, node, temp_statement_instr_order_set, temp_statement_environment_set, all_count, branch_dependency);
+			}
+		} else {
+			IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
+					IRMeta.MethodInvocation + identifier, branch_dependency);
+		}
+		temp_statement_instr_order.clear();
+		temp_statement_instr_is_self.clear();
+	}
+	
+	private void PreMethodInvocation(List<Expression> exprs)
+	{
+		// temp_statement_instr_order
+		Iterator<Expression> eitr = exprs.iterator();
+		while (eitr.hasNext())
+		{
+			
+			Expression expr = eitr.next();
+			pre_visit_task.put(expr, new Runnable() {
+				@Override
+				public void run() {
+					Map<IJavaElement, Integer> env = irc.CopyEnvironment();
+					temp_statement_instr_order.put(expr, env);
+				}
+			});
+			post_visit_task.put(expr, new Runnable() {
+				@Override
+				public void run() {
+					Map<IJavaElement, Boolean> new_is_self_env = new HashMap<IJavaElement, Boolean>();
+					temp_statement_instr_is_self.put(expr, new_is_self_env);
+					Map<IJavaElement, Integer> origin_env = temp_statement_instr_order.get(expr);
+					Map<IJavaElement, Integer> new_env = new HashMap<IJavaElement, Integer>();
+					Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
+					while (titr.hasNext())
+					{
+						IJavaElement ije = titr.next();
+						new_is_self_env.put(ije, false);
+						List<IRForOneInstruction> list = irc.GetOneAllIRUnits(ije);
+						if (list != null && list.size() > 0)
+						{
+							int idx = list.size() - 1;
+							new_env.put(ije, idx);
+							Integer ori_idx = origin_env.get(ije);
+							if (ori_idx == idx)
+							{
+								new_is_self_env.put(ije, true);
+							}
+						}
+					}
+					temp_statement_instr_order.put(expr, new_env);
+					StatementOverHandle();
+				}
+			});
+		}
+	}
 
 	@Override
 	public void endVisit(MethodInvocation node) {
@@ -659,15 +738,15 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// handling expressions.
 
-	private boolean HandleBinding(IBinding ib) {
+	private boolean HandleBinding(IBinding ib, ASTNode happen) {
 		if (!BindingManager.QualifiedBinding(ib)) {
 			return false;
 		}
 		IJavaElement jele = ib.getJavaElement();
-		return HandleIJavaElement(jele);
+		return HandleIJavaElement(jele, happen);
 	}
 
-	private boolean HandleIJavaElement(IJavaElement jele) {
+	private boolean HandleIJavaElement(IJavaElement jele, ASTNode happen) {
 		// handle loop_bind, just for no variable bind statements such as
 		// break and continue.
 		// if (!BindingManager.QualifiedBinding(ib)) {
@@ -704,13 +783,14 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 		// next isolated tasks.
 		all_count.put(jele, -1);
+		all_happen.put(jele, happen);
 		return true;
 	}
 
 	@Override
 	public boolean visit(SimpleName node) {
 		IBinding ib = node.resolveBinding();
-		HandleBinding(ib);
+		HandleBinding(ib, node);
 
 		return super.visit(node);
 	}
@@ -736,81 +816,81 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(StringLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()));
+		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(NumberLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()));
+		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(NullLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()));
+		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(CharacterLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()));
+		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(BooleanLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()));
+		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(TypeLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()));
+		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
 		return super.visit(node);
 	}
 
-	private void HandleType(IBinding ib, String represent) {
-		boolean source_resolved = HandleBinding(ib);
+	private void HandleType(IBinding ib, String represent, ASTNode happen) {
+		boolean source_resolved = HandleBinding(ib, happen);
 		if (!source_resolved) {
 			UnresolvedTypeElement ele = UnresolvedTypeElement.FetchConstantElement(represent);
-			HandleIJavaElement(ele);
+			HandleIJavaElement(ele, happen);
 		}
 	}
 
 	@Override
 	public boolean visit(ArrayType node) {
-		HandleType(node.resolveBinding(), node.toString());
+		HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
 
 	@Override
 	public boolean visit(SimpleType node) {
-		HandleType(node.resolveBinding(), node.toString());
+		HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
 
 	@Override
 	public boolean visit(PrimitiveType node) {
-		HandleType(node.resolveBinding(), node.toString());
+		HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
 
 	@Override
 	public boolean visit(QualifiedType node) {
-		HandleType(node.resolveBinding(), node.toString());
+		HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
 
 	@Override
 	public boolean visit(NameQualifiedType node) {
-		HandleType(node.resolveBinding(), node.toString());
+		HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
 
 	@Override
 	public boolean visit(QualifiedName node) {
-		HandleType(node.resolveBinding(), node.toString());
+		HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
 
@@ -892,7 +972,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(EnumConstantDeclaration node) {
-		HandleBinding(node.resolveVariable());
+		HandleBinding(node.resolveVariable(), node);
 		return super.visit(node);
 	}
 
@@ -991,7 +1071,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			IJavaElement jele = imb.getJavaElement();
 			if (jele != null && jele instanceof IMethod) {
 				IMethod im = (IMethod) jele;
-				HandleIJavaElement(im);
+				HandleIJavaElement(im, node);
 				handled = true;
 
 				IRForOneMethod irfom = IRGeneratorForOneProject.FetchIMethodIR(im);
@@ -1000,7 +1080,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			}
 		}
 		if (!handled) {
-			HandleIJavaElement(UnresolvedLambdaUniqueElement.FetchConstantElement(node.toString(), (IMember)irc.GetScopeIElement(), irc.CopyEnvironment()));
+			HandleIJavaElement(UnresolvedLambdaUniqueElement.FetchConstantElement(node.toString(), (IMember)irc.GetScopeIElement(), irc.CopyEnvironment()), node);
 		}
 		return super.visit(node);
 	}
@@ -1018,10 +1098,10 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return null;
 	}
 
-	private boolean HandleMethodReferenceStart(IMethodBinding imb) {
+	private boolean HandleMethodReferenceStart(IMethodBinding imb, ASTNode happen) {
 		IMethod im = WhetherGoIntoMethodReference(imb);
 		if (im != null) {
-			HandleIJavaElement(im);
+			HandleIJavaElement(im, happen);
 			return false;
 		}
 		return true;
@@ -1037,7 +1117,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(ExpressionMethodReference node) {
-		return HandleMethodReferenceStart(node.resolveMethodBinding());
+		return HandleMethodReferenceStart(node.resolveMethodBinding(), node);
 	}
 
 	@Override
@@ -1048,7 +1128,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(CreationReference node) {
-		return HandleMethodReferenceStart(node.resolveMethodBinding());
+		return HandleMethodReferenceStart(node.resolveMethodBinding(), node);
 	}
 
 	@Override
@@ -1059,7 +1139,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(TypeMethodReference node) {
-		return HandleMethodReferenceStart(node.resolveMethodBinding());
+		return HandleMethodReferenceStart(node.resolveMethodBinding(), node);
 	}
 
 	@Override
@@ -1070,7 +1150,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(SuperMethodReference node) {
-		boolean continue_visit = HandleMethodReferenceStart(node.resolveMethodBinding());
+		boolean continue_visit = HandleMethodReferenceStart(node.resolveMethodBinding(), node);
 		return continue_visit;
 	}
 
@@ -1092,10 +1172,10 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				}
 			}
 			if (!source_kind) {
-				HandleIJavaElement(UnresolvedTypeElement.FetchConstantElement(td.getName().toString()));
+				HandleIJavaElement(UnresolvedTypeElement.FetchConstantElement(td.getName().toString()), node);
 				return true;
 			} else {
-				HandleIJavaElement(it);
+				HandleIJavaElement(it, node);
 			}
 		}
 		return false;

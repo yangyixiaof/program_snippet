@@ -41,4 +41,6 @@ public class IRMeta {
 	public static final String MethodReference = "@MethodRef_";
 	public static final String FieldAccess = "@FieldAccess_";
 	
+	public static final String VirtualMethodReturn = "@VirtualMethodReturn";
+	
 }

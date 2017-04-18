@@ -1,6 +1,6 @@
-package cn.yyx.research.program.ir.connection;
+package cn.yyx.research.program.ir.storage.node.connection;
 
-public enum EdgeType {
+public enum EdgeBaseType {
 	
 	Sequential(1),
 	Self(1 << 1 | 1),
@@ -8,7 +8,7 @@ public enum EdgeType {
 	
 	private int type = 0;
 	
-	private EdgeType(int type) {
+	private EdgeBaseType(int type) {
 		this.type = type;
 	}
 	

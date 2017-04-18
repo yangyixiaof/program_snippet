@@ -1,26 +1,29 @@
 package cn.yyx.research.program.ir.storage.node.lowlevel;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.jdt.core.IJavaElement;
 
-import cn.yyx.research.program.ir.connection.Connection;
 import cn.yyx.research.program.ir.storage.node.IIRNode;
+import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
+import cn.yyx.research.program.ir.storage.node.connection.Connection;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 
 public abstract class IRForOneInstruction implements IIRNode {
 	
-	private IJavaElement im = null;
+	protected IJavaElement im = null;
+	protected IRCode parent_env = null;
 	
-	private Set<Connection> in_connects = new HashSet<Connection>();
-	private Set<Connection> out_connects = new HashSet<Connection>();
+	protected Map<Connection, IIRNodeTask> conn_task = new HashMap<Connection, IIRNodeTask>();
 	// private int start = -1;
 	// private int end = -1;
 	// private IRInstrKind ir_kind = IRInstrKind.Weak;
 	
-	public IRForOneInstruction(IJavaElement im) {
+	public IRForOneInstruction(IJavaElement im, IRCode parent_env) {
 		// , int start, int end, IRInstrKind ir_kind
 		this.setIm(im);
+		this.setParentEnv(parent_env);
 //		this.setStart(start);
 //		this.setEnd(end);
 //		this.setIr_kind(ir_kind);
@@ -30,8 +33,26 @@ public abstract class IRForOneInstruction implements IIRNode {
 		return im;
 	}
 
-	public void setIm(IJavaElement im) {
+	private void setIm(IJavaElement im) {
 		this.im = im;
+	}
+
+	public IRCode getParentEnv() {
+		return parent_env;
+	}
+
+	private void setParentEnv(IRCode parent_env) {
+		this.parent_env = parent_env;
+	}
+	
+	@Override
+	public void PutConnectionMergeTask(Connection conn, IIRNodeTask run) {
+		conn_task.put(conn, run);
+	}
+
+	@Override
+	public IIRNodeTask GetConnectionMergeTask(Connection conn) {
+		return conn_task.get(conn);
 	}
 	
 //	public void AddParent(IRForOneJavaInstruction parent)

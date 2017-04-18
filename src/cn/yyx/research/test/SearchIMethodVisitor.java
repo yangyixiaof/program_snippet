@@ -7,6 +7,8 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.CreationReference;
 import org.eclipse.jdt.core.dom.ExpressionMethodReference;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -198,9 +200,46 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		{
 			IMethod imethod = (IMethod)ibinding.getJavaElement();
 			try {
+				System.out.println("========MethodInvocation Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
 				System.out.println("MethodInvocation:" + node.getName() + " Search for declarations.");
 				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, true, new SearchResultRequestorForTest(java_project));
 			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(ConstructorInvocation node) {
+		System.out.println("ConstructorInvocation:" + node);
+		IMethodBinding ibinding = node.resolveConstructorBinding();
+		if (ibinding != null)
+		{
+			IMethod imethod = (IMethod)ibinding.getJavaElement();
+			try {
+				System.out.println("========Construction Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
+				System.out.println("MethodInvocation:" + node + " Search for declarations.");
+				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, true, new SearchResultRequestorForTest(java_project));
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(ClassInstanceCreation node) {
+		System.out.println("ClassInstanceCreation:" + node);
+		IMethodBinding ibinding = node.resolveConstructorBinding();
+		if (ibinding != null)
+		{
+			IMethod imethod = (IMethod)ibinding.getJavaElement();
+			try {
+				System.out.println("========ClassInstanceCreation Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
+				System.out.println("MethodInvocation:" + node + " Search for declarations.");
+				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, true, new SearchResultRequestorForTest(java_project));
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

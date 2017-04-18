@@ -4,13 +4,23 @@ import java.util.List;
 
 import org.eclipse.jdt.core.IType;
 
-public class IRForOneClass extends IRForOneJavaElement {
+public class IRForOneClass {
 	
 	private IRForOneField field_level = null;
 	private List<IRForOneMethod> method_level = null;
 	
+	private IType it = null;
+	
+	public IType getIt() {
+		return it;
+	}
+
+	public void setIt(IType it) {
+		this.it = it;
+	}
+	
 	public IRForOneClass(IType it) {
-		super(it);
+		this.it = it;
 //		IRGeneratorForOneProject.FetchITypeIR(it, this);
 	}
 

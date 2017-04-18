@@ -25,7 +25,7 @@ public class IRGeneratorForOneProject {
 	
 	private HashMap<IType, IRForOneClass> class_irs = new HashMap<IType, IRForOneClass>();
 	private HashMap<IMethod, IRForOneMethod> method_irs = new HashMap<IMethod, IRForOneMethod>();
-	// TODO
+	
 	// TODO source type is dependent on unresolved operations, how to model that dependency?
 	
 	private static IRGeneratorForOneProject irgfop = null;
