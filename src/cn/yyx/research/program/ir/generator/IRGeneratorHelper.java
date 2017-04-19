@@ -166,9 +166,12 @@ public class IRGeneratorHelper {
 	// irfom, binds, code);
 	// }
 
-	public static void GenerateNoVariableBindingIR(ASTNode node, ASTNode exact_node, IRCode irc,
-			Set<IJavaElement> member_set, String code, HashMap<IJavaElement, Integer> branch_dependency,
-			HashMap<IJavaElement, ASTNode> all_happen) {
+	public static void GenerateNoVariableBindingIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node, 
+			Set<IJavaElement> member_set, String code) {
+		IRCode irc = irgfob.irc;
+		HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
+		HashMap<IJavaElement, Integer> branch_dependency = irgfob.branchs_var_instr_order.peek();
+		
 		Set<IJavaElement> temp_bindings = member_set;
 		Iterator<IJavaElement> titr = temp_bindings.iterator();
 		while (titr.hasNext()) {
@@ -185,9 +188,13 @@ public class IRGeneratorHelper {
 		}
 	}
 
-	public static void GenerateGeneralIR(IRCode irc, ASTNode node, Set<IJavaElement> temp_statement_set,
-			Map<IJavaElement, Integer> all_count, HashMap<IJavaElement, ASTNode> all_happen, String code,
-			HashMap<IJavaElement, Integer> branch_dependency) {
+	public static void GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
+			String code) {
+		IRCode irc = irgfob.irc;
+		Map<IJavaElement, Integer> all_count = irgfob.all_count;
+		HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
+		HashMap<IJavaElement, Integer> branch_dependency = irgfob.branchs_var_instr_order.peek();
+		HashSet<IJavaElement> temp_statement_set = irgfob.temp_statement_environment_set;
 		Set<IJavaElement> concern = new HashSet<IJavaElement>(temp_statement_set);
 		Iterator<IJavaElement> oitr = temp_statement_set.iterator();
 		while (oitr.hasNext()) {
