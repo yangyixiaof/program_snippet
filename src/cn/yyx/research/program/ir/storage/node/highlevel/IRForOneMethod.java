@@ -1,14 +1,10 @@
 package cn.yyx.research.program.ir.storage.node.highlevel;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
-
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class IRForOneMethod extends IRCode {
 	
@@ -18,7 +14,6 @@ public class IRForOneMethod extends IRCode {
 	private List<IJavaElement> parameters = new LinkedList<IJavaElement>();
 	
 	// valid index is 0, -1 means no irs.
-	private Map<IJavaElement, IRForOneInstruction> out_nodes = new HashMap<IJavaElement, IRForOneInstruction>();
 	
 	// only three situations could lead to data_dependency key: first var_bind in method invocation(exclude cascade)/left value in assignment.
 	// private Map<IBinding, HashSet<IBinding>> data_dependency = new HashMap<IBinding, HashSet<IBinding>>();
@@ -59,13 +54,5 @@ public class IRForOneMethod extends IRCode {
 	{
 		return parameters;
 	}
-
-	public void PutOutNodes(IJavaElement ijele, IRForOneInstruction irfoi) {
-		out_nodes.put(ijele, irfoi);
-	}
-
-	public Map<IJavaElement, IRForOneInstruction> GetOutNodes() {
-		return out_nodes;
-	}
-		
+	
 }

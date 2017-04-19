@@ -22,9 +22,12 @@ import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
+import cn.yyx.research.program.ir.storage.node.connection.UnknownOutDirectionConnection;
+import cn.yyx.research.program.ir.storage.node.execution.MethodReturnPassTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation;
 
 public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
@@ -33,27 +36,32 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public static final int un_exist = -100;
 	// TODO variable declarations should be removed, only assignment in it should be retained.
 	
-	// TODO for return statements, all nodes related to return should be recorded.
+	// for return statements, all nodes related to return should be recorded.
 	
 	// name must be resolved and ensure it is a variable, a global variable or a type.
 	// for method invocation's parameters.
+	// TODO this element is not assigned.
+	protected HashSet<IJavaElement> temp_statement_instr_environment_set = new HashSet<IJavaElement>();
 	protected HashMap<ASTNode, Map<IJavaElement, Integer>> temp_statement_instr_order = new HashMap<ASTNode, Map<IJavaElement, Integer>>();
 	protected HashMap<ASTNode, Map<IJavaElement, Boolean>> temp_statement_instr_is_self = new HashMap<ASTNode, Map<IJavaElement, Boolean>>();
+	// above used for method invocation only.
+	// TODO this element is not assigned.
 	protected HashSet<IJavaElement> temp_statement_environment_set = new HashSet<IJavaElement>();
 	protected HashMap<IJavaElement, Integer> all_count = new HashMap<IJavaElement, Integer>();
 	protected HashMap<IJavaElement, ASTNode> all_happen = new HashMap<IJavaElement, ASTNode>();
 	
-	// TODO check if all_happen is all right assigned.
+	// check if all_happen is all right assigned. yes.
 	
 	// these two variables are all be handled when encountering source method invocation.
 	// this variable is initialized in Construction method. so this is already be initialized.
 	protected IJavaElement source_method_receiver_element = null; // already assigned.
-	// TODO this should be handled.
-	protected HashMap<ASTNode, IJavaElement> source_method_return_element = new HashMap<ASTNode, IJavaElement>();
+	// this should be handled. this is no need anymore.
+	// protected HashMap<ASTNode, IJavaElement> source_method_return_element = new HashMap<ASTNode, IJavaElement>();
 	
 	protected void StatementOverHandle() {
 		// no need to do that anymore.
 		// temp_statement_instr_order.clear();
+		temp_statement_instr_environment_set.clear();
 		temp_statement_environment_set.clear();
 	}
 
@@ -150,29 +158,26 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// method invocation.
 	
-	private void PostMethodInvocation(IMethodBinding imb, List<Expression> nlist, Expression expr, String identifier, ASTNode node,
-			HashMap<IJavaElement, HashMap<ASTNode, Integer>> temp_statement_instr_order_set,
-			Set<IJavaElement> temp_statement_environment_set,
-			Map<IJavaElement, Integer> all_count,
-			HashMap<IJavaElement, Integer> branch_dependency)
+	private void PostMethodInvocation(IMethodBinding imb, List<Expression> nlist, Expression expr, String identifier, ASTNode node)
 	{
 		if (imb != null && imb.getDeclaringClass() != null && imb.getDeclaringClass().isFromSource()) {
 			// source method invocation.
 			ITypeBinding itb = imb.getReturnType();
 			if (itb.isPrimitive() && !itb.getQualifiedName().equals("void"))
 			{
-				// TODO
-				HandleIJavaElement(new UncertainReferenceElement(node.toString()), node);
-				
-			}
-			IJavaElement jele = imb.getJavaElement();
-			if (jele != null && jele instanceof IMethod) {
-				IMethod im = (IMethod)jele;
-				IRGeneratorHelper.GenerateMethodInvocationIR(irc, nlist, im, expr, identifier, node, temp_statement_instr_order_set, temp_statement_environment_set, all_count, branch_dependency);
+				IJavaElement jele = imb.getJavaElement();
+				if (jele != null && jele instanceof IMethod) {
+					IMethod im = (IMethod)jele;
+					IRGeneratorHelper.GenerateMethodInvocationIR(irc, nlist, im, source_method_receiver_element, expr, identifier, node, temp_statement_instr_order, temp_statement_instr_is_self, temp_statement_environment_set, all_count, branchs_var_instr_order.peek());
+					IRForOneMethodInvocation irfomi = (IRForOneMethodInvocation)irc.GetLastIRUnit(source_method_receiver_element);
+					UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
+					HandleIJavaElement(ure, node);
+					IRGeneratorHelper.AddMethodReturnVirtualReceiveNodeAndSelfDependency(irc, ure, irfomi);
+				}
 			}
 		} else {
 			IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count,
-					IRMeta.MethodInvocation + identifier, branch_dependency);
+					IRMeta.MethodInvocation + identifier, branchs_var_instr_order.peek());
 		}
 		temp_statement_instr_order.clear();
 		temp_statement_instr_is_self.clear();
@@ -200,7 +205,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 					temp_statement_instr_is_self.put(expr, new_is_self_env);
 					Map<IJavaElement, Integer> origin_env = temp_statement_instr_order.get(expr);
 					Map<IJavaElement, Integer> new_env = new HashMap<IJavaElement, Integer>();
-					Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
+					Iterator<IJavaElement> titr = temp_statement_instr_environment_set.iterator();
 					while (titr.hasNext())
 					{
 						IJavaElement ije = titr.next();
@@ -218,7 +223,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 						}
 					}
 					temp_statement_instr_order.put(expr, new_env);
-					StatementOverHandle();
+					temp_statement_instr_environment_set.clear();
 				}
 			});
 		}
@@ -588,6 +593,17 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public void endVisit(ReturnStatement node) {
 		IRGeneratorHelper.GenerateGeneralIR(irc, node, temp_statement_environment_set, all_count, IRMeta.Return,
 				branchs_var_instr_order.peek());
+		Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
+		while (titr.hasNext())
+		{
+			IJavaElement ije = titr.next();
+			IRForOneInstruction iru = irc.GetLastIRUnit(ije);
+			if (iru != null)
+			{
+				irc.PutOutNodes(ije, iru);
+				iru.PutConnectionMergeTask(UnknownOutDirectionConnection.GetUnknownOutDirectionConnection(), new MethodReturnPassTask());
+			}
+		}
 	}
 
 	// need to handle data_dependency.

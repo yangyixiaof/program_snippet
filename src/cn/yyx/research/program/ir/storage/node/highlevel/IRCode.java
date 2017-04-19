@@ -23,6 +23,7 @@ public abstract class IRCode {
 	Map<IJavaElement, LinkedList<IRForOneInstruction>> irs = new HashMap<IJavaElement, LinkedList<IRForOneInstruction>>();
 	Map<IIRNode, Set<Connection>> in_connects = new HashMap<IIRNode, Set<Connection>>();
 	Map<IIRNode, Set<Connection>> out_connects = new HashMap<IIRNode, Set<Connection>>();
+	Map<IJavaElement, IRForOneInstruction> out_nodes = new HashMap<IJavaElement, IRForOneInstruction>();
 
 	private IMember im = null;
 
@@ -36,6 +37,14 @@ public abstract class IRCode {
 
 	public IRCode(IMember im) {
 		this.setIm(im);
+	}
+	
+	public void PutOutNodes(IJavaElement ijele, IRForOneInstruction irfoi) {
+		out_nodes.put(ijele, irfoi);
+	}
+	
+	public Map<IJavaElement, IRForOneInstruction> GetOutNodes() {
+		return out_nodes;
 	}
 
 	public Connection GetSpecifiedConnection(IIRNode source, IIRNode target) {
@@ -165,5 +174,5 @@ public abstract class IRCode {
 	public void AddBranchDependency(IIRNode source, IIRNode target) {
 		AddDependency(source, target, new EdgeConnectionType(EdgeBaseType.Branch.getType()));
 	}
-
+	
 }
