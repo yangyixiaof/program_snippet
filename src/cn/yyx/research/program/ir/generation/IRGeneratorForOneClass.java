@@ -40,10 +40,10 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 		if (ije instanceof IMethod)
 		{
 			IMethod im = (IMethod)ije;
-			IRForOneMethod imb = IRGeneratorForOneProject.FetchIMethodIR(im);
+			IRForOneMethod imb = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(im);
 			IRGeneratorForOneLogicBlock irgfocb = new IRGeneratorForOneLogicBlock(imb);
 			node.accept(irgfocb);
-			IRGeneratorForOneProject.FetchITypeIR((it)).AddMethodLevel((IRForOneMethod)irgfocb.GetGeneration());
+			IRGeneratorForOneProject.GetInstance().FetchITypeIR((it)).AddMethodLevel((IRForOneMethod)irgfocb.GetGeneration());
 		}
 		return false;
 	}
@@ -53,7 +53,7 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 		if (node instanceof AbstractTypeDeclaration || node instanceof AnonymousClassDeclaration)
 		{
 			this.node.accept(this);
-			IRGeneratorForOneProject.FetchITypeIR((it)).SetFieldLevel((IRForOneField)irc);
+			IRGeneratorForOneProject.GetInstance().FetchITypeIR((it)).SetFieldLevel((IRForOneField)irc);
 		}
 		super.postVisit(node);
 	}

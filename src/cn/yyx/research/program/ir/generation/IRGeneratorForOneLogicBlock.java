@@ -22,8 +22,8 @@ import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
-import cn.yyx.research.program.ir.storage.node.connection.UnknownOutDirectionConnection;
-import cn.yyx.research.program.ir.storage.node.execution.MethodReturnPassTask;
+import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.node.execution.RequireHandleTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
@@ -665,10 +665,45 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// no need to do anything.
 		return super.visit(node);
 	}
+	
+	@Override
+	public boolean visit(ReturnStatement node) {
+		Expression expr = node.getExpression();
+		if (expr != null)
+		{
+			pre_visit_task.put(expr, new Runnable() {
+				@Override
+				public void run() {
+					RecordASTNodePreEnvironment(expr);
+				}
+			});
+			post_visit_task.put(expr, new Runnable() {
+				@Override
+				public void run() {
+					boolean direct = CompareASTNodePreEnvironmentToJudgeIfDirectTransfer(expr);
+					if (direct)
+					{
+						Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
+						while (titr.hasNext())
+						{
+							IJavaElement ije = titr.next();
+							IRForOneInstruction iru = irc.GetLastIRUnit(ije);
+							if (iru != null)
+							{
+								iru.SetOutConnectionMergeTask(new RequireHandleTask(iru, EdgeBaseType.Self.getType()));
+							}
+						}
+					}
+				}
+			});
+		}
+		// CompareASTNodePreEnvironmentToJudgeIfDirectTransfer
+		return super.visit(node);
+	}
 
 	@Override
 	public void endVisit(ReturnStatement node) {
-		IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.Return);
+		// IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.Return);
 		Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
 		while (titr.hasNext())
 		{
@@ -677,7 +712,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			if (iru != null)
 			{
 				irc.PutOutNodes(ije, iru);
-				iru.PutConnectionMergeTask(UnknownOutDirectionConnection.GetUnknownOutDirectionConnection(), new MethodReturnPassTask());
 			}
 		}
 	}
@@ -910,44 +944,44 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(StringLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(NumberLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(NullLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(CharacterLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(BooleanLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(TypeLiteral node) {
-		HandleIJavaElement(ConstantUniqueElement.FetchConstantElement(node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
 		return super.visit(node);
 	}
 
 	private void HandleType(IBinding ib, String represent, ASTNode happen) {
 		boolean source_resolved = HandleBinding(ib, happen);
 		if (!source_resolved) {
-			UnresolvedTypeElement ele = UnresolvedTypeElement.FetchConstantElement(represent);
+			UnresolvedTypeElement ele = IRGeneratorForOneProject.GetInstance().FetchUnresolvedTypeElement(represent);
 			HandleIJavaElement(ele, happen);
 		}
 	}
@@ -1172,13 +1206,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				HandleIJavaElement(im, node);
 				handled = true;
 
-				IRForOneMethod irfom = IRGeneratorForOneProject.FetchIMethodIR(im);
+				IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(im);
 				IRGeneratorForOneLogicBlock irgfocb = new IRGeneratorForOneLogicBlock(irfom);
 				node.accept(irgfocb);
 			}
 		}
 		if (!handled) {
-			HandleIJavaElement(UnresolvedLambdaUniqueElement.FetchConstantElement(node.toString(), (IMember)irc.GetScopeIElement(), irc.CopyEnvironment()), node);
+			HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchUnresolvedLambdaUniqueElement(node.toString(), (IMember)irc.GetScopeIElement(), irc.CopyEnvironment()), node);
 		}
 		return super.visit(node);
 	}
@@ -1270,7 +1304,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				}
 			}
 			if (!source_kind) {
-				HandleIJavaElement(UnresolvedTypeElement.FetchConstantElement(td.getName().toString()), node);
+				HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchUnresolvedTypeElement(td.getName().toString()), node);
 				return true;
 			} else {
 				HandleIJavaElement(it, node);

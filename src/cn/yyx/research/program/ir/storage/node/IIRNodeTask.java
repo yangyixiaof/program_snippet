@@ -1,5 +1,6 @@
 package cn.yyx.research.program.ir.storage.node;
 
+import cn.yyx.research.program.ir.storage.node.connection.DynamicConnection;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 
 public abstract class IIRNodeTask {
@@ -10,6 +11,6 @@ public abstract class IIRNodeTask {
 		this.iirnode = iirnode;
 	}
 	
-	public abstract StaticConnection MergeConnection(StaticConnection connect);
+	public abstract DynamicConnection HandleOutConnection(StaticConnection connect);
 	
 }

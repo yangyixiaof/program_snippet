@@ -66,6 +66,11 @@ public abstract class IRForOneInstruction implements IIRNode {
 		return iirtask;
 	}
 	
+	public void SetOutConnectionMergeTask(IIRNodeTask iirtask)
+	{
+		this.iirtask = iirtask;
+	}
+	
 //	public void AddParent(IRForOneJavaInstruction parent)
 //	{
 //		parents.add(parent);

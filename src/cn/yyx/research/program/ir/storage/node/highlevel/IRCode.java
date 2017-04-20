@@ -1,7 +1,6 @@
 package cn.yyx.research.program.ir.storage.node.highlevel;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,10 +10,6 @@ import java.util.Set;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 
-import cn.yyx.research.program.ir.storage.node.IIRNode;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeConnectionType;
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public abstract class IRCode {
@@ -128,26 +123,26 @@ public abstract class IRCode {
 		}
 		return env;
 	}
-
-	private void AddDependency(IIRNode source, IIRNode target, EdgeConnectionType et) {
-		Set<StaticConnection> rset = in_connects.get(target);
-		if (rset == null) {
-			rset = new HashSet<StaticConnection>();
-			in_connects.put(target, rset);
-		}
-		rset.add(new StaticConnection(source, target, et));
-	}
-
-	public void AddSequentialDependency(IIRNode source, IIRNode target) {
-		AddDependency(source, target, EdgeBaseType.Sequential.getType(), 0);
-	}
-
-	public void AddSelfDependency(IIRNode source, IIRNode target) {
-		AddDependency(source, target, EdgeBaseType.Self.getType(), 0);
-	}
-
-	public void AddBranchDependency(IIRNode source, IIRNode target) {
-		AddDependency(source, target, EdgeBaseType.Branch.getType(), 0);
-	}
+	
+//	private void AddDependency(IIRNode source, IIRNode target, EdgeConnectionType et) {
+//		Set<StaticConnection> rset = in_connects.get(target);
+//		if (rset == null) {
+//			rset = new HashSet<StaticConnection>();
+//			in_connects.put(target, rset);
+//		}
+//		rset.add(new StaticConnection(source, target, et));
+//	}
+//
+//	public void AddSequentialDependency(IIRNode source, IIRNode target) {
+//		AddDependency(source, target, EdgeBaseType.Sequential.getType(), 0);
+//	}
+//
+//	public void AddSelfDependency(IIRNode source, IIRNode target) {
+//		AddDependency(source, target, EdgeBaseType.Self.getType(), 0);
+//	}
+//
+//	public void AddBranchDependency(IIRNode source, IIRNode target) {
+//		AddDependency(source, target, EdgeBaseType.Branch.getType(), 0);
+//	}
 	
 }

@@ -1,8 +1,10 @@
 package cn.yyx.research.program.ir.generation;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -47,6 +49,28 @@ public class IRGeneratorForOneProject {
 		return conn;
 	}
 	
+	public Set<StaticConnection> GetOutConnection(IIRNode iirn)
+	{
+		HashSet<StaticConnection> result = new HashSet<StaticConnection>();
+		Map<IIRNode, StaticConnection> ios = out_connects.get(iirn);
+		if (ios != null)
+		{
+			result.addAll(ios.values());
+		}
+		return result;
+	}
+	
+	public Set<StaticConnection> GetInConnection(IIRNode iirn)
+	{
+		HashSet<StaticConnection> result = new HashSet<StaticConnection>();
+		Map<IIRNode, StaticConnection> iis = in_connects.get(iirn);
+		if (iis != null)
+		{
+			result.addAll(iis.values());
+		}
+		return result;
+	}
+	
 	private void OneDirectionRegist(StaticConnection conn, IIRNode source, IIRNode target, Map<IIRNode, Map<IIRNode, StaticConnection>> in_connects)
 	{
 		Map<IIRNode, StaticConnection> ins = in_connects.get(target);
@@ -74,7 +98,7 @@ public class IRGeneratorForOneProject {
 	
 	// Solved. source type is dependent on unresolved operations, how to model that dependency?
 	
-	public ConstantUniqueElement FetchConstantElement(String represent)
+	public ConstantUniqueElement FetchConstantUniqueElement(String represent)
 	{
 		ConstantUniqueElement yce = constant_unique_element_cache.get(represent);
 		if (yce == null) {
