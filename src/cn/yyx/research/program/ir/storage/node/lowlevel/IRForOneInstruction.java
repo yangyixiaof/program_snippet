@@ -1,13 +1,11 @@
 package cn.yyx.research.program.ir.storage.node.lowlevel;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Constructor;
 
 import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.program.ir.storage.node.IIRNode;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
-import cn.yyx.research.program.ir.storage.node.connection.Connection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 
 public abstract class IRForOneInstruction implements IIRNode {
@@ -15,15 +13,33 @@ public abstract class IRForOneInstruction implements IIRNode {
 	protected IJavaElement im = null;
 	protected IRCode parent_env = null;
 	
-	protected Map<Connection, IIRNodeTask> conn_task = new HashMap<Connection, IIRNodeTask>();
+	protected IIRNodeTask iirtask = null;
+	
 	// private int start = -1;
 	// private int end = -1;
 	// private IRInstrKind ir_kind = IRInstrKind.Weak;
 	
-	public IRForOneInstruction(IJavaElement im, IRCode parent_env) {
+	public IRForOneInstruction(IJavaElement im, IRCode parent_env, Class<? extends IIRNodeTask> task_class) {
 		// , int start, int end, IRInstrKind ir_kind
 		this.setIm(im);
 		this.setParentEnv(parent_env);
+		Constructor<?> cons[] = task_class.getConstructors();
+		for (Constructor<?> con : cons) {
+			Class<?>[] para_types = con.getParameterTypes();
+			if (para_types != null && para_types.length == 1 && IIRNodeTask.class.isAssignableFrom(para_types[0])) {
+				try {
+					iirtask = (IIRNodeTask) con.newInstance(this);
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.err.println("Error in new IIRTask.");
+					System.exit(1);
+				}
+			}
+		}
+		if (iirtask == null) {
+			System.err.println("IIRTask not initialized, serious errors, the system will exit.");
+			System.exit(1);
+		}
 //		this.setStart(start);
 //		this.setEnd(end);
 //		this.setIr_kind(ir_kind);
@@ -45,14 +61,9 @@ public abstract class IRForOneInstruction implements IIRNode {
 		this.parent_env = parent_env;
 	}
 	
-	@Override
-	public void PutConnectionMergeTask(Connection conn, IIRNodeTask run) {
-		conn_task.put(conn, run);
-	}
-
-	@Override
-	public IIRNodeTask GetConnectionMergeTask(Connection conn) {
-		return conn_task.get(conn);
+	public IIRNodeTask GetOutConnectionMergeTask()
+	{
+		return iirtask;
 	}
 	
 //	public void AddParent(IRForOneJavaInstruction parent)

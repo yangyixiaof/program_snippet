@@ -1,8 +1,5 @@
 package cn.yyx.research.program.ir.element;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -17,24 +14,7 @@ public class UnresolvedTypeElement implements IJavaElement {
 	
 	String represent = null;
 	
-	private static Map<String, UnresolvedTypeElement> cache = new TreeMap<String, UnresolvedTypeElement>();
-	
-	public static UnresolvedTypeElement FetchConstantElement(String represent)
-	{
-		UnresolvedTypeElement yce = cache.get(represent);
-		if (yce == null) {
-			yce = new UnresolvedTypeElement(represent);
-			cache.put(represent, yce);
-		}
-		return yce;
-	}
-	
-	public static void Clear()
-	{
-		cache.clear();
-	}
-	
-	protected UnresolvedTypeElement(String represent) {
+	public UnresolvedTypeElement(String represent) {
 		this.represent = represent;
 	}
 	

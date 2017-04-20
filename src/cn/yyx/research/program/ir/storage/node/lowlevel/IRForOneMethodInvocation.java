@@ -12,9 +12,9 @@ import java.util.Set;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 
-import cn.yyx.research.program.ir.generator.IRGeneratorForOneProject;
+import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.storage.node.IIRNode;
-import cn.yyx.research.program.ir.storage.node.connection.Connection;
+import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 
@@ -58,8 +58,8 @@ public class IRForOneMethodInvocation extends IRForOneInstruction {
 	}
 
 	@Override
-	public Map<IIRNode, Set<Connection>> PrepareOutNodes() {
-		Map<IIRNode, Set<Connection>> result = new HashMap<IIRNode, Set<Connection>>();
+	public Map<IIRNode, Set<StaticConnection>> PrepareOutNodes() {
+		Map<IIRNode, Set<StaticConnection>> result = new HashMap<IIRNode, Set<StaticConnection>>();
 		// Set<IIRNode> imset = new HashSet<IIRNode>();
 		Iterator<IMethod> mitr = methods.iterator();
 		while (mitr.hasNext())
@@ -73,9 +73,9 @@ public class IRForOneMethodInvocation extends IRForOneInstruction {
 			{
 				IJavaElement ije = iitr.next();
 				IRForOneInstruction irfoi = ions.get(ije);
-				Set<Connection> out_connects = parent_env.GetOutConnects(this);
+				Set<StaticConnection> out_connects = parent_env.GetOutConnects(this);
 				if (out_connects != null) {
-					result.put(irfoi, new HashSet<Connection>(out_connects));
+					result.put(irfoi, new HashSet<StaticConnection>(out_connects));
 				}
 			}
 		}
@@ -83,8 +83,8 @@ public class IRForOneMethodInvocation extends IRForOneInstruction {
 	}
 
 	@Override
-	public Map<IIRNode, Set<Connection>> PrepareInNodes() {
-		Map<IIRNode, Set<Connection>> result = new HashMap<IIRNode, Set<Connection>>();
+	public Map<IIRNode, Set<StaticConnection>> PrepareInNodes() {
+		Map<IIRNode, Set<StaticConnection>> result = new HashMap<IIRNode, Set<StaticConnection>>();
 		Set<IRForOneInstruction> keys = para_order_instr_index_map.keySet();
 		Iterator<IRForOneInstruction> kitr = keys.iterator();
 		while (kitr.hasNext())
@@ -106,11 +106,11 @@ public class IRForOneMethodInvocation extends IRForOneInstruction {
 						if (list != null && list.size() > 0)
 						{
 							IRForOneInstruction para_element = list.get(0);
-							Connection cnn = irfom.GetSpecifiedConnection(source, para_element);
-							Set<Connection> para_cnns = result.get(para_element);
+							StaticConnection cnn = irfom.GetSpecifiedConnection(source, para_element);
+							Set<StaticConnection> para_cnns = result.get(para_element);
 							if (para_cnns == null)
 							{
-								para_cnns = new HashSet<Connection>();
+								para_cnns = new HashSet<StaticConnection>();
 								result.put(para_element, para_cnns);
 							}
 							para_cnns.add(cnn);

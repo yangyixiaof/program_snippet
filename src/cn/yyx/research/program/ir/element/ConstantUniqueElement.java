@@ -1,8 +1,5 @@
 package cn.yyx.research.program.ir.element;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -15,26 +12,9 @@ import org.eclipse.jdt.core.JavaModelException;
 
 public class ConstantUniqueElement implements IJavaElement {
 	
-	String represent = null;
+	private String represent = null;
 	
-	private static Map<String, ConstantUniqueElement> cache = new TreeMap<String, ConstantUniqueElement>();
-	
-	public static ConstantUniqueElement FetchConstantElement(String represent)
-	{
-		ConstantUniqueElement yce = cache.get(represent);
-		if (yce == null) {
-			yce = new ConstantUniqueElement(represent);
-			cache.put(represent, yce);
-		}
-		return yce;
-	}
-	
-	public static void Clear()
-	{
-		cache.clear();
-	}
-	
-	protected ConstantUniqueElement(String represent) {
+	public ConstantUniqueElement(String represent) {
 		this.represent = represent;
 	}
 	

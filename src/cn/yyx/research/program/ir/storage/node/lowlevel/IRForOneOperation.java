@@ -7,7 +7,7 @@ import java.util.Set;
 import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.program.ir.storage.node.IIRNode;
-import cn.yyx.research.program.ir.storage.node.connection.Connection;
+import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 
 public class IRForOneOperation extends IRForOneInstruction {
@@ -28,15 +28,15 @@ public class IRForOneOperation extends IRForOneInstruction {
 	}
 
 	@Override
-	public Map<IIRNode, Set<Connection>> PrepareOutNodes() {
-		Map<IIRNode, Set<Connection>> irmap = new HashMap<IIRNode, Set<Connection>>();
+	public Map<IIRNode, Set<StaticConnection>> PrepareOutNodes() {
+		Map<IIRNode, Set<StaticConnection>> irmap = new HashMap<IIRNode, Set<StaticConnection>>();
 		irmap.put(this, parent_env.GetOutConnects(this));
 		return irmap;
 	}
 
 	@Override
-	public Map<IIRNode, Set<Connection>> PrepareInNodes() {
-		Map<IIRNode, Set<Connection>> irmap = new HashMap<IIRNode, Set<Connection>>();
+	public Map<IIRNode, Set<StaticConnection>> PrepareInNodes() {
+		Map<IIRNode, Set<StaticConnection>> irmap = new HashMap<IIRNode, Set<StaticConnection>>();
 		irmap.put(this, parent_env.GetInConnects(this));
 		return irmap;
 	}

@@ -12,17 +12,15 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 
 import cn.yyx.research.program.ir.storage.node.IIRNode;
-import cn.yyx.research.program.ir.storage.node.connection.Connection;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeConnectionType;
+import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public abstract class IRCode {
 
 	Map<IJavaElement, Set<IJavaElement>> deps = new HashMap<IJavaElement, Set<IJavaElement>>();
 	Map<IJavaElement, LinkedList<IRForOneInstruction>> irs = new HashMap<IJavaElement, LinkedList<IRForOneInstruction>>();
-	Map<IIRNode, Set<Connection>> in_connects = new HashMap<IIRNode, Set<Connection>>();
-	Map<IIRNode, Set<Connection>> out_connects = new HashMap<IIRNode, Set<Connection>>();
 	Map<IJavaElement, IRForOneInstruction> out_nodes = new HashMap<IJavaElement, IRForOneInstruction>();
 
 	private IMember im = null;
@@ -47,58 +45,35 @@ public abstract class IRCode {
 		return out_nodes;
 	}
 
-	public Connection GetSpecifiedConnection(IIRNode source, IIRNode target) {
-		Set<Connection> ocnnts = out_connects.get(source);
-		if (ocnnts == null) {
-			return null;
-		}
-		Iterator<Connection> itr = ocnnts.iterator();
-		while (itr.hasNext()) {
-			Connection cnn = itr.next();
-			if (cnn.getTarget() == target) {
-				return cnn;
-			}
-		}
-		return null;
-	}
-
-	private Set<Connection> GetConnects(IIRNode node, Map<IIRNode, Set<Connection>> connects) {
-		Set<Connection> result = new HashSet<Connection>();
-		Set<Connection> ics = connects.get(node);
-		if (ics != null) {
-			result.addAll(ics);
-		}
-		return result;
-	}
-
-	public void AddConnection(Connection conn) {
-		IIRNode source = conn.getSource();
-		IIRNode target = conn.getTarget();
-		{
-			Set<Connection> in_set = in_connects.get(target);
-			if (in_set == null) {
-				in_set = new HashSet<Connection>();
-				in_connects.put(target, in_set);
-			}
-			in_set.add(conn);
-		}
-		{
-			Set<Connection> out_set = out_connects.get(source);
-			if (out_set == null) {
-				out_set = new HashSet<Connection>();
-				out_connects.put(source, out_set);
-			}
-			out_set.add(conn);
-		}
-	}
-
-	public Set<Connection> GetInConnects(IIRNode node) {
-		return GetConnects(node, in_connects);
-	}
-
-	public Set<Connection> GetOutConnects(IIRNode node) {
-		return GetConnects(node, out_connects);
-	}
+//	private Set<StaticConnection> GetConnects(IIRNode node, Map<IIRNode, Set<StaticConnection>> connects) {
+//		Set<StaticConnection> result = new HashSet<StaticConnection>();
+//		Set<StaticConnection> ics = connects.get(node);
+//		if (ics != null) {
+//			result.addAll(ics);
+//		}
+//		return result;
+//	}
+//
+//	public void AddConnection(StaticConnection conn) {
+//		IIRNode source = conn.getSource();
+//		IIRNode target = conn.getTarget();
+//		{
+//			Set<StaticConnection> in_set = in_connects.get(target);
+//			if (in_set == null) {
+//				in_set = new HashSet<StaticConnection>();
+//				in_connects.put(target, in_set);
+//			}
+//			in_set.add(conn);
+//		}
+//		{
+//			Set<StaticConnection> out_set = out_connects.get(source);
+//			if (out_set == null) {
+//				out_set = new HashSet<StaticConnection>();
+//				out_connects.put(source, out_set);
+//			}
+//			out_set.add(conn);
+//		}
+//	}
 
 	public void AddOneIRUnit(IJavaElement ivb, IRForOneInstruction irfou) {
 		LinkedList<IRForOneInstruction> list = irs.get(ivb);
@@ -155,24 +130,24 @@ public abstract class IRCode {
 	}
 
 	private void AddDependency(IIRNode source, IIRNode target, EdgeConnectionType et) {
-		Set<Connection> rset = in_connects.get(target);
+		Set<StaticConnection> rset = in_connects.get(target);
 		if (rset == null) {
-			rset = new HashSet<Connection>();
+			rset = new HashSet<StaticConnection>();
 			in_connects.put(target, rset);
 		}
-		rset.add(new Connection(source, target, et));
+		rset.add(new StaticConnection(source, target, et));
 	}
 
 	public void AddSequentialDependency(IIRNode source, IIRNode target) {
-		AddDependency(source, target, new EdgeConnectionType(EdgeBaseType.Sequential.getType()));
+		AddDependency(source, target, EdgeBaseType.Sequential.getType(), 0);
 	}
 
 	public void AddSelfDependency(IIRNode source, IIRNode target) {
-		AddDependency(source, target, new EdgeConnectionType(EdgeBaseType.Self.getType()));
+		AddDependency(source, target, EdgeBaseType.Self.getType(), 0);
 	}
 
 	public void AddBranchDependency(IIRNode source, IIRNode target) {
-		AddDependency(source, target, new EdgeConnectionType(EdgeBaseType.Branch.getType()));
+		AddDependency(source, target, EdgeBaseType.Branch.getType(), 0);
 	}
 	
 }

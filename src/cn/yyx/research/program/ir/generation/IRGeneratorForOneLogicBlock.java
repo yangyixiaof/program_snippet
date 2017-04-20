@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.generator;
+package cn.yyx.research.program.ir.generation;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +34,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public static int max_level = Integer.MAX_VALUE; // Integer.MAX_VALUE partly
 														// means infinite.
 	public static final int un_exist = -100;
+	// TODO return and assign right should add special task.
 	// TODO variable declarations should be removed, only assignment in it should be retained.
 	// TODO how to recognize the global relationship, eclipse jdt offers?
 	
@@ -163,6 +164,73 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// method invocation.
 	
+	private void RecordASTNodePreEnvironment(ASTNode node)
+	{
+		Map<IJavaElement, Integer> env = irc.CopyEnvironment();
+		temp_statement_instr_order.put(node, env);
+	}
+	
+	private boolean CompareASTNodePreEnvironmentToJudgeIfDirectTransfer(ASTNode node)
+	{
+		if (temp_statement_expression_environment_set.size() == 1)
+		{
+			Map<IJavaElement, Integer> origin_env = temp_statement_instr_order.get(node);
+			Iterator<IJavaElement> titr = temp_statement_expression_environment_set.iterator();
+			IJavaElement ije = titr.next();
+			List<IRForOneInstruction> list = irc.GetOneAllIRUnits(ije);
+			if (list != null && list.size() > 0)
+			{
+				int idx = list.size() - 1;
+				Integer ori_idx = origin_env.get(ije);
+				if (ori_idx == idx)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private void PreMethodInvocation(List<Expression> exprs)
+	{
+		// temp_statement_instr_order
+		Iterator<Expression> eitr = exprs.iterator();
+		while (eitr.hasNext())
+		{
+			
+			Expression expr = eitr.next();
+			pre_visit_task.put(expr, new Runnable() {
+				@Override
+				public void run() {
+					RecordASTNodePreEnvironment(expr);
+				}
+			});
+			post_visit_task.put(expr, new Runnable() {
+				@Override
+				public void run() {
+					boolean direct_transfer = CompareASTNodePreEnvironmentToJudgeIfDirectTransfer(expr);
+					Map<IJavaElement, Boolean> new_is_self_env = new HashMap<IJavaElement, Boolean>();
+					temp_statement_instr_is_self.put(expr, new_is_self_env);
+					Map<IJavaElement, Integer> new_env = new HashMap<IJavaElement, Integer>();
+					Iterator<IJavaElement> titr = temp_statement_expression_environment_set.iterator();
+					while (titr.hasNext())
+					{
+						IJavaElement ije = titr.next();
+						List<IRForOneInstruction> list = irc.GetOneAllIRUnits(ije);
+						if (list != null && list.size() > 0)
+						{
+							int idx = list.size() - 1;
+							new_env.put(ije, idx);
+							new_is_self_env.put(ije, direct_transfer);
+						}
+					}
+					temp_statement_instr_order.put(expr, new_env);
+					TempExpressionOverHandle();
+				}
+			});
+		}
+	}
+	
 	private void PostMethodInvocation(IMethodBinding imb, List<Expression> nlist, Expression expr, String identifier, ASTNode node)
 	{
 		if (imb != null && imb.getDeclaringClass() != null && imb.getDeclaringClass().isFromSource()) {
@@ -185,52 +253,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 		temp_statement_instr_order.clear();
 		temp_statement_instr_is_self.clear();
-	}
-	
-	private void PreMethodInvocation(List<Expression> exprs)
-	{
-		// temp_statement_instr_order
-		Iterator<Expression> eitr = exprs.iterator();
-		while (eitr.hasNext())
-		{
-			
-			Expression expr = eitr.next();
-			pre_visit_task.put(expr, new Runnable() {
-				@Override
-				public void run() {
-					Map<IJavaElement, Integer> env = irc.CopyEnvironment();
-					temp_statement_instr_order.put(expr, env);
-				}
-			});
-			post_visit_task.put(expr, new Runnable() {
-				@Override
-				public void run() {
-					Map<IJavaElement, Boolean> new_is_self_env = new HashMap<IJavaElement, Boolean>();
-					temp_statement_instr_is_self.put(expr, new_is_self_env);
-					Map<IJavaElement, Integer> origin_env = temp_statement_instr_order.get(expr);
-					Map<IJavaElement, Integer> new_env = new HashMap<IJavaElement, Integer>();
-					Iterator<IJavaElement> titr = temp_statement_expression_environment_set.iterator();
-					while (titr.hasNext())
-					{
-						IJavaElement ije = titr.next();
-						new_is_self_env.put(ije, false);
-						List<IRForOneInstruction> list = irc.GetOneAllIRUnits(ije);
-						if (list != null && list.size() > 0)
-						{
-							int idx = list.size() - 1;
-							new_env.put(ije, idx);
-							Integer ori_idx = origin_env.get(ije);
-							if (ori_idx == idx)
-							{
-								new_is_self_env.put(ije, true);
-							}
-						}
-					}
-					temp_statement_instr_order.put(expr, new_env);
-					TempExpressionOverHandle();
-				}
-			});
-		}
 	}
 	
 	@Override

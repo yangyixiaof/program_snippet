@@ -2,7 +2,6 @@ package cn.yyx.research.program.ir.element;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
@@ -31,24 +30,7 @@ public class UnresolvedLambdaUniqueElement implements IMethod {
 	IMember parent_im = null;
 	Map<IJavaElement, Integer> env = new HashMap<IJavaElement, Integer>();
 	
-	private static Map<String, UnresolvedLambdaUniqueElement> cache = new TreeMap<String, UnresolvedLambdaUniqueElement>();
-	
-	public static UnresolvedLambdaUniqueElement FetchConstantElement(String represent, IMember parent_im, Map<IJavaElement, Integer> env)
-	{
-		UnresolvedLambdaUniqueElement yce = cache.get(represent);
-		if (yce == null) {
-			yce = new UnresolvedLambdaUniqueElement(represent, parent_im, env);
-			cache.put(represent, yce);
-		}
-		return yce;
-	}
-	
-	public static void Clear()
-	{
-		cache.clear();
-	}
-	
-	protected UnresolvedLambdaUniqueElement(String represent, IMember parent_im, Map<IJavaElement, Integer> env) {
+	public UnresolvedLambdaUniqueElement(String represent, IMember parent_im, Map<IJavaElement, Integer> env) {
 		this.represent = represent;
 		this.parent_im = parent_im;
 		this.env.putAll(env);

@@ -1,9 +1,15 @@
 package cn.yyx.research.program.ir.storage.node;
 
-import cn.yyx.research.program.ir.storage.node.connection.Connection;
+import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 
-public interface IIRNodeTask {
+public abstract class IIRNodeTask {
 	
-	public Connection MergeConnection(Connection connect);
+	IIRNode iirnode = null;
+	
+	public IIRNodeTask(IIRNode iirnode) {
+		this.iirnode = iirnode;
+	}
+	
+	public abstract StaticConnection MergeConnection(StaticConnection connect);
 	
 }

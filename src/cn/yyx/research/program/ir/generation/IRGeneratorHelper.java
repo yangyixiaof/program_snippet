@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.generator;
+package cn.yyx.research.program.ir.generation;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.search.IRSearchRequestor;
 import cn.yyx.research.program.ir.storage.node.connection.AllOutDirectionConnection;
-import cn.yyx.research.program.ir.storage.node.connection.Connection;
+import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeConnectionType;
 import cn.yyx.research.program.ir.storage.node.execution.DirectParameterPassIntoMethodTask;
@@ -84,11 +84,11 @@ public class IRGeneratorHelper {
 
 						boolean is_self = jele_is_self.get(ije);
 						if (is_self) {
-							Connection conn = new Connection(source, now,
+							StaticConnection conn = new StaticConnection(source, now,
 									new EdgeConnectionType(EdgeBaseType.Self.getType()));
 							source.PutConnectionMergeTask(conn, new DirectParameterPassIntoMethodTask());
 						} else {
-							Connection conn = new Connection(source, now,
+							StaticConnection conn = new StaticConnection(source, now,
 									new EdgeConnectionType(EdgeBaseType.Sequential.getType()));
 							source.PutConnectionMergeTask(conn, new UndirectParameterPassIntoMethodTask());
 						}
@@ -262,7 +262,7 @@ public class IRGeneratorHelper {
 		irfoo.PutConnectionMergeTask(AllOutDirectionConnection.GetAllOutDirectionConnection(), new SkipSelfTask());
 		irc.AddOneIRUnit(im, irfoo);
 		HandleNodeSelfAndBranchDependency(irc, im, irfoo, null);
-		Connection conn = new Connection(irfomi, irfoo, new EdgeConnectionType(EdgeBaseType.Self.getType()));
+		StaticConnection conn = new StaticConnection(irfomi, irfoo, new EdgeConnectionType(EdgeBaseType.Self.getType()));
 		irfomi.PutConnectionMergeTask(conn, new MethodReturnPassTask());
 	}
 
