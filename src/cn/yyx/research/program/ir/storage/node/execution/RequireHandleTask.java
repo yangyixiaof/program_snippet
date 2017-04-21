@@ -7,11 +7,8 @@ import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 
 public class RequireHandleTask extends IIRNodeTask {
 	
-	int accept_type = 0;
-	
-	public RequireHandleTask(IIRNode iirnode, int accept_type) {
+	public RequireHandleTask(IIRNode iirnode) {
 		super(iirnode);
-		this.accept_type = accept_type;
 	}
 
 	@Override

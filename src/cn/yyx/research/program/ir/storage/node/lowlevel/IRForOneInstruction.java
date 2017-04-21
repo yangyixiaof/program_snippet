@@ -1,12 +1,11 @@
 package cn.yyx.research.program.ir.storage.node.lowlevel;
 
-import java.lang.reflect.Constructor;
-
 import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.program.ir.storage.node.IIRNode;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
+import cn.yyx.research.program.systemutil.ReflectionInvoke;
 
 public abstract class IRForOneInstruction implements IIRNode {
 	
@@ -14,6 +13,8 @@ public abstract class IRForOneInstruction implements IIRNode {
 	protected IRCode parent_env = null;
 	
 	protected IIRNodeTask iirtask = null;
+	protected int accept_type = 0;
+	protected int require_type = 0;
 	
 	// private int start = -1;
 	// private int end = -1;
@@ -23,19 +24,7 @@ public abstract class IRForOneInstruction implements IIRNode {
 		// , int start, int end, IRInstrKind ir_kind
 		this.setIm(im);
 		this.setParentEnv(parent_env);
-		Constructor<?> cons[] = task_class.getConstructors();
-		for (Constructor<?> con : cons) {
-			Class<?>[] para_types = con.getParameterTypes();
-			if (para_types != null && para_types.length == 1 && IIRNodeTask.class.isAssignableFrom(para_types[0])) {
-				try {
-					iirtask = (IIRNodeTask) con.newInstance(this);
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.err.println("Error in new IIRTask.");
-					System.exit(1);
-				}
-			}
-		}
+		ReflectionInvoke.InvokeConstructor(task_class, new Object[]{this});
 		if (iirtask == null) {
 			System.err.println("IIRTask not initialized, serious errors, the system will exit.");
 			System.exit(1);
@@ -105,5 +94,25 @@ public abstract class IRForOneInstruction implements IIRNode {
 //	public void setIr_kind(IRInstrKind ir_kind) {
 //		this.ir_kind = ir_kind;
 //	}
+	
+	@Override
+	public void SetRequireType(int require_type) {
+		this.require_type = require_type;
+	}
+	
+	@Override
+	public int GetRequireType() {
+		return require_type;
+	}
+	
+	@Override
+	public void SetAcceptType(int accept_type) {
+		this.accept_type = accept_type;
+	}
+	
+	@Override
+	public int GetAcceptType() {
+		return accept_type;
+	}
 	
 }

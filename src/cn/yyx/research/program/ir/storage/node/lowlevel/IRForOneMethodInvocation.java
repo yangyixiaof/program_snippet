@@ -81,7 +81,7 @@ public class IRForOneMethodInvocation extends IRForOneInstruction {
 					while (oitr.hasNext())
 					{
 						StaticConnection sc = oitr.next();
-						temp_result.add(new StaticConnection(irfoi, sc.getTarget(), sc.getType(), sc.getRequireType()));
+						temp_result.add(new StaticConnection(irfoi, sc.getTarget(), sc.getType()));
 					}
 					result.put(irfoi, temp_result);
 				}
@@ -121,7 +121,7 @@ public class IRForOneMethodInvocation extends IRForOneInstruction {
 								para_cnns = new HashSet<StaticConnection>();
 								result.put(para_element, para_cnns);
 							}
-							para_cnns.add(new StaticConnection(source, para_element, cnn.getType(), cnn.getRequireType()));
+							para_cnns.add(new StaticConnection(source, para_element, cnn.getType()));
 						}
 					}
 				}

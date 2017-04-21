@@ -5,15 +5,13 @@ import cn.yyx.research.program.ir.storage.node.IIRNode;
 public class StaticConnection {
 	
 	private int type = 0;
-	private int require_type = 0;
 	private IIRNode source = null;
 	private IIRNode target = null;
 	
-	public StaticConnection(IIRNode source, IIRNode target, int type, int require_type) {
+	public StaticConnection(IIRNode source, IIRNode target, int type) {
 		this.setSource(source);
 		this.setTarget(target);
 		this.setType(type);
-		this.setRequireType(require_type);
 	}
 	
 	public StaticConnection MergeStaticConnection(StaticConnection another_connection)
@@ -23,7 +21,7 @@ public class StaticConnection {
 			System.err.println("To_Merge Connection is wrong match source and target are not matched.");
 			System.exit(1);
 		}
-		return new StaticConnection(source, target, getType() | another_connection.getType(), getRequireType() | another_connection.getRequireType());
+		return new StaticConnection(source, target, getType() | another_connection.getType());
 	}
 	
 	public boolean IsTarget(IIRNode node)
@@ -94,14 +92,6 @@ public class StaticConnection {
 
 	private void setType(int type) {
 		this.type = type;
-	}
-
-	public int getRequireType() {
-		return require_type;
-	}
-
-	private void setRequireType(int require_type) {
-		this.require_type = require_type;
 	}
 	
 }

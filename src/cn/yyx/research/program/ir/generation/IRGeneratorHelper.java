@@ -18,21 +18,18 @@ import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.search.IRSearchRequestor;
-import cn.yyx.research.program.ir.storage.node.connection.AllOutDirectionConnection;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeConnectionType;
-import cn.yyx.research.program.ir.storage.node.execution.DirectParameterPassIntoMethodTask;
-import cn.yyx.research.program.ir.storage.node.execution.MethodReturnPassTask;
+import cn.yyx.research.program.ir.storage.node.execution.DefaultINodeTask;
 import cn.yyx.research.program.ir.storage.node.execution.SkipSelfTask;
-import cn.yyx.research.program.ir.storage.node.execution.UndirectParameterPassIntoMethodTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 
 public class IRGeneratorHelper {
-
+	// TODO Important!!! every parameter needs a virtual node with skip_self_task and require_self flag.
+	// TODO all things need to be checked that the only one self true node needs to add a distinct node.
 	// can only be invoked in end_visit_method_invocation.
 	public static void GenerateMethodInvocationIR(IRGeneratorForOneLogicBlock irgfob, List<Expression> nlist,
 			IMethod im, Expression expr, String identifier, ASTNode node) {
@@ -67,7 +64,7 @@ public class IRGeneratorHelper {
 			if (methods != null && methods.size() > 0) {
 				Map<IRForOneInstruction, Integer> para_order_instr_index_map = new HashMap<IRForOneInstruction, Integer>();
 				IRForOneMethodInvocation now = new IRForOneMethodInvocation(irc, source_method_receiver_element,
-						methods);
+						methods, DefaultINodeTask.class);
 				Iterator<Expression> nitr = nlist.iterator();
 				int idx = -1;
 				while (nitr.hasNext()) {
@@ -84,13 +81,10 @@ public class IRGeneratorHelper {
 
 						boolean is_self = jele_is_self.get(ije);
 						if (is_self) {
+							// TODO
 							StaticConnection conn = new StaticConnection(source, now,
 									new EdgeConnectionType(EdgeBaseType.Self.getType()));
 							source.PutConnectionMergeTask(conn, new DirectParameterPassIntoMethodTask());
-						} else {
-							StaticConnection conn = new StaticConnection(source, now,
-									new EdgeConnectionType(EdgeBaseType.Sequential.getType()));
-							source.PutConnectionMergeTask(conn, new UndirectParameterPassIntoMethodTask());
 						}
 					}
 				}
@@ -181,7 +175,7 @@ public class IRGeneratorHelper {
 				// int start = exact_node.getStartPosition();
 				// int end = start + exact_node.getLength() - 1;
 				// IRInstrKind ir_kind = IRInstrKind.ComputeKind(1);
-				IRForOneOperation now = new IRForOneOperation(irc, im, code);
+				IRForOneOperation now = new IRForOneOperation(irc, im, code, DefaultINodeTask.class);
 				irc.AddOneIRUnit(im, now);
 				HandleNodeSelfAndBranchDependency(irc, im, now, branch_dependency);
 			}
@@ -222,7 +216,7 @@ public class IRGeneratorHelper {
 						// int start = exact_node.getStartPosition();
 						// int end = start + exact_node.getLength() - 1;
 						// IRInstrKind ir_kind = IRInstrKind.ComputeKind(count);
-						IRForOneOperation now = new IRForOneOperation(irc, im, code);
+						IRForOneOperation now = new IRForOneOperation(irc, im, code, DefaultINodeTask.class);
 
 						HandleNodeSelfAndBranchDependency(irc, im, now, branch_dependency);
 

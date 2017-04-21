@@ -24,6 +24,7 @@ import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.execution.RequireHandleTask;
+import cn.yyx.research.program.ir.storage.node.execution.SkipSelfTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
@@ -163,6 +164,20 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	// method invocation.
+	
+	private IJavaElement WholeExpressionIsAnElement(ASTNode expr)
+	{
+		Iterator<IJavaElement> titr = temp_statement_expression_environment_set.iterator();
+		while (titr.hasNext())
+		{
+			IJavaElement ije = titr.next();
+			ASTNode happen = all_happen.get(ije);
+			if (happen == expr) {
+				return ije;
+			}
+		}
+		return null;
+	}
 	
 	private void RecordASTNodePreEnvironment(ASTNode node)
 	{
@@ -620,7 +635,12 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(VariableDeclarationFragment node) {
-		// TODO how to redirect?
+		// Solved. how to redirect? same as assignment.
+		Expression ini = node.getInitializer();
+		if (ini != null)
+		{
+			// TODO
+		}
 		IRGeneratorForOneLogicBlock this_ref = this;
 		post_visit_task.put(node.getName(), new Runnable() {
 			@Override
@@ -630,12 +650,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				StatementOverHandle();
 			}
 		});
-		return super.visit(node);
+		return false;
 	}
 
 	@Override
 	public boolean visit(SingleVariableDeclaration node) {
-		// TODO how to redirect?
+		// Solved. how to redirect? same as assignment.
+		// TODO
 		IRGeneratorForOneLogicBlock this_ref = this;
 		post_visit_task.put(node.getName(), new Runnable() {
 			@Override
@@ -690,7 +711,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 							IRForOneInstruction iru = irc.GetLastIRUnit(ije);
 							if (iru != null)
 							{
-								iru.SetOutConnectionMergeTask(new RequireHandleTask(iru, EdgeBaseType.Self.getType()));
+								iru.SetAcceptType(EdgeBaseType.Self.getType());
+								iru.SetOutConnectionMergeTask(new RequireHandleTask(iru));
 							}
 						}
 					}
@@ -719,17 +741,34 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// need to handle data_dependency.
 	@Override
 	public boolean visit(Assignment node) {
-		// TODO how to redirect?
-		node.getRightHandSide().accept(this);
+		// Solved. how to redirect? last node to skip self.
+		// TODO depd needs to record which iirnode left value depends.
+		// TODO assign dependency should be extracted as a stand_alone function because var-declare also will also use it.
+		Expression right_val = node.getRightHandSide();
+		right_val.accept(this);
+		IJavaElement right_jele = WholeExpressionIsAnElement(right_val);
+		if (right_jele != null)
+		{
+			IRForOneInstruction iru = irc.GetLastIRUnit(right_jele);
+			iru.SetAcceptType(EdgeBaseType.Self.getType());
+		}
 		HashSet<IJavaElement> depd = new HashSet<IJavaElement>(temp_statement_environment_set);
 		StatementOverHandle();
-		node.getLeftHandSide().accept(this);
+		Expression left_val = node.getLeftHandSide();
+		left_val.accept(this);
 		IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.LeftHandAssign);
-		// add assign dependency.
-		Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
-		while (titr.hasNext()) {
-			IJavaElement ijele = titr.next();
-			irc.AddAssignDependency(ijele, new HashSet<IJavaElement>(depd));
+		IJavaElement left_jele = WholeExpressionIsAnElement(left_val);
+		if (left_jele != null) {
+			IRForOneInstruction iru = irc.GetLastIRUnit(left_jele);
+			iru.SetRequireType(EdgeBaseType.Self.getType());
+			iru.SetOutConnectionMergeTask(new SkipSelfTask(iru));
+		} else {
+			// add assign dependency.
+			Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
+			while (titr.hasNext()) {
+				IJavaElement ijele = titr.next();
+				irc.AddAssignDependency(ijele, new HashSet<IJavaElement>(depd));
+			}
 		}
 		// post_visit_task.put(node.getRightHandSide(), new Runnable() {
 		// @Override

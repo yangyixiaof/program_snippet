@@ -15,4 +15,12 @@ public interface IIRNode {
 	
 	public IIRNodeTask GetOutConnectionMergeTask();
 	
+	public int GetRequireType();
+	
+	public void SetRequireType(int require_type);
+	
+	public int GetAcceptType();
+	
+	public void SetAcceptType(int accept_type);
+	
 }
