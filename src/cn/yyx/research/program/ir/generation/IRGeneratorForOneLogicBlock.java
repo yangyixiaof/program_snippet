@@ -38,6 +38,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// TODO return and assign right should add special task.
 	// TODO variable declarations should be removed, only assignment in it should be retained.
 	// TODO how to recognize the global relationship, eclipse jdt offers?
+	// TODO Important!!!!!!!, dependencies between differernt variables seem not handled, some are not needed but some are needed.
 	
 	// for return statements, all nodes related to return should be recorded.
 	
@@ -742,7 +743,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(Assignment node) {
 		// Solved. how to redirect? last node to skip self.
-		// TODO depd needs to record which iirnode left value depends.
+		// TODO depd needs to record which iirnode left value depends. connections need to be added from left to right.
 		// TODO assign dependency should be extracted as a stand_alone function because var-declare also will also use it.
 		Expression right_val = node.getRightHandSide();
 		right_val.accept(this);
