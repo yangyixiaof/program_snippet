@@ -24,13 +24,15 @@ import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.JavaModelException;
 
+import cn.yyx.research.program.ir.orgranization.IRTreeNode;
+
 public class UnresolvedLambdaUniqueElement implements IMethod {
 	
 	String represent = null;
 	IMember parent_im = null;
-	Map<IJavaElement, Integer> env = new HashMap<IJavaElement, Integer>();
+	Map<IJavaElement, IRTreeNode> env = new HashMap<IJavaElement, IRTreeNode>();
 	
-	public UnresolvedLambdaUniqueElement(String represent, IMember parent_im, Map<IJavaElement, Integer> env) {
+	public UnresolvedLambdaUniqueElement(String represent, IMember parent_im, Map<IJavaElement, IRTreeNode> env) {
 		this.represent = represent;
 		this.parent_im = parent_im;
 		this.env.putAll(env);

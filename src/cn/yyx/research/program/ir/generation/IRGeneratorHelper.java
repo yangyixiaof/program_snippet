@@ -28,6 +28,7 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 
 public class IRGeneratorHelper {
+	// TODO method declaration remember to check parameter list, add null if necessary. remember to add virtual node to each parameter.
 	// TODO Important!!! every parameter needs a virtual node with skip_self_task and require_self flag.
 	// TODO all things need to be checked that the only one self true node needs to add a distinct node.
 	// can only be invoked in end_visit_method_invocation.

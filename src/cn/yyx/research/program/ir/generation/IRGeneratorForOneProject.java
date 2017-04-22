@@ -21,6 +21,7 @@ import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
+import cn.yyx.research.program.ir.orgranization.IRTreeNode;
 import cn.yyx.research.program.ir.storage.node.IIRNode;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
@@ -108,7 +109,7 @@ public class IRGeneratorForOneProject {
 		return yce;
 	}
 	
-	public UnresolvedLambdaUniqueElement FetchUnresolvedLambdaUniqueElement(String represent, IMember parent_im, Map<IJavaElement, Integer> env)
+	public UnresolvedLambdaUniqueElement FetchUnresolvedLambdaUniqueElement(String represent, IMember parent_im, Map<IJavaElement, IRTreeNode> env)
 	{
 		UnresolvedLambdaUniqueElement yce = unresolved_lambda_unique_element_cache.get(represent);
 		if (yce == null) {
