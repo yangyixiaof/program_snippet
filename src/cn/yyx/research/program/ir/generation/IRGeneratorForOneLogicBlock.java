@@ -51,6 +51,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// Solved. this element is not assigned. should be assigned in HandleIJavaElement.
 	// above used for method invocation only.
 	// Solved. this element is not assigned. should be assigned in HandleIJavaElement.
+	
+	protected HashMap<ASTNode, Set<IJavaElement>> temp_statement_expression_element_memory = new HashMap<ASTNode, Set<IJavaElement>>();
 	protected HashSet<IJavaElement> temp_statement_expression_environment_set = new HashSet<IJavaElement>();
 	protected HashSet<IJavaElement> temp_statement_environment_set = new HashSet<IJavaElement>();
 	protected HashMap<IJavaElement, Integer> all_count = new HashMap<IJavaElement, Integer>();
@@ -64,7 +66,30 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// this should be handled. this is no need anymore.
 	// protected HashMap<ASTNode, IJavaElement> source_method_return_element = new HashMap<ASTNode, IJavaElement>();
 	
-	protected void TempExpressionOverHandle() {
+	private Set<IJavaElement> SearchAndRememberAllElementsInASTNodeInJustEnvironment(Expression expr) {
+		// TODO Auto-generated method stub
+		HashSet<IJavaElement> result = new HashSet<IJavaElement>();
+		result.addAll(temp_statement_expression_environment_set);
+		Set<ASTNode> tkeys = temp_statement_expression_element_memory.keySet();
+		Iterator<ASTNode> titr = tkeys.iterator();
+		while (titr.hasNext())
+		{
+			ASTNode astnode = titr.next();
+			if (ASTSearch.ASTNodeContainsAnASTNode(expr, astnode))
+			{
+				Set<IJavaElement> set = temp_statement_expression_element_memory.remove(astnode);
+				result.addAll(set);
+			}
+		}
+		temp_statement_expression_element_memory.put(expr, result);
+		return result;
+	}
+	
+	protected void TempExpressionOverHandle(ASTNode node, boolean remember) {
+		if (remember)
+		{
+			temp_statement_expression_element_memory.put(node, new HashSet<IJavaElement>(temp_statement_expression_environment_set));
+		}
 		temp_statement_expression_environment_set.clear();
 	}
 	
@@ -1124,7 +1149,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(InfixExpression node) {
 		HashMap<IJavaElement, List<IRTreeNode>> merge = new HashMap<IJavaElement, List<IRTreeNode>>();
-		node_to_merge.put(node, );
+		node_to_merge.put(node, merge);
 		
 		Map<IJavaElement, IRTreeNode> env = irc.CopyEnvironment();
 		
@@ -1154,7 +1179,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			post_visit_task.put(expr, new Runnable() {
 				@Override
 				public void run() {
-					Set<IJavaElement> all_elements = SearchAllElementsInASTNode(expr);
+					Set<IJavaElement> all_elements = SearchAndRememberAllElementsInASTNodeInJustEnvironment(expr);
 					Iterator<IJavaElement> itr = all_elements.iterator();
 					while (itr.hasNext())
 					{
@@ -1203,6 +1228,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			}
 			irc.SwitchDirection(ije, irtn);
 		}
+		node_to_merge.remove(node);
 		super.endVisit(node);
 	}
 	@Override

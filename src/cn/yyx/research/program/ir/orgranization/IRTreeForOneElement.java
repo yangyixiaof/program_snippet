@@ -28,9 +28,9 @@ public class IRTreeForOneElement {
 		this.SetLastNode(switch_to_last_node);
 	}
 	
-	public void GoForwardANode(IRTreeNode child, Integer num_of_connects)
+	public void GoForwardANode(IRTreeNode child)
 	{
-		GetLastNode().PutChild(child, num_of_connects);
+		GetLastNode().PutChild(child);
 		SetLastNode(child);
 	}
 
