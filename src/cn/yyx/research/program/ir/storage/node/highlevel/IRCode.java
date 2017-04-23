@@ -9,13 +9,13 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneElement;
-import cn.yyx.research.program.ir.orgranization.IRTreeNode;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public abstract class IRCode {
 
 	Map<IJavaElement, Set<IJavaElement>> deps = new HashMap<IJavaElement, Set<IJavaElement>>();
 	Map<IJavaElement, IRTreeForOneElement> irs = new HashMap<IJavaElement, IRTreeForOneElement>();
-	Map<IJavaElement, IRTreeNode> out_nodes = new HashMap<IJavaElement, IRTreeNode>();
+	Map<IJavaElement, IRForOneInstruction> out_nodes = new HashMap<IJavaElement, IRForOneInstruction>();
 
 	private IMember im = null;
 
@@ -31,11 +31,11 @@ public abstract class IRCode {
 		this.setIm(im);
 	}
 	
-	public void PutOutNodes(IJavaElement ijele, IRTreeNode irfoi) {
+	public void PutOutNodes(IJavaElement ijele, IRForOneInstruction irfoi) {
 		out_nodes.put(ijele, irfoi);
 	}
 	
-	public Map<IJavaElement, IRTreeNode> GetOutNodes() {
+	public Map<IJavaElement, IRForOneInstruction> GetOutNodes() {
 		return out_nodes;
 	}
 
@@ -74,7 +74,7 @@ public abstract class IRCode {
 		return irs.get(ije);
 	}
 	
-	public void SwitchDirection(IJavaElement ije, IRTreeNode switch_to_last_node)
+	public void SwitchDirection(IJavaElement ije, IRForOneInstruction switch_to_last_node)
 	{
 		IRTreeForOneElement irtree = irs.get(ije);
 		if (irtree != null) {
@@ -82,13 +82,13 @@ public abstract class IRCode {
 		}
 	}
 
-	public void GoForwardOneIRTreeNode(IJavaElement ije, IRTreeNode irfou) {
-		IRTreeForOneElement list = irs.get(ije);
-		if (list == null) {
-			list = new IRTreeForOneElement(ije, this);
-			irs.put(ije, list);
+	public void GoForwardOneIRTreeNode(IJavaElement ije, IRForOneInstruction irfou) {
+		IRTreeForOneElement ir_ele = irs.get(ije);
+		if (ir_ele == null) {
+			ir_ele = new IRTreeForOneElement(ije, this);
+			irs.put(ije, ir_ele);
 		}
-		list.GoForwardANode(irfou, 1);
+		ir_ele.GoForwardANode(irfou);
 	}
 
 	public abstract void AddParameter(IJavaElement im);
@@ -106,7 +106,7 @@ public abstract class IRCode {
 		return ii.HasElement();
 	}
 
-	public IRTreeNode GetFirstIRTreeNode(IJavaElement ije) {
+	public IRForOneInstruction GetFirstIRTreeNode(IJavaElement ije) {
 		IRTreeForOneElement ii = irs.get(ije);
 		if (ii == null) {
 			return null;
@@ -114,7 +114,7 @@ public abstract class IRCode {
 		return ii.GetRootNode();
 	}
 	
-	public IRTreeNode GetLastIRTreeNode(IJavaElement ije) {
+	public IRForOneInstruction GetLastIRTreeNode(IJavaElement ije) {
 		IRTreeForOneElement ii = irs.get(ije);
 		if (ii == null) {
 			return null;
@@ -142,10 +142,20 @@ public abstract class IRCode {
 		return im;
 	}
 
-	public Map<IJavaElement, IRTreeNode> CopyEnvironment() {
-		Map<IJavaElement, IRTreeNode> env = new HashMap<IJavaElement, IRTreeNode>();
+	public Map<IJavaElement, IRForOneInstruction> CopyEnvironment() {
+		Map<IJavaElement, IRForOneInstruction> env = new HashMap<IJavaElement, IRForOneInstruction>();
 		Set<IJavaElement> ikeys = irs.keySet();
 		Iterator<IJavaElement> iitr = ikeys.iterator();
+		while (iitr.hasNext()) {
+			IJavaElement ije = iitr.next();
+			env.put(ije, irs.get(ije).GetLastNode());
+		}
+		return env;
+	}
+	
+	public Map<IJavaElement, IRForOneInstruction> CopyEnvironment(Set<IJavaElement> elements) {
+		Map<IJavaElement, IRForOneInstruction> env = new HashMap<IJavaElement, IRForOneInstruction>();
+		Iterator<IJavaElement> iitr = elements.iterator();
 		while (iitr.hasNext()) {
 			IJavaElement ije = iitr.next();
 			env.put(ije, irs.get(ije).GetLastNode());

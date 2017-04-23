@@ -73,7 +73,8 @@ public class IRForOneMethodInvocation extends IRForOneInstruction {
 			while (iitr.hasNext())
 			{
 				IJavaElement ije = iitr.next();
-				IRForOneInstruction irfoi = ions.get(ije);
+				IRForOneInstruction irtn = ions.get(ije);
+				IRForOneInstruction irfoi = irtn;
 				Set<StaticConnection> out_connects = IRGeneratorForOneProject.GetInstance().GetOutConnection(this);
 				if (out_connects != null) {
 					HashSet<StaticConnection> temp_result = new HashSet<StaticConnection>();
@@ -110,10 +111,9 @@ public class IRForOneMethodInvocation extends IRForOneInstruction {
 					if (params.size() > para_index_in_invoked_method)
 					{
 						IJavaElement ije = params.get(para_index_in_invoked_method);
-						List<IRForOneInstruction> list = irfom.GetOneAllIRUnits(ije);
-						if (list != null && list.size() > 0)
+						IRForOneInstruction para_element = irfom.GetFirstIRTreeNode(ije);
+						if (para_element != null)
 						{
-							IRForOneInstruction para_element = list.get(0);
 							StaticConnection cnn = IRGeneratorForOneProject.GetInstance().GetSpecifiedConnection(source, this);
 							Set<StaticConnection> para_cnns = result.get(para_element);
 							if (para_cnns == null)

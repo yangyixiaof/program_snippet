@@ -23,11 +23,10 @@ import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
-import cn.yyx.research.program.ir.orgranization.IRTreeNode;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.DefaultINodeTask;
 import cn.yyx.research.program.ir.storage.node.execution.RequireHandleTask;
-import cn.yyx.research.program.ir.storage.node.execution.SkipSelfTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
@@ -67,7 +66,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// protected HashMap<ASTNode, IJavaElement> source_method_return_element = new HashMap<ASTNode, IJavaElement>();
 	
 	private Set<IJavaElement> SearchAndRememberAllElementsInASTNodeInJustEnvironment(Expression expr) {
-		// TODO Auto-generated method stub
 		HashSet<IJavaElement> result = new HashSet<IJavaElement>();
 		result.addAll(temp_statement_expression_environment_set);
 		Set<ASTNode> tkeys = temp_statement_expression_element_memory.keySet();
@@ -100,10 +98,10 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		temp_statement_environment_set.clear();
 	}
 
-	protected Stack<HashMap<IJavaElement, IRTreeNode>> branchs_var_instr_order = new Stack<HashMap<IJavaElement, IRTreeNode>>();
+	protected Stack<HashMap<IJavaElement, IRForOneInstruction>> branchs_var_instr_order = new Stack<HashMap<IJavaElement, IRForOneInstruction>>();
 
 	protected void PushBranchInstructionOrder() {
-		HashMap<IJavaElement, IRTreeNode> t_hash = new HashMap<IJavaElement, IRTreeNode>();
+		HashMap<IJavaElement, IRForOneInstruction> t_hash = new HashMap<IJavaElement, IRForOneInstruction>();
 		Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
 		while (titr.hasNext()) {
 			IJavaElement ije = titr.next();
@@ -205,7 +203,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return null;
 	}
 	
-	protected HashMap<ASTNode, Map<IJavaElement, Integer>> method_parameter_element_instr_order = new HashMap<ASTNode, Map<IJavaElement, Integer>>();
+	protected HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>> method_parameter_element_instr_order = new HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>>();
 	protected HashMap<ASTNode, Map<IJavaElement, Boolean>> method_parameter_element_instr_is_self = new HashMap<ASTNode, Map<IJavaElement, Boolean>>();
 	
 //	private void RecordASTNodePreEnvironment(ASTNode node)
@@ -252,30 +250,28 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			post_visit_task.put(expr, new Runnable() {
 				@Override
 				public void run() {
-					IJavaElement ije = WholeExpressionIsAnElement(expr);
-					if (ije != null && temp_statement_expression_environment_set.size() == 1)
-					{
-						// only one element. direct transfer.
-						
-					}
-					boolean direct_transfer = CompareASTNodePreEnvironmentToJudgeIfDirectTransfer(expr);
+					IJavaElement w_ije = WholeExpressionIsAnElement(expr);
 					Map<IJavaElement, Boolean> new_is_self_env = new HashMap<IJavaElement, Boolean>();
 					method_parameter_element_instr_is_self.put(expr, new_is_self_env);
-					Map<IJavaElement, Integer> new_env = new HashMap<IJavaElement, Integer>();
+					Map<IJavaElement, IRForOneInstruction> new_env = new HashMap<IJavaElement, IRForOneInstruction>();
 					Iterator<IJavaElement> titr = temp_statement_expression_environment_set.iterator();
 					while (titr.hasNext())
 					{
 						IJavaElement ije = titr.next();
-						List<IRForOneInstruction> list = irc.GetOneAllIRUnits(ije);
-						if (list != null && list.size() > 0)
+						IRForOneInstruction last_instr = irc.GetLastIRTreeNode(ije);
+						if (last_instr != null)
 						{
-							int idx = list.size() - 1;
-							new_env.put(ije, idx);
+							new_env.put(ije, last_instr);
+							boolean direct_transfer = false;
+							if (ije == w_ije)
+							{
+								direct_transfer = true;
+							}
 							new_is_self_env.put(ije, direct_transfer);
 						}
 					}
 					method_parameter_element_instr_order.put(expr, new_env);
-					TempExpressionOverHandle();
+					TempExpressionOverHandle(null, false);
 				}
 			});
 		}
@@ -551,7 +547,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 						IRGeneratorHelper.GenerateGeneralIR(this_ref, exp,
 								IRMeta.For_Initial);
 						
-						TempExpressionOverHandle();
+						TempExpressionOverHandle(null, false);
 						this_ref.temp_statement_environment_set = temp;
 					}
 				});
@@ -572,7 +568,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 								IRMeta.For_Judge);
 						PushBranchInstructionOrder();
 						
-						TempExpressionOverHandle();
+						TempExpressionOverHandle(null, false);
 						this_ref.temp_statement_environment_set = temp;
 					}
 				});
@@ -593,7 +589,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 						IRGeneratorHelper.GenerateGeneralIR(this_ref, exp,
 								IRMeta.For_Update);
 						
-						TempExpressionOverHandle();
+						TempExpressionOverHandle(null, false);
 						this_ref.temp_statement_environment_set = temp;
 					}
 				});
@@ -667,41 +663,79 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// VariableDeclarationFragment.
 		return super.visit(node);
 	}
+	
+	private void HandleAssign(Expression left, Expression right)
+	{
+		if (right != null)
+		{
+			right.accept(this);
+		}
+		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment(temp_statement_environment_set);
+		StatementOverHandle();
+		
+		right.accept(this);
+		
+		Iterator<IJavaElement> itr = temp_statement_environment_set.iterator();
+		while (itr.hasNext())
+		{
+			IJavaElement t_ije = itr.next();
+			IRForOneInstruction last_node = irc.GetLastIRTreeNode(t_ije);
+			last_node.SetRequireType(EdgeBaseType.Self.getType());
+			
+			Set<IJavaElement> ekeys = env.keySet();
+			Iterator<IJavaElement> eitr = ekeys.iterator();
+			while (eitr.hasNext())
+			{
+				IJavaElement e_ije = eitr.next();
+				if (e_ije != t_ije)
+				{
+					IRForOneInstruction ir_instr = env.get(e_ije);
+					IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(ir_instr, last_node, EdgeBaseType.Sequential.getType()));
+				}
+			}
+		}
+		
+		IJavaElement ije = WholeExpressionIsAnElement(right);
+		if (ije != null)
+		{
+			IRForOneInstruction last = irc.GetLastIRTreeNode(ije);
+			last.SetRequireType(EdgeBaseType.Self.getType());
+			irc.AddAssignDependency(ije, new HashSet<IJavaElement>(env.keySet()));
+		}
+		
+		StatementOverHandle();
+	}
 
 	@Override
 	public boolean visit(VariableDeclarationFragment node) {
 		// Solved. how to redirect? same as assignment.
-		Expression ini = node.getInitializer();
-		if (ini != null)
-		{
-			// TODO
-		}
-		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getName(), new Runnable() {
-			@Override
-			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(this_ref, node,
-						IRMeta.VariabledDeclare);
-				StatementOverHandle();
-			}
-		});
+		HandleAssign(node.getName(), node.getInitializer());
+//		IRGeneratorForOneLogicBlock this_ref = this;
+//		post_visit_task.put(node.getName(), new Runnable() {
+//			@Override
+//			public void run() {
+//				IRGeneratorHelper.GenerateGeneralIR(this_ref, node,
+//						IRMeta.VariabledDeclare);
+//				StatementOverHandle();
+//			}
+//		});
 		return false;
 	}
 
 	@Override
 	public boolean visit(SingleVariableDeclaration node) {
 		// Solved. how to redirect? same as assignment.
-		// TODO
-		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getName(), new Runnable() {
-			@Override
-			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(this_ref, node,
-						IRMeta.VariabledDeclare);
-				StatementOverHandle();
-			}
-		});
-		return super.visit(node);
+		HandleAssign(node.getName(), node.getInitializer());
+//		IRGeneratorForOneLogicBlock this_ref = this;
+//		post_visit_task.put(node.getName(), new Runnable() {
+//			@Override
+//			public void run() {
+//				IRGeneratorHelper.GenerateGeneralIR(this_ref, node,
+//						IRMeta.VariabledDeclare);
+//				StatementOverHandle();
+//			}
+//		});
+		return false;
 	}
 
 	@Override
@@ -736,15 +770,14 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			post_visit_task.put(expr, new Runnable() {
 				@Override
 				public void run() {
-					
-					boolean direct = CompareASTNodePreEnvironmentToJudgeIfDirectTransfer(expr);
-					if (direct)
+					IJavaElement ije = WholeExpressionIsAnElement(expr);
+					if (ije != null)
 					{
 						Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
 						while (titr.hasNext())
 						{
-							IJavaElement ije = titr.next();
-							IRForOneInstruction iru = irc.GetLastIRTreeNode(ije);
+							IJavaElement t_ije = titr.next();
+							IRForOneInstruction iru = irc.GetLastIRTreeNode(t_ije);
 							if (iru != null)
 							{
 								iru.SetAcceptType(EdgeBaseType.Self.getType());
@@ -781,32 +814,35 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		
 		// TODO depd needs to record which iirnode left value depends. connections need to be added from left to right.
 		// TODO assign dependency should be extracted as a stand_alone function because var-declare also will also use it.
-		Expression right_val = node.getRightHandSide();
-		right_val.accept(this);
-		IJavaElement right_jele = WholeExpressionIsAnElement(right_val);
-		if (right_jele != null)
-		{
-			IRForOneInstruction iru = irc.GetLastIRTreeNode(right_jele);
-			iru.SetAcceptType(EdgeBaseType.Self.getType());
-		}
-		HashSet<IJavaElement> depd = new HashSet<IJavaElement>(temp_statement_environment_set);
-		StatementOverHandle();
-		Expression left_val = node.getLeftHandSide();
-		left_val.accept(this);
-		IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.LeftHandAssign);
-		IJavaElement left_jele = WholeExpressionIsAnElement(left_val);
-		if (left_jele != null) {
-			IRForOneInstruction iru = irc.GetLastIRTreeNode(left_jele);
-			iru.SetRequireType(EdgeBaseType.Self.getType());
-			iru.SetOutConnectionMergeTask(new SkipSelfTask(iru));
-		} else {
-			// add assign dependency.
-			Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
-			while (titr.hasNext()) {
-				IJavaElement ijele = titr.next();
-				irc.AddAssignDependency(ijele, new HashSet<IJavaElement>(depd));
-			}
-		}
+		
+		HandleAssign(node.getLeftHandSide(), node.getRightHandSide());
+		
+//		Expression right_val = node.getRightHandSide();
+//		right_val.accept(this);
+//		IJavaElement right_jele = WholeExpressionIsAnElement(right_val);
+//		if (right_jele != null)
+//		{
+//			IRForOneInstruction iru = irc.GetLastIRTreeNode(right_jele);
+//			iru.SetAcceptType(EdgeBaseType.Self.getType());
+//		}
+//		HashSet<IJavaElement> depd = new HashSet<IJavaElement>(temp_statement_environment_set);
+//		StatementOverHandle();
+//		Expression left_val = node.getLeftHandSide();
+//		left_val.accept(this);
+//		IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.LeftHandAssign);
+//		IJavaElement left_jele = WholeExpressionIsAnElement(left_val);
+//		if (left_jele != null) {
+//			IRForOneInstruction iru = irc.GetLastIRTreeNode(left_jele);
+//			iru.SetRequireType(EdgeBaseType.Self.getType());
+//			iru.SetOutConnectionMergeTask(new SkipSelfTask(iru));
+//		} else {
+//			// add assign dependency.
+//			Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
+//			while (titr.hasNext()) {
+//				IJavaElement ijele = titr.next();
+//				irc.AddAssignDependency(ijele, new HashSet<IJavaElement>(depd));
+//			}
+//		}
 		// post_visit_task.put(node.getRightHandSide(), new Runnable() {
 		// @Override
 		// public void run() {
@@ -1144,14 +1180,14 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 	
 	// TODO begin to handle infix expression.
-	private Map<ASTNode, Map<IJavaElement, List<IRTreeNode>>> node_to_merge = new HashMap<ASTNode, Map<IJavaElement, List<IRTreeNode>>>();
+	private Map<ASTNode, Map<IJavaElement, List<IRForOneInstruction>>> node_to_merge = new HashMap<ASTNode, Map<IJavaElement, List<IRForOneInstruction>>>();
 	
 	@Override
 	public boolean visit(InfixExpression node) {
-		HashMap<IJavaElement, List<IRTreeNode>> merge = new HashMap<IJavaElement, List<IRTreeNode>>();
+		HashMap<IJavaElement, List<IRForOneInstruction>> merge = new HashMap<IJavaElement, List<IRForOneInstruction>>();
 		node_to_merge.put(node, merge);
 		
-		Map<IJavaElement, IRTreeNode> env = irc.CopyEnvironment();
+		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment();
 		
 		List<Expression> expr_list = new LinkedList<Expression>();
 		expr_list.add(node.getLeftOperand());
@@ -1171,7 +1207,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 					while (eijeitr.hasNext())
 					{
 						IJavaElement ije = eijeitr.next();
-						IRTreeNode irtree_node = env.get(ije);
+						IRForOneInstruction irtree_node = env.get(ije);
 						irc.SwitchDirection(ije, irtree_node);
 					}
 				}
@@ -1184,10 +1220,10 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 					while (itr.hasNext())
 					{
 						IJavaElement ije = itr.next();
-						List<IRTreeNode> list = merge.get(ije);
+						List<IRForOneInstruction> list = merge.get(ije);
 						if (list == null)
 						{
-							list = new LinkedList<IRTreeNode>();
+							list = new LinkedList<IRForOneInstruction>();
 							merge.put(ije, list);
 						}
 						list.add(irc.GetLastIRTreeNode(ije));
@@ -1211,22 +1247,21 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public void endVisit(InfixExpression node) {
 //		IRGeneratorHelper.GenerateGeneralIR(this, node.getRightOperand(),
 //				IRMeta.InfixRightExpression + node.getOperator().toString());
-		Map<IJavaElement, List<IRTreeNode>> merge = node_to_merge.get(node);
+		Map<IJavaElement, List<IRForOneInstruction>> merge = node_to_merge.get(node);
 		Set<IJavaElement> mkeys = merge.keySet();
 		Iterator<IJavaElement> mitr = mkeys.iterator();
 		while (mitr.hasNext())
 		{
 			IJavaElement ije = mitr.next();
-			List<IRTreeNode> list = merge.get(ije);
+			List<IRForOneInstruction> list = merge.get(ije);
 			IRForOneOperation irfop = new IRForOneOperation(irc, ije, node.getOperator().toString(), DefaultINodeTask.class);
-			IRTreeNode irtn = new IRTreeNode(irfop);
-			Iterator<IRTreeNode> litr = list.iterator();
+			Iterator<IRForOneInstruction> litr = list.iterator();
 			while (litr.hasNext())
 			{
-				IRTreeNode tn = litr.next();
-				tn.PutChild(irtn);
+				IRForOneInstruction tn = litr.next();
+				IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(tn, irfop, EdgeBaseType.Self.getType()));
 			}
-			irc.SwitchDirection(ije, irtn);
+			irc.SwitchDirection(ije, irfop);
 		}
 		node_to_merge.remove(node);
 		super.endVisit(node);
