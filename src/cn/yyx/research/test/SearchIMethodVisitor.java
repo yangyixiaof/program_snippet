@@ -7,6 +7,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.CreationReference;
@@ -45,6 +46,17 @@ public class SearchIMethodVisitor extends ASTVisitor {
 			System.out.println("@super:" + node.getClass());
 		}
 		super.preVisit(node);
+	}
+	
+	@Override
+	public boolean visit(BreakStatement node) {
+		IBinding ib = node.getLabel().resolveBinding();
+		if (ib != null) {
+			System.out.println("BreakStatement binding:" + ib + ";class:" + ib.getClass());
+		} else {
+			System.out.println("BreakStatement binding:" + ib);
+		}
+		return super.visit(node);
 	}
 	
 	@Override

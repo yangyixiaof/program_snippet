@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ILocalVariable;
@@ -32,6 +33,7 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
+import cn.yyx.research.program.ir.task.IRASTNodeTask;
 
 public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
@@ -122,8 +124,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// protected Queue<IRTask> undone_tasks = new LinkedList<IRTask>();
 
-	protected Map<ASTNode, Runnable> post_visit_task = new HashMap<ASTNode, Runnable>();
-	protected Map<ASTNode, Runnable> pre_visit_task = new HashMap<ASTNode, Runnable>();
+	protected IRASTNodeTask post_visit_task = new IRASTNodeTask();
+	protected IRASTNodeTask pre_visit_task = new IRASTNodeTask();
 
 	protected Map<ASTNode, HashSet<IJavaElement>> ast_block_bind = new HashMap<ASTNode, HashSet<IJavaElement>>();
 
@@ -146,10 +148,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (node instanceof Block) {
 			ast_block_bind.put(node, new HashSet<IJavaElement>());
 		}
-		if (pre_visit_task.containsKey(node)) {
-			Runnable run = pre_visit_task.get(node);
-			run.run();
-		}
+		pre_visit_task.ProcessAndRemoveTask(node);
 		super.preVisit(node);
 	}
 
@@ -162,10 +161,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (node instanceof Statement) {
 			StatementOverHandle();
 		}
-		if (post_visit_task.containsKey(node)) {
-			Runnable run = post_visit_task.get(node);
-			run.run();
-		}
+		post_visit_task.ProcessAndRemoveTask(node);
 		super.postVisit(node);
 	}
 
@@ -393,6 +389,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	// handling statements.
+	
+	// TODO all branches and loops should handle parallel connections.
 
 	@Override
 	public boolean visit(IfStatement node) {
@@ -632,22 +630,77 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// loop statements end.
 
-	// missed to consider the label and will be considered in the future.
-	@Override
-	public void endVisit(BreakStatement node) {
+	// Solved. missed to consider the label and will be considered in the future.
+	
+	private void HandleBreakContinueStatement(ASTNode node, SimpleName label, String code) {
 		ASTNode n = ASTSearch.FindMostCloseLoopNode(node);
 		if (n != null && ast_block_bind.containsKey(n)) {
-			IRGeneratorHelper.GenerateNoVariableBindingIR(this, node, ast_block_bind.get(n),
-					IRMeta.Break);
+			HashSet<IJavaElement> elements = ast_block_bind.get(n);
+			Map<IJavaElement, IRForOneInstruction> eles = irc.CopyEnvironment(elements);
+			
+			ASTNode break_scope = SearchForLiveScopeOfBreakContinue(node, label);
+			
+			IRGeneratorForOneLogicBlock this_ref = this;
+			post_visit_task.put(break_scope, new Runnable() {
+				@Override
+				public void run() {
+					IRGeneratorHelper.GenerateNoVariableBindingIR(this_ref, node, elements,
+							code);
+					Set<IJavaElement> keys = eles.keySet();
+					Iterator<IJavaElement> kitr = keys.iterator();
+					while (kitr.hasNext())
+					{
+						IJavaElement ije = kitr.next();
+						IRForOneInstruction ir_instr = eles.get(ije);
+						IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(ir_instr, irc.GetLastIRTreeNode(ije), EdgeBaseType.Self.getType()));
+					}
+				}
+			});
 		}
+	}
+	
+	@Override
+	public boolean visit(BreakStatement node) {
+		HandleBreakContinueStatement(node, node.getLabel(), IRMeta.Break);
+		return false;
 	}
 
 	@Override
-	public void endVisit(ContinueStatement node) {
-		ASTNode n = ASTSearch.FindMostCloseLoopNode(node);
-		if (n != null && ast_block_bind.containsKey(n)) {
-			IRGeneratorHelper.GenerateNoVariableBindingIR(this, node, ast_block_bind.get(n),
-					IRMeta.Continue);
+	public boolean visit(ContinueStatement node) {
+		HandleBreakContinueStatement(node, node.getLabel(), IRMeta.Continue);
+		return false;
+	}
+	
+	private Map<String, ASTNode> label_scope = new TreeMap<String, ASTNode>();
+	
+	@Override
+	public boolean visit(LabeledStatement node) {
+		// will do in the future. The current structure does not recognize such
+		// minor but close relation.
+		SimpleName label = node.getLabel();
+		if (label != null)
+		{
+			label_scope.put(label.toString(), node.getBody());
+		}
+		return super.visit(node);
+	}
+	
+	@Override
+	public void endVisit(LabeledStatement node) {
+		SimpleName label = node.getLabel();
+		if (label != null)
+		{
+			label_scope.remove(label.toString());
+		}
+		super.endVisit(node);
+	}
+	
+	private ASTNode SearchForLiveScopeOfBreakContinue(ASTNode node, SimpleName label)
+	{
+		if (label != null) {
+			return label_scope.get(label.toString());
+		} else {
+			return ASTSearch.FindMostCloseLoopNode(node);
 		}
 	}
 
@@ -1660,13 +1713,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(ThrowStatement node) {
 		// will do in the future.
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(LabeledStatement node) {
-		// will do in the future. The current structure does not recognize such
-		// minor but close relation.
 		return super.visit(node);
 	}
 
