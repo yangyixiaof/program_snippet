@@ -45,7 +45,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// TODO how to recognize the global relationship, eclipse jdt offers?
 	// Solved. Important!!!!!!!, dependencies between differernt variables seem not handled, some are not needed but some are needed.
 	
-	// TODO switch case mechanism is not as tree or graph and is sequential which is not right.
+	// Solved. switch case mechanism is not as tree or graph and is sequential which is not right.
 	
 	// for return statements, all nodes related to return should be recorded.
 	
@@ -1023,6 +1023,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				switch_judge_members.push(new HashSet<IJavaElement>(temp_statement_environment_set));
 				IRGeneratorHelper.GenerateGeneralIR(this_ref, node, IRMeta.Switch);
 				PushBranchInstructionOrder();
+				switch_record.put(node, irc.CopyEnvironment());
 				StatementOverHandle();
 			}
 		});
@@ -1060,8 +1061,17 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// }
 		// slist.add(node);
 		IRGeneratorForOneLogicBlock this_ref = this;
-
-		PopSwitchBranch((SwitchStatement) node.getParent());
+		SwitchStatement switch_statement = (SwitchStatement) node.getParent();
+		Map<IJavaElement, IRForOneInstruction> env = switch_record.get(switch_statement);
+		Set<IJavaElement> ekys = env.keySet();
+		Iterator<IJavaElement> eitr = ekys.iterator();
+		while (eitr.hasNext())
+		{
+			IJavaElement ije = eitr.next();
+			irc.SwitchDirection(ije, env.get(ije));
+		}
+		
+		PopSwitchBranch(switch_statement);
 		Expression expr = node.getExpression();
 		if (expr != null) {
 			post_visit_task.Put(expr, new Runnable() {
@@ -1104,6 +1114,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		switch_judge_members.pop();
 		PopSwitchBranch(node);
 		RemoveSwitchBranch(node);
+		switch_record.remove(node);
 	}
 
 	// handling expressions.
