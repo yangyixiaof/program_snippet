@@ -38,10 +38,10 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public static int max_level = Integer.MAX_VALUE; // Integer.MAX_VALUE partly
 														// means infinite.
 	public static final int un_exist = -100;
-	// TODO return and assign right should add special task.
-	// TODO variable declarations should be removed, only assignment in it should be retained.
+	// Solved. return and assign right should add special task.
+	// Solved. variable declarations should be removed, only assignment in it should be retained.
 	// TODO how to recognize the global relationship, eclipse jdt offers?
-	// TODO Important!!!!!!!, dependencies between differernt variables seem not handled, some are not needed but some are needed.
+	// Solved. Important!!!!!!!, dependencies between differernt variables seem not handled, some are not needed but some are needed.
 	
 	// for return statements, all nodes related to return should be recorded.
 	
@@ -291,7 +291,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 					IRForOneMethodInvocation irfomi = (IRForOneMethodInvocation)irc.GetLastIRTreeNode(source_method_receiver_element);
 					UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
 					HandleIJavaElement(ure, node);
-					IRGeneratorHelper.AddMethodReturnVirtualReceiveNodeAndSelfDependency(irc, ure, irfomi);
+					IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, irfomi);
 				}
 			}
 		} else {
@@ -812,8 +812,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public boolean visit(Assignment node) {
 		// Solved. how to redirect? last node to skip self.
 		
-		// TODO depd needs to record which iirnode left value depends. connections need to be added from left to right.
-		// TODO assign dependency should be extracted as a stand_alone function because var-declare also will also use it.
+		// Solved. depd needs to record which iirnode left value depends. connections need to be added from left to right.
+		// Solved. assign dependency should be extracted as a stand_alone function because var-declare also will also use it.
 		
 		HandleAssign(node.getLeftHandSide(), node.getRightHandSide());
 		
@@ -1179,7 +1179,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		super.endVisit(node);
 	}
 	
-	// TODO begin to handle infix expression.
+	// Reminding: begin to handle infix expression.
 	private Map<ASTNode, Map<IJavaElement, List<IRForOneInstruction>>> node_to_merge = new HashMap<ASTNode, Map<IJavaElement, List<IRForOneInstruction>>>();
 	
 	@Override
@@ -1250,11 +1250,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		Map<IJavaElement, List<IRForOneInstruction>> merge = node_to_merge.get(node);
 		Set<IJavaElement> mkeys = merge.keySet();
 		Iterator<IJavaElement> mitr = mkeys.iterator();
+		List<IRForOneOperation> new_creation = new LinkedList<IRForOneOperation>();
 		while (mitr.hasNext())
 		{
 			IJavaElement ije = mitr.next();
 			List<IRForOneInstruction> list = merge.get(ije);
 			IRForOneOperation irfop = new IRForOneOperation(irc, ije, node.getOperator().toString(), DefaultINodeTask.class);
+			new_creation.add(irfop);
 			Iterator<IRForOneInstruction> litr = list.iterator();
 			while (litr.hasNext())
 			{
@@ -1263,6 +1265,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			}
 			irc.SwitchDirection(ije, irfop);
 		}
+		IRGeneratorHelper.HandleEachElementInSameOperationDependency(new_creation);
+		node_to_merge.get(node).clear();
 		node_to_merge.remove(node);
 		super.endVisit(node);
 	}

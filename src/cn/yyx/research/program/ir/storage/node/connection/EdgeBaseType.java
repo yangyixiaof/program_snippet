@@ -2,9 +2,10 @@ package cn.yyx.research.program.ir.storage.node.connection;
 
 public enum EdgeBaseType {
 	
-	Sequential(1),
-	Self(1 << 1 | 1),
-	Branch(1 << 2);
+	SameOperations(1),
+	Sequential(1 << 1),
+	Self(1 << 2 | 1 << 1),
+	Branch(1 << 3);
 	
 	private int type = 0;
 	
