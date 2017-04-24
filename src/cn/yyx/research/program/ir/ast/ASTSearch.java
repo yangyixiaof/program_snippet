@@ -6,6 +6,7 @@ import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 public class ASTSearch {
@@ -66,7 +67,7 @@ public class ASTSearch {
 	public static ASTNode FindMostCloseBreakContinueScope(ASTNode astnode)
 	{
 		ASTNode temp = astnode;
-		while (temp != null && !(temp instanceof WhileStatement) && !(temp instanceof DoStatement) && !(temp instanceof ForStatement) && !(temp instanceof EnhancedForStatement))
+		while (temp != null && !(temp instanceof WhileStatement) && !(temp instanceof DoStatement) && !(temp instanceof ForStatement) && !(temp instanceof EnhancedForStatement) && !(temp instanceof SwitchStatement))
 		{
 			temp = temp.getParent();
 		}

@@ -15,7 +15,7 @@ public class IRASTNodeTask {
 	public IRASTNodeTask() {
 	}
 	
-	public void put(ASTNode node, Runnable run)
+	public void Put(ASTNode node, Runnable run)
 	{
 		List<Runnable> tasks = run_task.get(node);
 		if (tasks == null)

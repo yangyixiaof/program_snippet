@@ -245,7 +245,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 //					RecordASTNodePreEnvironment(expr);
 //				}
 //			});
-			post_visit_task.put(expr, new Runnable() {
+			post_visit_task.Put(expr, new Runnable() {
 				@Override
 				public void run() {
 					IJavaElement w_ije = WholeExpressionIsAnElement(expr);
@@ -367,7 +367,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		List<Expression> nlist = (List<Expression>) node.arguments();
 		PreMethodInvocation(nlist);
 		if (node.getAnonymousClassDeclaration() != null) {
-			pre_visit_task.put(node, new Runnable() {
+			pre_visit_task.Put(node, new Runnable() {
 				@Override
 				public void run() {
 					PostMethodInvocation(node.resolveConstructorBinding(), nlist, null,
@@ -390,21 +390,97 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// handling statements.
 	
-	// TODO all branches and loops should handle parallel connections.
-
-	@Override
-	public boolean visit(IfStatement node) {
+	// Solved. all branches and loops should handle parallel connections.
+	protected HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>> switch_record = new HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>>();
+	
+	private void HandleOneBranch(ASTNode all_in_control, ASTNode then_stat, boolean clear)
+	{
+		if (then_stat != null)
+		{
+			pre_visit_task.Put(then_stat, new Runnable() {
+				@Override
+				public void run() {
+					ast_block_bind.put(then_stat, new HashSet<IJavaElement>());
+				}
+			});
+			post_visit_task.Put(then_stat, new Runnable() {
+				@Override
+				public void run() {
+					HashSet<IJavaElement> eles = ast_block_bind.get(then_stat);
+					Iterator<IJavaElement> eitr = eles.iterator();
+					while (eitr.hasNext())
+					{
+						IJavaElement ije = eitr.next();
+						irc.SwitchDirection(ije, switch_record.get(all_in_control).get(ije));
+						Map<IJavaElement, List<IRForOneInstruction>> merge = node_to_merge.get(all_in_control);
+						if (merge == null)
+						{
+							merge = new HashMap<IJavaElement, List<IRForOneInstruction>>();
+							node_to_merge.put(all_in_control, merge);
+						}
+						List<IRForOneInstruction> merge_list = merge.get(ije);
+						if (merge_list == null)
+						{
+							merge_list = new LinkedList<IRForOneInstruction>();
+							merge.put(ije, merge_list);
+						}
+						merge_list.add(irc.GetLastIRTreeNode(ije));
+					}
+					ast_block_bind.remove(then_stat);
+					if (clear) {
+						StatementOverHandle();
+					}
+				}
+			});
+		}
+	}
+	
+	private void PreVisitBranch(ASTNode all_in_control, Expression judge, ASTNode then_stat, ASTNode else_stat, boolean clear)
+	{
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getExpression(), new Runnable() {
+		post_visit_task.Put(judge, new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getExpression(),
+				IRGeneratorHelper.GenerateGeneralIR(this_ref, judge,
 						IRMeta.If);
 				PushBranchInstructionOrder();
-				StatementOverHandle();
+				switch_record.put(all_in_control, irc.CopyEnvironment());
+				if (clear) {
+					StatementOverHandle();
+				}
 			}
 		});
-
+		HandleOneBranch(all_in_control, then_stat, clear);
+		
+		HandleOneBranch(all_in_control, else_stat, clear);
+	}
+	
+	private void PostVisitBranch(ASTNode all_in_control, boolean clear)
+	{
+		PopBranchInstructionOrder();
+		switch_record.remove(all_in_control);
+		List<IRForOneOperation> ops = new LinkedList<IRForOneOperation>();
+		Map<IJavaElement, List<IRForOneInstruction>> merge = node_to_merge.remove(all_in_control);
+		Iterator<IJavaElement> itr = merge.keySet().iterator();
+		while (itr.hasNext())
+		{
+			IJavaElement ije = itr.next();
+			IRForOneOperation irfop = new IRForOneOperation(irc, ije, IRMeta.BranchOver, DefaultINodeTask.class);
+			ops.add(irfop);
+			List<IRForOneInstruction> merge_list = merge.get(ije);
+			MergeListParallelToOne(merge_list, ije, irfop);
+		}
+		IRGeneratorHelper.HandleEachElementInSameOperationDependency(ops);
+		merge.clear();
+		if (clear)
+		{
+			StatementOverHandle();
+		}
+	}
+	
+	@Override
+	public boolean visit(IfStatement node) {
+		PreVisitBranch(node, node.getExpression(), node.getThenStatement(), node.getElseStatement(), true);
 		// Statement thenstat = node.getThenStatement();
 		// if (thenstat != null)
 		// {
@@ -438,22 +514,23 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void endVisit(IfStatement node) {
-		PopBranchInstructionOrder();
+		PostVisitBranch(node, true);
 		super.endVisit(node);
 	}
 
 	// highly related to IfStatement.
 	@Override
 	public boolean visit(ConditionalExpression node) {
-		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getExpression(), new Runnable() {
-			@Override
-			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getExpression(),
-						IRMeta.If);
-				PushBranchInstructionOrder();
-			}
-		});
+		PreVisitBranch(node, node.getExpression(), node.getThenExpression(), node.getElseExpression(), false);
+//		IRGeneratorForOneLogicBlock this_ref = this;
+//		post_visit_task.Put(node.getExpression(), new Runnable() {
+//			@Override
+//			public void run() {
+//				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getExpression(),
+//						IRMeta.If);
+//				PushBranchInstructionOrder();
+//			}
+//		});
 
 		// post_visit_task.put(node.getThenExpression(), new Runnable() {
 		// @Override
@@ -478,7 +555,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void endVisit(ConditionalExpression node) {
-		PopBranchInstructionOrder();
+		PostVisitBranch(node, false);
 		super.endVisit(node);
 	}
 
@@ -487,7 +564,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public boolean visit(WhileStatement node) {
 		// ast_block_bind.put(node, new HashSet<IBinding>());
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getExpression(), new Runnable() {
+		post_visit_task.Put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
 				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getExpression(),
@@ -509,7 +586,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public boolean visit(DoStatement node) {
 		// ast_block_bind.put(node, new HashSet<IBinding>());
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getExpression(), new Runnable() {
+		post_visit_task.Put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
 				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getExpression(),
@@ -538,7 +615,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			last_expr = ini_list.get(ini_list.size() - 1);
 			final ASTNode exp = last_expr;
 			if (last_expr != null) {
-				post_visit_task.put(last_expr, new Runnable() {
+				post_visit_task.Put(last_expr, new Runnable() {
 					@Override
 					public void run() {
 						HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
@@ -558,7 +635,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			last_expr = expr;
 			final ASTNode exp = last_expr;
 			if (last_expr != null) {
-				post_visit_task.put(last_expr, new Runnable() {
+				post_visit_task.Put(last_expr, new Runnable() {
 					@Override
 					public void run() {
 						HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
@@ -580,7 +657,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			last_expr = upd_list.get(upd_list.size() - 1);
 			final ASTNode exp = last_expr;
 			if (last_expr != null) {
-				post_visit_task.put(last_expr, new Runnable() {
+				post_visit_task.Put(last_expr, new Runnable() {
 					@Override
 					public void run() {
 						HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
@@ -612,7 +689,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(EnhancedForStatement node) {
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getExpression(), new Runnable() {
+		post_visit_task.Put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
 				IRGeneratorHelper.GenerateGeneralIR(this_ref, node,
@@ -641,7 +718,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			ASTNode break_scope = SearchForLiveScopeOfBreakContinue(node, label);
 			
 			IRGeneratorForOneLogicBlock this_ref = this;
-			post_visit_task.put(break_scope, new Runnable() {
+			post_visit_task.Put(break_scope, new Runnable() {
 				@Override
 				public void run() {
 					IRGeneratorHelper.GenerateNoVariableBindingIR(this_ref, node, elements,
@@ -822,7 +899,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 //					RecordASTNodePreEnvironment(expr);
 //				}
 //			});
-			post_visit_task.put(expr, new Runnable() {
+			post_visit_task.Put(expr, new Runnable() {
 				@Override
 				public void run() {
 					IJavaElement ije = WholeExpressionIsAnElement(expr);
@@ -912,7 +989,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(SynchronizedStatement node) {
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getExpression(), new Runnable() {
+		post_visit_task.Put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
 				IRGeneratorHelper.GenerateGeneralIR(this_ref, node,
@@ -940,7 +1017,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// }
 		// });
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getExpression(), new Runnable() {
+		post_visit_task.Put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
 				switch_judge_members.push(new HashSet<IJavaElement>(temp_statement_environment_set));
@@ -987,7 +1064,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		PopSwitchBranch((SwitchStatement) node.getParent());
 		Expression expr = node.getExpression();
 		if (expr != null) {
-			post_visit_task.put(expr, new Runnable() {
+			post_visit_task.Put(expr, new Runnable() {
 				@Override
 				public void run() {
 					IRGeneratorHelper.GenerateGeneralIR(this_ref, node,
@@ -1217,7 +1294,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(InstanceofExpression node) {
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getLeftOperand(), new Runnable() {
+		post_visit_task.Put(node.getLeftOperand(), new Runnable() {
 			@Override
 			public void run() {
 				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getLeftOperand(), 
@@ -1254,7 +1331,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		while (eitr.hasNext())
 		{
 			Expression expr = eitr.next();
-			pre_visit_task.put(expr, new Runnable() {
+			pre_visit_task.Put(expr, new Runnable() {
 				@Override
 				public void run() {
 					Set<IJavaElement> ekeys = env.keySet();
@@ -1267,7 +1344,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 					}
 				}
 			});
-			post_visit_task.put(expr, new Runnable() {
+			post_visit_task.Put(expr, new Runnable() {
 				@Override
 				public void run() {
 					Set<IJavaElement> all_elements = SearchAndRememberAllElementsInASTNodeInJustEnvironment(expr);
@@ -1297,7 +1374,18 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 //		});
 		return false;
 	}
-
+	
+	private void MergeListParallelToOne(List<IRForOneInstruction> list, IJavaElement ije, IRForOneOperation irfop)
+	{
+		Iterator<IRForOneInstruction> litr = list.iterator();
+		while (litr.hasNext())
+		{
+			IRForOneInstruction tn = litr.next();
+			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(tn, irfop, EdgeBaseType.Self.getType()));
+		}
+		irc.SwitchDirection(ije, irfop);
+	}
+	
 	@Override
 	public void endVisit(InfixExpression node) {
 //		IRGeneratorHelper.GenerateGeneralIR(this, node.getRightOperand(),
@@ -1312,13 +1400,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			List<IRForOneInstruction> list = merge.get(ije);
 			IRForOneOperation irfop = new IRForOneOperation(irc, ije, node.getOperator().toString(), DefaultINodeTask.class);
 			new_creation.add(irfop);
-			Iterator<IRForOneInstruction> litr = list.iterator();
-			while (litr.hasNext())
-			{
-				IRForOneInstruction tn = litr.next();
-				IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(tn, irfop, EdgeBaseType.Self.getType()));
-			}
-			irc.SwitchDirection(ije, irfop);
+			MergeListParallelToOne(list, ije, irfop);
 		}
 		IRGeneratorHelper.HandleEachElementInSameOperationDependency(new_creation);
 		node_to_merge.get(node).clear();
@@ -1346,7 +1428,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(CatchClause node) {
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getException(), new Runnable() {
+		post_visit_task.Put(node.getException(), new Runnable() {
 			@Override
 			public void run() {
 				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getException(),
@@ -1359,7 +1441,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(CastExpression node) {
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getType(), new Runnable() {
+		post_visit_task.Put(node.getType(), new Runnable() {
 			@Override
 			public void run() {
 				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getType(),
@@ -1379,7 +1461,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(ArrayCreation node) {
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getType(), new Runnable() {
+		post_visit_task.Put(node.getType(), new Runnable() {
 			@Override
 			public void run() {
 				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getType(),
@@ -1391,7 +1473,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		Iterator<Expression> itr = nlist.iterator();
 		while (itr.hasNext()) {
 			Expression expr = itr.next();
-			post_visit_task.put(expr, new Runnable() {
+			post_visit_task.Put(expr, new Runnable() {
 				@Override
 				public void run() {
 					IRGeneratorHelper.GenerateGeneralIR(this_ref, expr,
@@ -1411,7 +1493,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(ArrayAccess node) {
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.put(node.getArray(), new Runnable() {
+		post_visit_task.Put(node.getArray(), new Runnable() {
 			@Override
 			public void run() {
 				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getArray(),
