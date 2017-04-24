@@ -43,6 +43,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// TODO how to recognize the global relationship, eclipse jdt offers?
 	// Solved. Important!!!!!!!, dependencies between differernt variables seem not handled, some are not needed but some are needed.
 	
+	// TODO switch case mechanism is not as tree or graph and is sequential which is not right.
+	
 	// for return statements, all nodes related to return should be recorded.
 	
 	// name must be resolved and ensure it is a variable, a global variable or a type.

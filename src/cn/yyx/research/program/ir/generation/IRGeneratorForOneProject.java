@@ -137,10 +137,10 @@ public class IRGeneratorForOneProject {
 	}
 	
 	private IRGeneratorForOneProject(IJavaProject java_project) {
-		this.java_project = java_project;
+		this.setJava_project(java_project);
 	}
 	
-	public static void Initial(IJavaProject java_project)
+	private static void Initial(IJavaProject java_project)
 	{
 		if (irgfop != null)
 		{
@@ -163,11 +163,12 @@ public class IRGeneratorForOneProject {
 		constant_unique_element_cache.clear();
 		class_irs.clear();
 		method_irs.clear();
-		java_project = null;
+		setJava_project(null);
 	}
 	
-	private void GenerateForAllICompilationUnits() throws JavaModelException
+	public static void GenerateForAllICompilationUnits(IJavaProject java_project) throws JavaModelException
 	{
+		Initial(java_project);
 		List<ICompilationUnit> units = JavaSearch.SearchForAllICompilationUnits(java_project);
 		// System.err.println("unit_size:" + units.size());
 		for (final ICompilationUnit icu : units) {
@@ -227,6 +228,14 @@ public class IRGeneratorForOneProject {
 	public Map<IMethod, IRForOneMethod> GetMethodIR()
 	{
 		return method_irs;
+	}
+
+	public IJavaProject getJava_project() {
+		return java_project;
+	}
+
+	private void setJava_project(IJavaProject java_project) {
+		this.java_project = java_project;
 	}
 	
 }
