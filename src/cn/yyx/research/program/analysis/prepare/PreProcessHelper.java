@@ -7,12 +7,12 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.text.edits.TextEdit;
 
-import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
+import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICompilationUnits;
 
 public class PreProcessHelper {
 
 	public static void EliminateAllParameterizedType(IJavaProject java_project) throws JavaModelException {
-		List<ICompilationUnit> units = JavaSearch.SearchForAllICompilationUnits(java_project);
+		List<ICompilationUnit> units = EclipseSearchForICompilationUnits.SearchForAllICompilationUnits(java_project);
 		// System.err.println("unit_size:" + units.size());
 		for (final ICompilationUnit compilation_resource : units) {
 			TextEdit edit = PreProcessCompilationUnitHelper.EntirePreProcessCompilationUnit(compilation_resource,

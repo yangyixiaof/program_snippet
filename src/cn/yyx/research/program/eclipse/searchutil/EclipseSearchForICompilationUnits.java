@@ -3,21 +3,14 @@ package cn.yyx.research.program.eclipse.searchutil;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.search.IJavaSearchConstants;
-import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.jdt.core.search.SearchParticipant;
-import org.eclipse.jdt.core.search.SearchPattern;
-import org.eclipse.jdt.core.search.SearchRequestor;
 
-public class JavaSearch {
+public class EclipseSearchForICompilationUnits {
 
 	public static List<ICompilationUnit> SearchForAllICompilationUnits(IJavaProject java_project)
 			throws JavaModelException {
@@ -38,15 +31,6 @@ public class JavaSearch {
 			}
 		}
 		return units;
-	}
-
-	public static void SearchForWhereTheMethodIsConcreteImplementated(IMethod method, SearchRequestor requestor)
-			throws CoreException {
-		// Create search pattern
-		System.out.println("SearchForImplementation, method is:" + method);
-		SearchPattern pattern = SearchPattern.createPattern(method, IJavaSearchConstants.DECLARATIONS);
-		new SearchEngine().search(pattern, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
-				SearchEngine.createWorkspaceScope(), requestor, null);
 	}
 
 }

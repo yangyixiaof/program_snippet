@@ -20,7 +20,7 @@ import org.eclipse.jdt.internal.corext.callhierarchy.CallHierarchy;
 import org.eclipse.jdt.internal.corext.callhierarchy.MethodWrapper;
 
 import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
-import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
+import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICompilationUnits;
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
@@ -175,7 +175,7 @@ public class IRGeneratorForOneProject {
 	public static void GenerateForAllICompilationUnits(IJavaProject java_project) throws JavaModelException
 	{
 		Initial(java_project);
-		List<ICompilationUnit> units = JavaSearch.SearchForAllICompilationUnits(java_project);
+		List<ICompilationUnit> units = EclipseSearchForICompilationUnits.SearchForAllICompilationUnits(java_project);
 		// System.err.println("unit_size:" + units.size());
 		for (final ICompilationUnit icu : units) {
 			CompilationUnit cu = JDTParser.CreateJDTParser(java_project).ParseICompilationUnit(icu);

@@ -8,7 +8,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
-import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
+import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICompilationUnits;
 
 public class TestJavaSearch {
 	
@@ -17,7 +17,7 @@ public class TestJavaSearch {
 	
 	public void TestJavaSearchMehodInvocation(IJavaProject java_project) throws CoreException
 	{
-		List<ICompilationUnit> units = JavaSearch.SearchForAllICompilationUnits(java_project);
+		List<ICompilationUnit> units = EclipseSearchForICompilationUnits.SearchForAllICompilationUnits(java_project);
 		System.out.println("All ICompilationUnit Size:" + units.size());
 		for (ICompilationUnit unit : units)
 		{

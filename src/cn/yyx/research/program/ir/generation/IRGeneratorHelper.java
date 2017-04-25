@@ -15,9 +15,9 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 
-import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
+import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForIMember;
 import cn.yyx.research.program.ir.ast.ASTSearch;
-import cn.yyx.research.program.ir.search.IRSearchRequestor;
+import cn.yyx.research.program.ir.search.IRSearchMethodRequestor;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.DefaultINodeTask;
@@ -55,8 +55,9 @@ public class IRGeneratorHelper {
 			// source method invocation.
 			Collection<IMethod> methods = null;
 			try {
-				IRSearchRequestor sr = new IRSearchRequestor();
-				JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(im, sr);
+				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(IRGeneratorForOneProject.GetInstance().getJava_project(), im);
+				EclipseSearchForIMember search = new EclipseSearchForIMember();
+				search.SearchForWhereTheMethodIsConcreteImplementated(im, sr);
 				methods = sr.GetMethods();
 			} catch (CoreException e) {
 				e.printStackTrace();

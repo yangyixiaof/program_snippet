@@ -26,7 +26,8 @@ import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TypeMethodReference;
 
-import cn.yyx.research.program.eclipse.searchutil.JavaSearch;
+import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForIMember;
+import cn.yyx.research.program.ir.search.IRSearchMethodRequestor;
 
 public class SearchIMethodVisitor extends ASTVisitor {
 	
@@ -212,7 +213,9 @@ public class SearchIMethodVisitor extends ASTVisitor {
 			try {
 				System.out.println("========MethodInvocation Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
 				System.out.println("MethodInvocation:" + node.getName() + " Search for declarations.");
-				JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(imethod, new SearchResultRequestorForTest(java_project));
+				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
+				EclipseSearchForIMember search = new EclipseSearchForIMember();
+				search.SearchForWhereTheMethodIsConcreteImplementated(imethod, sr);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -230,7 +233,9 @@ public class SearchIMethodVisitor extends ASTVisitor {
 			try {
 				System.out.println("========Construction Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
 				System.out.println("MethodInvocation:" + node + " Search for declarations.");
-				JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(imethod, new SearchResultRequestorForTest(java_project));
+				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
+				EclipseSearchForIMember search = new EclipseSearchForIMember();
+				search.SearchForWhereTheMethodIsConcreteImplementated(imethod, sr);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -252,7 +257,9 @@ public class SearchIMethodVisitor extends ASTVisitor {
 				{
 					System.out.println("Method Element is null:" + node);
 				}
-				JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(imethod, new SearchResultRequestorForTest(java_project));
+				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
+				EclipseSearchForIMember search = new EclipseSearchForIMember();
+				search.SearchForWhereTheMethodIsConcreteImplementated(imethod, sr);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
