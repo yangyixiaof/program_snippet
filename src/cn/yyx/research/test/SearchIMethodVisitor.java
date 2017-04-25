@@ -1,9 +1,13 @@
 package cn.yyx.research.test;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -27,6 +31,7 @@ import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TypeMethodReference;
 
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForIMember;
+import cn.yyx.research.program.ir.IRControl;
 import cn.yyx.research.program.ir.search.IRSearchMethodRequestor;
 
 public class SearchIMethodVisitor extends ASTVisitor {
@@ -198,6 +203,26 @@ public class SearchIMethodVisitor extends ASTVisitor {
 //		}
 //		return super.visit(node);
 //	}
+	private void PrintInformation(Set<IMethod> methods)
+	{
+		// codes below are just used for debugging.
+		Iterator<IMethod> mitr = methods.iterator();
+		while (mitr.hasNext()) {
+			IMethod method = (IMethod) mitr.next();
+			if (IRControl.debug)
+			{
+				IType type = method.getDeclaringType();
+				System.out.println("================== start ==================");
+				System.out.println("IType:" + type);
+//				System.out.println("matches:" + match.toString());
+//				System.out.println("match element class:" + match.getElement().getClass());
+//				CompilationUnit cu = JDTParser.CreateJDTParser(java_project).ParseICompilationUnit(im.getCompilationUnit());
+//				String searched_content = cu.getTypeRoot().getBuffer().getText(match.getOffset(), match.getLength());
+//				System.out.println("searched_content:" + searched_content);
+				System.out.println("================== end ==================");
+			}
+		}
+	}
 	
 	@Override
 	public boolean visit(MethodInvocation node) {
@@ -216,6 +241,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
 				EclipseSearchForIMember search = new EclipseSearchForIMember();
 				search.SearchForWhereTheMethodIsConcreteImplementated(imethod, sr);
+				PrintInformation(sr.GetMethods());
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -236,6 +262,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
 				EclipseSearchForIMember search = new EclipseSearchForIMember();
 				search.SearchForWhereTheMethodIsConcreteImplementated(imethod, sr);
+				PrintInformation(sr.GetMethods());
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -260,6 +287,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
 				EclipseSearchForIMember search = new EclipseSearchForIMember();
 				search.SearchForWhereTheMethodIsConcreteImplementated(imethod, sr);
+				PrintInformation(sr.GetMethods());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
