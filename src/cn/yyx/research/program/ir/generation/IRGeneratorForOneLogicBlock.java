@@ -455,10 +455,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		HandleOneBranch(all_in_control, else_stat, clear);
 	}
 	
-	private void PostVisitBranch(ASTNode all_in_control, boolean clear)
+	private void HandleMerge(ASTNode all_in_control)
 	{
-		PopBranchInstructionOrder();
-		switch_record.remove(all_in_control);
 		List<IRForOneOperation> ops = new LinkedList<IRForOneOperation>();
 		Map<IJavaElement, List<IRForOneInstruction>> merge = node_to_merge.remove(all_in_control);
 		Iterator<IJavaElement> itr = merge.keySet().iterator();
@@ -472,6 +470,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 		IRGeneratorHelper.HandleEachElementInSameOperationDependency(ops);
 		merge.clear();
+	}
+	
+	private void PostVisitBranch(ASTNode all_in_control, boolean clear)
+	{
+		PopBranchInstructionOrder();
+		switch_record.remove(all_in_control);
+		HandleMerge(all_in_control);
 		if (clear)
 		{
 			StatementOverHandle();
@@ -1002,7 +1007,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	protected Stack<Set<IJavaElement>> switch_judge_members = new Stack<Set<IJavaElement>>();
 	protected Map<ASTNode, Integer> switch_case_flag = new HashMap<ASTNode, Integer>();
-
+	protected Map<SwitchStatement, SwitchCase> last_switch_case = new HashMap<SwitchStatement, SwitchCase>();
+	
 	@Override
 	public boolean visit(SwitchStatement node) {
 		// switch_case_bind.push(new HashSet<IBinding>());
@@ -1016,6 +1022,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// IRMeta.Switch, branchs_var_instr_order.peek());
 		// }
 		// });
+		node_to_merge.put(node, new HashMap<IJavaElement, List<IRForOneInstruction>>());
 		IRGeneratorForOneLogicBlock this_ref = this;
 		post_visit_task.Put(node.getExpression(), new Runnable() {
 			@Override
@@ -1043,8 +1050,35 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 	}
 
-	private void RemoveSwitchBranch(SwitchStatement node) {
+	private void ClearSwitchEnvironment(SwitchStatement node) {
 		switch_case_flag.remove(node);
+		switch_judge_members.pop();
+		switch_record.remove(node);
+		last_switch_case.remove(node);
+		node_to_merge.get(node).clear();
+		node_to_merge.remove(node);
+	}
+	
+	private void HandleLastSwitchCase(SwitchStatement switch_statement, SwitchCase node)
+	{
+		SwitchCase sc = last_switch_case.get(switch_statement);
+		if (sc == null) {
+			if (node != null)
+			{
+				last_switch_case.put(switch_statement, node);
+			}
+		} else {
+			HashSet<IJavaElement> bind_elements = ast_block_bind.get(sc);
+			Map<IJavaElement, List<IRForOneInstruction>> merge = node_to_merge.get(switch_statement);
+			PrepareCurrentEnvironmentToMerge(bind_elements, merge);
+			
+			ast_block_bind.remove(sc);
+			if (node != null)
+			{
+				last_switch_case.put(switch_statement, node);
+				ast_block_bind.put(node, new HashSet<IJavaElement>());
+			}
+		}
 	}
 
 	// closely related expressions.
@@ -1060,8 +1094,14 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// binds.clear();
 		// }
 		// slist.add(node);
+		
 		IRGeneratorForOneLogicBlock this_ref = this;
 		SwitchStatement switch_statement = (SwitchStatement) node.getParent();
+		
+		// handle previous switch_case.
+		HandleLastSwitchCase(switch_statement, node);
+		
+		// switch to direction.
 		Map<IJavaElement, IRForOneInstruction> env = switch_record.get(switch_statement);
 		Set<IJavaElement> ekys = env.keySet();
 		Iterator<IJavaElement> eitr = ekys.iterator();
@@ -1111,10 +1151,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		//
 		// binds.clear();
 		// slist.clear();
-		switch_judge_members.pop();
+		HandleLastSwitchCase(node, null);
+		
+		HandleMerge(node);
+		
 		PopSwitchBranch(node);
-		RemoveSwitchBranch(node);
-		switch_record.remove(node);
+		ClearSwitchEnvironment(node);
+		StatementOverHandle();
 	}
 
 	// handling expressions.
@@ -1325,6 +1368,22 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// Reminding: begin to handle infix expression.
 	private Map<ASTNode, Map<IJavaElement, List<IRForOneInstruction>>> node_to_merge = new HashMap<ASTNode, Map<IJavaElement, List<IRForOneInstruction>>>();
 	
+	private void PrepareCurrentEnvironmentToMerge(Set<IJavaElement> bind_elements, Map<IJavaElement, List<IRForOneInstruction>> merge)
+	{
+		Iterator<IJavaElement> itr = bind_elements.iterator();
+		while (itr.hasNext())
+		{
+			IJavaElement ije = itr.next();
+			List<IRForOneInstruction> list = merge.get(ije);
+			if (list == null)
+			{
+				list = new LinkedList<IRForOneInstruction>();
+				merge.put(ije, list);
+			}
+			list.add(irc.GetLastIRTreeNode(ije));
+		}
+	}
+	
 	@Override
 	public boolean visit(InfixExpression node) {
 		HashMap<IJavaElement, List<IRForOneInstruction>> merge = new HashMap<IJavaElement, List<IRForOneInstruction>>();
@@ -1359,18 +1418,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				@Override
 				public void run() {
 					Set<IJavaElement> all_elements = SearchAndRememberAllElementsInASTNodeInJustEnvironment(expr);
-					Iterator<IJavaElement> itr = all_elements.iterator();
-					while (itr.hasNext())
-					{
-						IJavaElement ije = itr.next();
-						List<IRForOneInstruction> list = merge.get(ije);
-						if (list == null)
-						{
-							list = new LinkedList<IRForOneInstruction>();
-							merge.put(ije, list);
-						}
-						list.add(irc.GetLastIRTreeNode(ije));
-					}
+					PrepareCurrentEnvironmentToMerge(all_elements, merge);
 				}
 			});
 		}
