@@ -45,10 +45,19 @@ public class IRSearchMethodRequestor extends SearchRequestor {
 				while (titr.hasNext())
 				{
 					IType tit = titr.next();
+					
+					// System.out.println("temp tit:" + tit);
+					
 					IMethod imd = tit.getMethod(method.getElementName(), method.getParameterTypes());
-					if (imd != null && !Flags.isAbstract(imd.getFlags()))
+					
+					// System.out.println("temp tit imd:" + imd);
+					
+					if (imd != null) //  && !Flags.isAbstract(imd.getFlags())
 					{
-						methods.add(imd);
+						EclipseSearchForIMember search = new EclipseSearchForIMember();
+						IRSearchMethodRequestor requestor = new IRSearchMethodRequestor(java_project, imd);
+						search.SearchForWhereTheMethodIsConcreteImplementated(imd, requestor);
+						methods.addAll(requestor.GetMethods());
 					}
 				}
 			} else if (Flags.isAbstract(im.getFlags())) {

@@ -214,6 +214,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 				IType type = method.getDeclaringType();
 				System.out.println("================== start ==================");
 				System.out.println("IType:" + type);
+				System.out.println("IMethod:" + method);
 //				System.out.println("matches:" + match.toString());
 //				System.out.println("match element class:" + match.getElement().getClass());
 //				CompilationUnit cu = JDTParser.CreateJDTParser(java_project).ParseICompilationUnit(im.getCompilationUnit());
