@@ -56,7 +56,7 @@ public class IRGeneratorHelper {
 			Collection<IMethod> methods = null;
 			try {
 				IRSearchRequestor sr = new IRSearchRequestor();
-				JavaSearch.SearchForWhereTheMethodIsInvoked(im, true, sr);
+				JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(im, sr);
 				methods = sr.GetMethods();
 			} catch (CoreException e) {
 				e.printStackTrace();

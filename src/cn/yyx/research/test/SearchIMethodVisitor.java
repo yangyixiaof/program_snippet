@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.LambdaExpression;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.NumberLiteral;
@@ -181,24 +180,23 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		return super.visit(node);
 	}
 	
-	@Override
-	public boolean visit(MethodDeclaration node) {
-		System.out.println(node.getName());
-		IMethodBinding ibinding = node.resolveBinding();
-		if (ibinding != null)
-		{
-			IMethod imethod = (IMethod)ibinding.getJavaElement();
-			try {
-				// testing.
-				System.out.println("MethodInvocation:" + node.getName() + " Search for references.");
-				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, false, new SearchResultRequestorForTest(java_project));
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return super.visit(node);
-	}
+//	@Override
+//	public boolean visit(MethodDeclaration node) {
+//		System.out.println(node.getName());
+//		IMethodBinding ibinding = node.resolveBinding();
+//		if (ibinding != null)
+//		{
+//			IMethod imethod = (IMethod)ibinding.getJavaElement();
+//			try {
+//				// testing.
+//				System.out.println("MethodInvocation:" + node.getName() + " Search for references.");
+//				JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(imethod, false, new SearchResultRequestorForTest(java_project));
+//			} catch (CoreException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		return super.visit(node);
+//	}
 	
 	@Override
 	public boolean visit(MethodInvocation node) {
@@ -214,7 +212,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 			try {
 				System.out.println("========MethodInvocation Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
 				System.out.println("MethodInvocation:" + node.getName() + " Search for declarations.");
-				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, true, new SearchResultRequestorForTest(java_project));
+				JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(imethod, new SearchResultRequestorForTest(java_project));
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -232,7 +230,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 			try {
 				System.out.println("========Construction Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
 				System.out.println("MethodInvocation:" + node + " Search for declarations.");
-				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, true, new SearchResultRequestorForTest(java_project));
+				JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(imethod, new SearchResultRequestorForTest(java_project));
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -250,7 +248,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 			try {
 				System.out.println("========ClassInstanceCreation Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
 				System.out.println("MethodInvocation:" + node + " Search for declarations.");
-				JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, true, new SearchResultRequestorForTest(java_project));
+				JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(imethod, new SearchResultRequestorForTest(java_project));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

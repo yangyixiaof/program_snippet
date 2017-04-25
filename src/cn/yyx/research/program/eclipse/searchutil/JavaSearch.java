@@ -39,9 +39,9 @@ public class JavaSearch {
 		return units;
 	}
 	
-	public static void SearchForWhereTheMethodIsInvoked(IMethod method, boolean is_declaration, SearchRequestor requestor) throws CoreException {// "foo"
+	public static void SearchForWhereTheMethodIsConcreteImplementated(IMethod method, SearchRequestor requestor) throws CoreException {// "Fool"
 	    // Create search pattern
-	    SearchPattern pattern = SearchPattern.createPattern(method, (is_declaration ? IJavaSearchConstants.DECLARATIONS : IJavaSearchConstants.REFERENCES));
+	    SearchPattern pattern = SearchPattern.createPattern(method, IJavaSearchConstants.DECLARATIONS | (method.isConstructor()? IJavaSearchConstants.CONSTRUCTOR : IJavaSearchConstants.METHOD));
 		new SearchEngine().search(pattern, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
 				SearchEngine.createWorkspaceScope(), requestor, null);
 	}
