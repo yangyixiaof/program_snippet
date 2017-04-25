@@ -34,6 +34,7 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 @SuppressWarnings("restriction")
 public class IRGeneratorForOneProject {
 	// TODO two things: first, mark whether a method is constructor and its IType. second, test caller-roots method and JavaSearch Engine.
+	// TODO remember to check if searched method are null, if null, what to handle?
 	private IJavaProject java_project = null;
 	
 	private HashMap<IType, IRForOneClass> class_irs = new HashMap<IType, IRForOneClass>();

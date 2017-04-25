@@ -248,6 +248,10 @@ public class SearchIMethodVisitor extends ASTVisitor {
 			try {
 				System.out.println("========ClassInstanceCreation Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
 				System.out.println("MethodInvocation:" + node + " Search for declarations.");
+				if (imethod == null)
+				{
+					System.out.println("Method Element is null:" + node);
+				}
 				JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(imethod, new SearchResultRequestorForTest(java_project));
 			} catch (Exception e) {
 				e.printStackTrace();

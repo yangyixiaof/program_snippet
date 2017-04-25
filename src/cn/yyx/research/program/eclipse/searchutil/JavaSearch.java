@@ -18,8 +18,9 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 
 public class JavaSearch {
-	
-	public static List<ICompilationUnit> SearchForAllICompilationUnits(IJavaProject java_project) throws JavaModelException  {
+
+	public static List<ICompilationUnit> SearchForAllICompilationUnits(IJavaProject java_project)
+			throws JavaModelException {
 		IPackageFragmentRoot[] package_roots = java_project.getPackageFragmentRoots();
 		List<ICompilationUnit> units = new LinkedList<ICompilationUnit>();
 		for (IPackageFragmentRoot package_root : package_roots) {
@@ -38,12 +39,14 @@ public class JavaSearch {
 		}
 		return units;
 	}
-	
-	public static void SearchForWhereTheMethodIsConcreteImplementated(IMethod method, SearchRequestor requestor) throws CoreException {// "Fool"
-	    // Create search pattern
-	    SearchPattern pattern = SearchPattern.createPattern(method, IJavaSearchConstants.DECLARATIONS | (method.isConstructor()? IJavaSearchConstants.CONSTRUCTOR : IJavaSearchConstants.METHOD));
+
+	public static void SearchForWhereTheMethodIsConcreteImplementated(IMethod method, SearchRequestor requestor)
+			throws CoreException {
+		// Create search pattern
+		System.out.println("SearchForImplementation, method is:" + method);
+		SearchPattern pattern = SearchPattern.createPattern(method, IJavaSearchConstants.DECLARATIONS);
 		new SearchEngine().search(pattern, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
 				SearchEngine.createWorkspaceScope(), requestor, null);
 	}
-	
+
 }
