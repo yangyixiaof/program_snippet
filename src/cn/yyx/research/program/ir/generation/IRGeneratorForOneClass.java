@@ -40,7 +40,12 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 		if (ije instanceof IMethod)
 		{
 			IMethod im = (IMethod)ije;
-			IRForOneMethod imb = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(im);
+			IRForOneMethod imb = null;
+			if (node.isConstructor()) {
+				imb = IRGeneratorForOneProject.GetInstance().FetchIConstructorIR(im, it);
+			} else {
+				imb = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(im);
+			}
 			IRGeneratorForOneLogicBlock irgfocb = new IRGeneratorForOneLogicBlock(imb);
 			node.accept(irgfocb);
 			IRGeneratorForOneProject.GetInstance().FetchITypeIR((it)).AddMethodLevel((IRForOneMethod)irgfocb.GetGeneration());

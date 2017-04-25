@@ -27,6 +27,7 @@ import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.storage.node.IIRNode;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
@@ -234,6 +235,17 @@ public class IRGeneratorForOneProject {
 			class_irs.put(it, irclass);
 		}
 		return irclass;
+	}
+	
+	public IRForOneMethod FetchIConstructorIR(IMethod im, IType it)
+	{
+		IRForOneMethod irmethod = method_irs.get(im);
+		if (irmethod == null)
+		{
+			irmethod = new IRForOneConstructor(im, it);
+			method_irs.put(im, irmethod);
+		}
+		return irmethod;
 	}
 	
 	public IRForOneMethod FetchIMethodIR(IMethod im)
