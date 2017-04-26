@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.internal.core.ResolvedSourceMethod;
 
+import cn.yyx.research.logger.DebugLogger;
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForIMember;
 
 @SuppressWarnings("restriction")
@@ -46,11 +47,11 @@ public class IRSearchMethodRequestor extends SearchRequestor {
 				{
 					IType tit = titr.next();
 					
-					// System.out.println("temp tit:" + tit);
+					System.out.println("temp tit:" + tit);
 					
 					IMethod imd = tit.getMethod(method.getElementName(), method.getParameterTypes());
 					
-					// System.out.println("temp tit imd:" + imd);
+					System.out.println("temp tit imd:" + imd);
 					
 					if (imd != null) //  && !Flags.isAbstract(imd.getFlags())
 					{
@@ -66,6 +67,7 @@ public class IRSearchMethodRequestor extends SearchRequestor {
 				methods.add(im);
 			}
 		}
+		DebugLogger.Log(match, java_project);
 	}
 
 	public Set<IMethod> GetMethods() {

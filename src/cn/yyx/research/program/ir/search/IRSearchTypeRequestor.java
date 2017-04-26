@@ -10,8 +10,8 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.internal.core.ResolvedSourceType;
 
+import cn.yyx.research.logger.DebugLogger;
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForIMember;
-import cn.yyx.research.program.ir.IRControl;
 
 @SuppressWarnings("restriction")
 public class IRSearchTypeRequestor extends SearchRequestor {
@@ -41,16 +41,7 @@ public class IRSearchTypeRequestor extends SearchRequestor {
 			}
 		}
 		
-		
-		
-		
-		if (IRControl.debug)
-		{
-			System.out.println("================== type search start ==================");
-			System.out.println(match.getElement().getClass());
-			System.out.println(match);
-			System.out.println("================== type search end ==================");
-		}
+		DebugLogger.Log(match, java_project);
 //			ResolvedSourceMethod rsm = (ResolvedSourceMethod)match.getElement();
 //			System.out.println("key:"+rsm.getKey());
 	}

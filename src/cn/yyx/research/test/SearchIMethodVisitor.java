@@ -31,28 +31,26 @@ import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TypeMethodReference;
 
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForIMember;
-import cn.yyx.research.program.ir.IRControl;
 import cn.yyx.research.program.ir.search.IRSearchMethodRequestor;
 
 public class SearchIMethodVisitor extends ASTVisitor {
-	
+
 	IJavaProject java_project = null;
-	
+
 	public SearchIMethodVisitor(IJavaProject java_project) {
 		this.java_project = java_project;
 	}
-	
+
 	IMethodBinding im = null;
-	
+
 	@Override
 	public void preVisit(ASTNode node) {
-		if (node.toString().equals("super"))
-		{
+		if (node.toString().equals("super")) {
 			System.out.println("@super:" + node.getClass());
 		}
 		super.preVisit(node);
 	}
-	
+
 	@Override
 	public boolean visit(BreakStatement node) {
 		IBinding ib = node.getLabel().resolveBinding();
@@ -63,7 +61,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		}
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
 		ITypeBinding it = node.resolveBinding();
@@ -71,26 +69,24 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		System.out.println("@!AnonymousClassDeclaration:" + node + ";ije:" + ije + ";ije class:" + ije.getClass());
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(SimpleName node) {
 		IBinding ib = node.resolveBinding();
-		if (ib instanceof IVariableBinding)
-		{
-			IVariableBinding ivb = (IVariableBinding)ib;
+		if (ib instanceof IVariableBinding) {
+			IVariableBinding ivb = (IVariableBinding) ib;
 			IJavaElement ij = ivb.getJavaElement();
 			System.out.println("#SimpleName:" + node + ";IJavaElement:" + ij + ";IJavaElementClass:" + ij.getClass());
 		}
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(LambdaExpression node) {
 		System.out.println("==================== start ====================");
 		System.out.println("node:" + node);
 		IMethodBinding im = node.resolveMethodBinding();
-		if (this.im == null)
-		{
+		if (this.im == null) {
 			this.im = im;
 		} else {
 			System.out.println("if equals:" + this.im.equals(im));
@@ -126,7 +122,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		System.out.println("==================== end ====================");
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(TypeMethodReference node) {
 		System.out.println("==================== start ====================");
@@ -138,44 +134,44 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		System.out.println("==================== end ====================");
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(StringLiteral node) {
-		System.out.println("node:"+node);
-		System.out.println("Constant Value:"+node.resolveConstantExpressionValue());
-		System.out.println("TypeBinding:"+node.resolveTypeBinding());
-		System.out.println("TypeBinding not null:"+node.resolveTypeBinding() != null);
-		System.out.println("Constant Value not null:"+node.resolveTypeBinding() != null);
+		System.out.println("node:" + node);
+		System.out.println("Constant Value:" + node.resolveConstantExpressionValue());
+		System.out.println("TypeBinding:" + node.resolveTypeBinding());
+		System.out.println("TypeBinding not null:" + node.resolveTypeBinding() != null);
+		System.out.println("Constant Value not null:" + node.resolveTypeBinding() != null);
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(NumberLiteral node) {
-		System.out.println("node:"+node);
-		System.out.println("Constant Value:"+node.resolveConstantExpressionValue());
-		System.out.println("TypeBinding:"+node.resolveTypeBinding());
-		System.out.println("TypeBinding not null:"+node.resolveTypeBinding() != null);
-		System.out.println("Constant Value not null:"+node.resolveTypeBinding() != null);
+		System.out.println("node:" + node);
+		System.out.println("Constant Value:" + node.resolveConstantExpressionValue());
+		System.out.println("TypeBinding:" + node.resolveTypeBinding());
+		System.out.println("TypeBinding not null:" + node.resolveTypeBinding() != null);
+		System.out.println("Constant Value not null:" + node.resolveTypeBinding() != null);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(NullLiteral node) {
-		System.out.println("node:"+node);
-		System.out.println("Constant Value:"+node.resolveConstantExpressionValue());
-		System.out.println("TypeBinding:"+node.resolveTypeBinding());
-		System.out.println("TypeBinding not null:"+node.resolveTypeBinding() != null);
-		System.out.println("Constant Value not null:"+node.resolveTypeBinding() != null);
+		System.out.println("node:" + node);
+		System.out.println("Constant Value:" + node.resolveConstantExpressionValue());
+		System.out.println("TypeBinding:" + node.resolveTypeBinding());
+		System.out.println("TypeBinding not null:" + node.resolveTypeBinding() != null);
+		System.out.println("Constant Value not null:" + node.resolveTypeBinding() != null);
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(SuperMethodInvocation node) {
 		IMethodBinding imb = node.resolveMethodBinding();
 		System.out.println("SuperMethodInvocation Binding:" + imb + ";JavaElement:" + imb.getJavaElement());
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(SuperFieldAccess node) {
 		IVariableBinding ivb = node.resolveFieldBinding();
@@ -185,59 +181,53 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		System.out.println("SuperFieldAccess Binding:" + nivb + ";JavaElement:" + nivb.getJavaElement());
 		return super.visit(node);
 	}
-	
-//	@Override
-//	public boolean visit(MethodDeclaration node) {
-//		System.out.println(node.getName());
-//		IMethodBinding ibinding = node.resolveBinding();
-//		if (ibinding != null)
-//		{
-//			IMethod imethod = (IMethod)ibinding.getJavaElement();
-//			try {
-//				// testing.
-//				System.out.println("MethodInvocation:" + node.getName() + " Search for references.");
-//				JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(imethod, false, new SearchResultRequestorForTest(java_project));
-//			} catch (CoreException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		return super.visit(node);
-//	}
-	private void PrintInformation(Set<IMethod> methods)
-	{
+
+	// @Override
+	// public boolean visit(MethodDeclaration node) {
+	// System.out.println(node.getName());
+	// IMethodBinding ibinding = node.resolveBinding();
+	// if (ibinding != null)
+	// {
+	// IMethod imethod = (IMethod)ibinding.getJavaElement();
+	// try {
+	// // testing.
+	// System.out.println("MethodInvocation:" + node.getName() + " Search for
+	// references.");
+	// JavaSearch.SearchForWhereTheMethodIsConcreteImplementated(imethod, false,
+	// new SearchResultRequestorForTest(java_project));
+	// } catch (CoreException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// return super.visit(node);
+	// }
+	private void PrintInformation(Set<IMethod> methods) {
 		// codes below are just used for debugging.
 		Iterator<IMethod> mitr = methods.iterator();
 		while (mitr.hasNext()) {
 			IMethod method = (IMethod) mitr.next();
-			if (IRControl.debug)
-			{
-				IType type = method.getDeclaringType();
-				System.out.println("================== start ==================");
-				System.out.println("IType:" + type);
-				System.out.println("IMethod:" + method);
-//				System.out.println("matches:" + match.toString());
-//				System.out.println("match element class:" + match.getElement().getClass());
-//				CompilationUnit cu = JDTParser.CreateJDTParser(java_project).ParseICompilationUnit(im.getCompilationUnit());
-//				String searched_content = cu.getTypeRoot().getBuffer().getText(match.getOffset(), match.getLength());
-//				System.out.println("searched_content:" + searched_content);
-				System.out.println("================== end ==================");
-			}
+
+			IType type = method.getDeclaringType();
+			System.out.println("================== start ==================");
+			System.out.println("IType:" + type);
+			System.out.println("IMethod:" + method);
+			System.out.println("================== end ==================");
 		}
 	}
-	
+
 	@Override
 	public boolean visit(MethodInvocation node) {
 		System.out.println(node.getName());
-//		if (!node.getName().toString().startsWith("haha"))
-//		{
-//			return false;
-//		}
+		// if (!node.getName().toString().startsWith("haha"))
+		// {
+		// return false;
+		// }
 		IMethodBinding ibinding = node.resolveMethodBinding();
-		if (ibinding != null)
-		{
-			IMethod imethod = (IMethod)ibinding.getJavaElement();
+		if (ibinding != null) {
+			IMethod imethod = (IMethod) ibinding.getJavaElement();
 			try {
-				System.out.println("========MethodInvocation Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
+				System.out.println("========MethodInvocation Return========:" + ibinding.getReturnType().toString()
+						+ ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
 				System.out.println("MethodInvocation:" + node.getName() + " Search for declarations.");
 				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
 				EclipseSearchForIMember search = new EclipseSearchForIMember();
@@ -249,16 +239,16 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		}
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(ConstructorInvocation node) {
 		System.out.println("ConstructorInvocation:" + node);
 		IMethodBinding ibinding = node.resolveConstructorBinding();
-		if (ibinding != null)
-		{
-			IMethod imethod = (IMethod)ibinding.getJavaElement();
+		if (ibinding != null) {
+			IMethod imethod = (IMethod) ibinding.getJavaElement();
 			try {
-				System.out.println("========Construction Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
+				System.out.println("========Construction Return========:" + ibinding.getReturnType().toString() + ";"
+						+ (ibinding.getReturnType().getQualifiedName().equals("void")));
 				System.out.println("MethodInvocation:" + node + " Search for declarations.");
 				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
 				EclipseSearchForIMember search = new EclipseSearchForIMember();
@@ -270,19 +260,18 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		}
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(ClassInstanceCreation node) {
 		System.out.println("ClassInstanceCreation:" + node);
 		IMethodBinding ibinding = node.resolveConstructorBinding();
-		if (ibinding != null)
-		{
-			IMethod imethod = (IMethod)ibinding.getJavaElement();
+		if (ibinding != null) {
+			IMethod imethod = (IMethod) ibinding.getJavaElement();
 			try {
-				System.out.println("========ClassInstanceCreation Return========:" + ibinding.getReturnType().toString() + ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
+				System.out.println("========ClassInstanceCreation Return========:" + ibinding.getReturnType().toString()
+						+ ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
 				System.out.println("MethodInvocation:" + node + " Search for declarations.");
-				if (imethod == null)
-				{
+				if (imethod == null) {
 					System.out.println("Method Element is null:" + node);
 				}
 				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
@@ -295,5 +284,5 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		}
 		return super.visit(node);
 	}
-	
+
 }

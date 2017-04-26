@@ -9,13 +9,20 @@ import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 
+import cn.yyx.research.logger.DebugLogger;
+
 public class EclipseSearchForIMember {
 	
 	public void SearchForWhereTheMethodIsConcreteImplementated(IMethod method, SearchRequestor requestor)
 			throws CoreException {
 		// Create search pattern
-		System.out.println("SearchForImplementation, method is:" + method);
+		DebugLogger.Log("SearchForImplementation, method is:" + method);
 		SearchPattern pattern = SearchPattern.createPattern(method, IJavaSearchConstants.DECLARATIONS);
+		if (pattern == null)
+		{
+			DebugLogger.Log("method search pattern is null... this strange 'method' is:" + method);
+			return;
+		}
 		new SearchEngine().search(pattern, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
 				SearchEngine.createWorkspaceScope(), requestor, null);
 	}
@@ -23,8 +30,13 @@ public class EclipseSearchForIMember {
 	public void SearchForConcreteImplementationOfInterface(IType type, SearchRequestor requestor)
 			throws CoreException {
 		// Create search pattern
-		System.out.println("SearchForImplementation, type is:" + type);
+		DebugLogger.Log("SearchForImplementation, type is:" + type);
 		SearchPattern pattern = SearchPattern.createPattern(type, IJavaSearchConstants.IMPLEMENTORS);
+		if (pattern == null)
+		{
+			DebugLogger.Log("class or interface search pattern is null... this strange 'type' is:" + type);
+			return;
+		}
 		new SearchEngine().search(pattern, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
 				SearchEngine.createWorkspaceScope(), requestor, null);
 	}
