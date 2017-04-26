@@ -201,18 +201,18 @@ public class SearchIMethodVisitor extends ASTVisitor {
 	// }
 	// return super.visit(node);
 	// }
-	private void PrintInformation(Set<IMethod> methods) {
+	private void PrintInformation(IMethod search, Set<IMethod> methods) {
 		// codes below are just used for debugging.
+		System.out.println("================== search method integrate start ==================");
+		System.out.println("search content is:" + search);
 		Iterator<IMethod> mitr = methods.iterator();
 		while (mitr.hasNext()) {
 			IMethod method = (IMethod) mitr.next();
-
 			IType type = method.getDeclaringType();
-			System.out.println("================== start ==================");
 			System.out.println("IType:" + type);
 			System.out.println("IMethod:" + method);
-			System.out.println("================== end ==================");
 		}
+		System.out.println("================== search method integrate end ==================");
 	}
 
 	@Override
@@ -232,7 +232,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
 				EclipseSearchForIMember search = new EclipseSearchForIMember();
 				search.SearchForWhereTheMethodIsConcreteImplementated(imethod, sr);
-				PrintInformation(sr.GetMethods());
+				PrintInformation(imethod, sr.GetMethods());
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -253,7 +253,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
 				EclipseSearchForIMember search = new EclipseSearchForIMember();
 				search.SearchForWhereTheMethodIsConcreteImplementated(imethod, sr);
-				PrintInformation(sr.GetMethods());
+				PrintInformation(imethod, sr.GetMethods());
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -277,7 +277,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
 				EclipseSearchForIMember search = new EclipseSearchForIMember();
 				search.SearchForWhereTheMethodIsConcreteImplementated(imethod, sr);
-				PrintInformation(sr.GetMethods());
+				PrintInformation(imethod, sr.GetMethods());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

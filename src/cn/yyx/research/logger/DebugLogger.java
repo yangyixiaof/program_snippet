@@ -1,6 +1,7 @@
 package cn.yyx.research.logger;
 
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -31,6 +32,14 @@ public class DebugLogger {
 		if (IRControl.debug) {
 			System.out.println("================== search start ==================");
 			Object ele = match.getElement();
+			if (ele instanceof IMember)
+			{
+				IMember im = (IMember)ele;
+				if (im.isBinary())
+				{
+					return;
+				}
+			}
 			if (ele instanceof IMethod)
 			{
 				IMethod im = (IMethod)ele;
