@@ -2,7 +2,6 @@ package cn.yyx.research.program.ir.generation;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,10 +15,9 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.internal.corext.callhierarchy.CallHierarchy;
-import org.eclipse.jdt.internal.corext.callhierarchy.MethodWrapper;
 
 import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
+import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICallGraph;
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICompilationUnits;
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
@@ -31,7 +29,6 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
-@SuppressWarnings("restriction")
 public class IRGeneratorForOneProject {
 	// TODO two things: first, mark whether a method is constructor and its IType. second, test caller-roots method and JavaSearch Engine.
 	// TODO remember to check if searched method are null, if null, what to handle?
@@ -184,27 +181,14 @@ public class IRGeneratorForOneProject {
 		}
 	}
 	
-	public static List<IMethod> GenerateRootCallers()
+	public static Set<IMethod> GenerateRootCallers()
 	{
 		// this must be invoked after GenerateForAllICompilationUnits(...).
 		Set<IMethod> mset = irgfop.method_irs.keySet();
 		IMember[] members = new IMember[mset.size()];
 		mset.toArray(members);
-		List<IMethod> caller_roots = new LinkedList<IMethod>();
-		CallHierarchy callHierarchy = CallHierarchy.getDefault();
-		MethodWrapper[] callers = callHierarchy.getCallerRoots(members);
-		for (MethodWrapper mw : callers)
-		{
-			IMember im = mw.getMember();
-			if (!(im instanceof IMethod))
-			{
-				System.err.println("Strange! why not IMethod.");
-				System.exit(1);
-			}
-			IMethod imd = (IMethod) im;
-			caller_roots.add(imd);
-		}
-		return caller_roots;
+		Set<IMethod> methods = EclipseSearchForICallGraph.GetRootCallers(members);
+		return methods;
 	}
 	
 //	private void SelfAddToMethodIR(IMethod it, IRForOneMethod irfocbu)
