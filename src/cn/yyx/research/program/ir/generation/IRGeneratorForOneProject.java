@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
-import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICallGraph;
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICompilationUnits;
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
@@ -43,6 +42,27 @@ public class IRGeneratorForOneProject {
 	
 	private Map<IIRNode, Map<IIRNode, StaticConnection>> in_connects = new HashMap<IIRNode, Map<IIRNode, StaticConnection>>();
 	private Map<IIRNode, Map<IIRNode, StaticConnection>> out_connects = new HashMap<IIRNode, Map<IIRNode, StaticConnection>>();
+	
+	private Map<IMethod, Set<IMethod>> callee_callers = new HashMap<IMethod, Set<IMethod>>();
+	
+	public void AddCalleeCaller(IMethod callee, IMethod caller)
+	{
+		Set<IMethod> callers = callee_callers.get(callee);
+		if (callers == null)
+		{
+			callers = new HashSet<IMethod>();
+			callee_callers.put(callee, callers);
+		}
+		if (caller != null)
+		{
+			callers.add(caller);
+		}
+	}
+	
+	public Map<IMethod, Set<IMethod>> GetInverseCallGraph()
+	{
+		return callee_callers;
+	}
 	
 	public StaticConnection GetSpecifiedConnection(IIRNode source, IIRNode target) {
 		Map<IIRNode, StaticConnection> ocnnts = out_connects.get(source);
@@ -179,16 +199,6 @@ public class IRGeneratorForOneProject {
 			IRGeneratorForClassesInICompilationUnit irgfcicu = new IRGeneratorForClassesInICompilationUnit();
 			cu.accept(irgfcicu);
 		}
-	}
-	
-	public static Set<IMethod> GenerateRootCallers()
-	{
-		// this must be invoked after GenerateForAllICompilationUnits(...).
-		Set<IMethod> mset = irgfop.method_irs.keySet();
-		IMember[] members = new IMember[mset.size()];
-		mset.toArray(members);
-		Set<IMethod> methods = EclipseSearchForICallGraph.GetRootCallers(members);
-		return methods;
 	}
 	
 //	private void SelfAddToMethodIR(IMethod it, IRForOneMethod irfocbu)

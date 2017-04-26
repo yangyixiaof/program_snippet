@@ -19,7 +19,7 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 	private IType it = null;
 	
 	public IRGeneratorForOneClass(IType it) {
-		super(new IRForOneField(it));
+		super(null, new IRForOneField(it));
 	}
 		
 	@Override
@@ -46,7 +46,7 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 			} else {
 				imb = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(im);
 			}
-			IRGeneratorForOneLogicBlock irgfocb = new IRGeneratorForOneLogicBlock(imb);
+			IRGeneratorForOneLogicBlock irgfocb = new IRGeneratorForOneLogicBlock(im, imb);
 			node.accept(irgfocb);
 			IRGeneratorForOneProject.GetInstance().FetchITypeIR((it)).AddMethodLevel((IRForOneMethod)irgfocb.GetGeneration());
 		}

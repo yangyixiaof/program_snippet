@@ -225,6 +225,17 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		IMethodBinding ibinding = node.resolveMethodBinding();
 		if (ibinding != null) {
 			IMethod imethod = (IMethod) ibinding.getJavaElement();
+//			Set<IMethod> root_callers = null;
+//			// EclipseSearchForICallGraph.GetRootCallers(new IMember[]{imethod});
+//			Iterator<IMethod> ritr = root_callers.iterator();
+//			System.out.println("================ root calls start ================");
+//			System.out.println("callee:" + node);
+//			while (ritr.hasNext())
+//			{
+//				IMethod imd = ritr.next();
+//				System.out.println("root_call_method:" + imd);
+//			}
+//			System.out.println("================ root calls end ================");
 			try {
 				System.out.println("========MethodInvocation Return========:" + ibinding.getReturnType().toString()
 						+ ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
