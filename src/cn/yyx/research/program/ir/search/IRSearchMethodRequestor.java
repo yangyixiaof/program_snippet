@@ -83,7 +83,10 @@ public class IRSearchMethodRequestor extends SearchRequestor {
 			if (it.isInterface() || !im.exists() || Flags.isAbstract(im.getFlags())) {
 				HandleExtensionOfIType(it);
 			} else {
-				methods.add(im);
+				if (!im.isBinary())
+				{
+					methods.add(im);
+				}
 			}
 		}
 		DebugLogger.Log(match, java_project);
