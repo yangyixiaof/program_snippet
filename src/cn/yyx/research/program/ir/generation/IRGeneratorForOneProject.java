@@ -254,14 +254,14 @@ public class IRGeneratorForOneProject {
 		return irmethod;
 	}
 	
-	public Map<IType, IRForOneClass> GetClassIR()
+	public IRForOneClass GetClassIR(IType itp)
 	{
-		return class_irs;
+		return class_irs.get(itp);
 	}
 	
-	public Map<IMethod, IRForOneMethod> GetMethodIR()
+	public IRForOneMethod GetMethodIR(IMethod imd)
 	{
-		return method_irs;
+		return method_irs.get(imd);
 	}
 
 	public IJavaProject getJava_project() {

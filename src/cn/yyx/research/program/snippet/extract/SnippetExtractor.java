@@ -1,13 +1,19 @@
 package cn.yyx.research.program.snippet.extract;
 
+import java.util.Set;
+
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
 
 import cn.yyx.research.logger.DebugLogger;
 import cn.yyx.research.program.eclipse.exception.WrongArgumentException;
 import cn.yyx.research.program.eclipse.project.AnalysisEnvironment;
 import cn.yyx.research.program.eclipse.project.ProjectInfo;
+import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICallGraph;
+import cn.yyx.research.program.ir.IRControl;
+import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.systemutil.SystemUtil;
 import cn.yyx.research.test.TestJavaSearch;
 
@@ -37,7 +43,15 @@ public class SnippetExtractor implements IApplication {
 		IJavaProject java_project = LoadProjectAccordingToArgs((String[])context.getArguments().get(IApplicationContext.APPLICATION_ARGS));
 				
 		// testing.
-		TestJavaSearch.TestInAll(java_project);
+		if (IRControl.test) {
+			TestJavaSearch.TestInAll(java_project);
+		} else {
+			IRGeneratorForOneProject.GenerateForAllICompilationUnits(java_project);
+			IRGeneratorForOneProject irinstance = IRGeneratorForOneProject.GetInstance();
+			Set<IMethod> roots = EclipseSearchForICallGraph.GetRootCallEntries(irinstance.GetInverseCallGraph());
+			
+		}
+		
 		
 		// 我想选一门机器翻译和自然语言处理的课，但是好多都不能选，只给本科生开。
 		// 你知不知道，那种，语言的语义，到另一种语义的对应？那种课
