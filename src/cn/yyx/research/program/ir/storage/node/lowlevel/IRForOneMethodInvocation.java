@@ -2,22 +2,16 @@ package cn.yyx.research.program.ir.storage.node.lowlevel;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 
-import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
-import cn.yyx.research.program.ir.storage.node.IIRNode;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
-import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 
 public class IRForOneMethodInvocation extends IRForOneInstruction {
 	
@@ -58,76 +52,76 @@ public class IRForOneMethodInvocation extends IRForOneInstruction {
 		this.para_order_instr_index_map.putAll(para_order_instr_index_map);
 	}
 
-	@Override
-	public Map<IIRNode, Set<StaticConnection>> PrepareOutNodes() {
-		Map<IIRNode, Set<StaticConnection>> result = new HashMap<IIRNode, Set<StaticConnection>>();
-		// Set<IIRNode> imset = new HashSet<IIRNode>();
-		Iterator<IMethod> mitr = methods.iterator();
-		while (mitr.hasNext())
-		{
-			IMethod tim = mitr.next();
-			IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(tim);
-			Map<IJavaElement, IRForOneInstruction> ions = irfom.GetOutNodes();
-			Set<IJavaElement> ikeys = ions.keySet();
-			Iterator<IJavaElement> iitr = ikeys.iterator();
-			while (iitr.hasNext())
-			{
-				IJavaElement ije = iitr.next();
-				IRForOneInstruction irtn = ions.get(ije);
-				IRForOneInstruction irfoi = irtn;
-				Set<StaticConnection> out_connects = IRGeneratorForOneProject.GetInstance().GetOutConnection(this);
-				if (out_connects != null) {
-					HashSet<StaticConnection> temp_result = new HashSet<StaticConnection>();
-					Iterator<StaticConnection> oitr = out_connects.iterator();
-					while (oitr.hasNext())
-					{
-						StaticConnection sc = oitr.next();
-						temp_result.add(new StaticConnection(irfoi, sc.getTarget(), sc.getType()));
-					}
-					result.put(irfoi, temp_result);
-				}
-			}
-		}
-		return result;
-	}
-
-	@Override
-	public Map<IIRNode, Set<StaticConnection>> PrepareInNodes() {
-		Map<IIRNode, Set<StaticConnection>> result = new HashMap<IIRNode, Set<StaticConnection>>();
-		Set<IRForOneInstruction> keys = para_order_instr_index_map.keySet();
-		Iterator<IRForOneInstruction> kitr = keys.iterator();
-		while (kitr.hasNext())
-		{
-			IRForOneInstruction source = kitr.next();
-			Integer para_index_in_invoked_method = para_order_instr_index_map.get(source);
-			if (para_index_in_invoked_method != null)
-			{
-				Iterator<IMethod> mitr = methods.iterator();
-				while (mitr.hasNext())
-				{
-					IMethod tim = mitr.next();
-					IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(tim);
-					List<IJavaElement> params = irfom.GetParameters();
-					if (params.size() > para_index_in_invoked_method)
-					{
-						IJavaElement ije = params.get(para_index_in_invoked_method);
-						IRForOneInstruction para_element = irfom.GetFirstIRTreeNode(ije);
-						if (para_element != null)
-						{
-							StaticConnection cnn = IRGeneratorForOneProject.GetInstance().GetSpecifiedConnection(source, this);
-							Set<StaticConnection> para_cnns = result.get(para_element);
-							if (para_cnns == null)
-							{
-								para_cnns = new HashSet<StaticConnection>();
-								result.put(para_element, para_cnns);
-							}
-							para_cnns.add(new StaticConnection(source, para_element, cnn.getType()));
-						}
-					}
-				}
-			}
-		}
-		return result;
-	}
+//	@Override
+//	public Map<IRForOneInstruction, Set<StaticConnection>> PrepareOutNodes() {
+//		Map<IRForOneInstruction, Set<StaticConnection>> result = new HashMap<IRForOneInstruction, Set<StaticConnection>>();
+//		// Set<IIRNode> imset = new HashSet<IIRNode>();
+//		Iterator<IMethod> mitr = methods.iterator();
+//		while (mitr.hasNext())
+//		{
+//			IMethod tim = mitr.next();
+//			IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(tim);
+//			Map<IJavaElement, IRForOneInstruction> ions = irfom.GetOutNodes();
+//			Set<IJavaElement> ikeys = ions.keySet();
+//			Iterator<IJavaElement> iitr = ikeys.iterator();
+//			while (iitr.hasNext())
+//			{
+//				IJavaElement ije = iitr.next();
+//				IRForOneInstruction irtn = ions.get(ije);
+//				IRForOneInstruction irfoi = irtn;
+//				Set<StaticConnection> out_connects = IRGeneratorForOneProject.GetInstance().GetOutConnection(this);
+//				if (out_connects != null) {
+//					HashSet<StaticConnection> temp_result = new HashSet<StaticConnection>();
+//					Iterator<StaticConnection> oitr = out_connects.iterator();
+//					while (oitr.hasNext())
+//					{
+//						StaticConnection sc = oitr.next();
+//						temp_result.add(new StaticConnection(irfoi, sc.getTarget(), sc.getType()));
+//					}
+//					result.put(irfoi, temp_result);
+//				}
+//			}
+//		}
+//		return result;
+//	}
+//
+//	@Override
+//	public Map<IIRNode, Set<StaticConnection>> PrepareInNodes() {
+//		Map<IIRNode, Set<StaticConnection>> result = new HashMap<IIRNode, Set<StaticConnection>>();
+//		Set<IRForOneInstruction> keys = para_order_instr_index_map.keySet();
+//		Iterator<IRForOneInstruction> kitr = keys.iterator();
+//		while (kitr.hasNext())
+//		{
+//			IRForOneInstruction source = kitr.next();
+//			Integer para_index_in_invoked_method = para_order_instr_index_map.get(source);
+//			if (para_index_in_invoked_method != null)
+//			{
+//				Iterator<IMethod> mitr = methods.iterator();
+//				while (mitr.hasNext())
+//				{
+//					IMethod tim = mitr.next();
+//					IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(tim);
+//					List<IJavaElement> params = irfom.GetParameters();
+//					if (params.size() > para_index_in_invoked_method)
+//					{
+//						IJavaElement ije = params.get(para_index_in_invoked_method);
+//						IRForOneInstruction para_element = irfom.GetFirstIRTreeNode(ije);
+//						if (para_element != null)
+//						{
+//							StaticConnection cnn = IRGeneratorForOneProject.GetInstance().GetSpecifiedConnection(source, this);
+//							Set<StaticConnection> para_cnns = result.get(para_element);
+//							if (para_cnns == null)
+//							{
+//								para_cnns = new HashSet<StaticConnection>();
+//								result.put(para_element, para_cnns);
+//							}
+//							para_cnns.add(new StaticConnection(source, para_element, cnn.getType()));
+//						}
+//					}
+//				}
+//			}
+//		}
+//		return result;
+//	}
 	
 }

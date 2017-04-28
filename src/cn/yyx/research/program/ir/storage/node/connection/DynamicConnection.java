@@ -1,32 +1,32 @@
 package cn.yyx.research.program.ir.storage.node.connection;
 
-import cn.yyx.research.program.ir.storage.node.IIRNode;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class DynamicConnection {
 	
 	private int type = 0;
-	private IIRNode source = null;
-	private IIRNode target = null;
+	private IRForOneInstruction source = null;
+	private IRForOneInstruction target = null;
 	
-	public DynamicConnection(IIRNode source, IIRNode target, int type) {
+	public DynamicConnection(IRForOneInstruction source, IRForOneInstruction target, int type) {
 		this.setSource(source);
 		this.setTarget(target);
 		this.setType(type);
 	}
 
-	public IIRNode getTarget() {
+	public IRForOneInstruction getTarget() {
 		return target;
 	}
 
-	private void setTarget(IIRNode target) {
+	private void setTarget(IRForOneInstruction target) {
 		this.target = target;
 	}
 
-	public IIRNode getSource() {
+	public IRForOneInstruction getSource() {
 		return source;
 	}
 
-	private void setSource(IIRNode source) {
+	private void setSource(IRForOneInstruction source) {
 		this.source = source;
 	}
 

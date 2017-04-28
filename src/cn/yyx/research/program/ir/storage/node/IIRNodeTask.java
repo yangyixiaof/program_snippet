@@ -2,12 +2,13 @@ package cn.yyx.research.program.ir.storage.node;
 
 import cn.yyx.research.program.ir.storage.node.connection.DynamicConnection;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public abstract class IIRNodeTask {
 	
-	IIRNode iirnode = null;
+	IRForOneInstruction iirnode = null;
 	
-	public IIRNodeTask(IIRNode iirnode) {
+	public IIRNodeTask(IRForOneInstruction iirnode) {
 		this.iirnode = iirnode;
 	}
 	

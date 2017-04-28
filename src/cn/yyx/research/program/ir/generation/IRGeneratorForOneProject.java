@@ -22,7 +22,6 @@ import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICompilationUn
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
-import cn.yyx.research.program.ir.storage.node.IIRNode;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeTypeUtil;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
@@ -43,8 +42,8 @@ public class IRGeneratorForOneProject {
 	private Map<String, UnresolvedLambdaUniqueElement> unresolved_lambda_unique_element_cache = new TreeMap<String, UnresolvedLambdaUniqueElement>();
 	private Map<String, ConstantUniqueElement> constant_unique_element_cache = new TreeMap<String, ConstantUniqueElement>();
 	
-	private Map<IIRNode, Map<IIRNode, StaticConnection>> in_connects = new HashMap<IIRNode, Map<IIRNode, StaticConnection>>();
-	private Map<IIRNode, Map<IIRNode, StaticConnection>> out_connects = new HashMap<IIRNode, Map<IIRNode, StaticConnection>>();
+	private Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> in_connects = new HashMap<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>>();
+	private Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> out_connects = new HashMap<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>>();
 	
 	private Map<IMethod, Set<IMethod>> callee_callers = new HashMap<IMethod, Set<IMethod>>();
 	
@@ -67,8 +66,8 @@ public class IRGeneratorForOneProject {
 		return callee_callers;
 	}
 	
-	public StaticConnection GetSpecifiedConnection(IIRNode source, IIRNode target) {
-		Map<IIRNode, StaticConnection> ocnnts = out_connects.get(source);
+	public StaticConnection GetSpecifiedConnection(IRForOneInstruction source, IRForOneInstruction target) {
+		Map<IRForOneInstruction, StaticConnection> ocnnts = out_connects.get(source);
 		if (ocnnts == null) {
 			return null;
 		}
@@ -76,17 +75,17 @@ public class IRGeneratorForOneProject {
 		return conn;
 	}
 	
-	private Set<IIRNode> GetINodes(Map<IIRNode, Map<IIRNode, StaticConnection>> connects, IIRNode iirn)
+	private Set<IRForOneInstruction> GetINodes(Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> connects, IRForOneInstruction iirn)
 	{
-		HashSet<IIRNode> result = new HashSet<IIRNode>();
-		Map<IIRNode, StaticConnection> is = connects.get(iirn);
+		HashSet<IRForOneInstruction> result = new HashSet<IRForOneInstruction>();
+		Map<IRForOneInstruction, StaticConnection> is = connects.get(iirn);
 		if (is != null)
 		{
-			Set<IIRNode> ikeys = is.keySet();
-			Iterator<IIRNode> iitr = ikeys.iterator();
+			Set<IRForOneInstruction> ikeys = is.keySet();
+			Iterator<IRForOneInstruction> iitr = ikeys.iterator();
 			while (iitr.hasNext())
 			{
-				IIRNode iir = iitr.next();
+				IRForOneInstruction iir = iitr.next();
 				StaticConnection sc = is.get(iir);
 				if (!EdgeTypeUtil.OnlyHasBaseType(sc.getType(), EdgeBaseType.SameOperations))
 				{
@@ -97,20 +96,20 @@ public class IRGeneratorForOneProject {
 		return result;
 	}
 	
-	public Set<IIRNode> GetOutINodes(IIRNode iirn)
+	public Set<IRForOneInstruction> GetOutINodes(IRForOneInstruction iirn)
 	{
 		return GetINodes(out_connects, iirn);
 	}
 
-	public Set<IIRNode> GetInINodes(IIRNode iirn)
+	public Set<IRForOneInstruction> GetInINodes(IRForOneInstruction iirn)
 	{
 		return GetINodes(in_connects, iirn);
 	}
 	
-	public Set<StaticConnection> GetOutConnection(IIRNode iirn)
+	public Set<StaticConnection> GetOutConnection(IRForOneInstruction iirn)
 	{
 		HashSet<StaticConnection> result = new HashSet<StaticConnection>();
-		Map<IIRNode, StaticConnection> ios = out_connects.get(iirn);
+		Map<IRForOneInstruction, StaticConnection> ios = out_connects.get(iirn);
 		if (ios != null)
 		{
 			result.addAll(ios.values());
@@ -118,10 +117,10 @@ public class IRGeneratorForOneProject {
 		return result;
 	}
 	
-	public Set<StaticConnection> GetInConnection(IIRNode iirn)
+	public Set<StaticConnection> GetInConnection(IRForOneInstruction iirn)
 	{
 		HashSet<StaticConnection> result = new HashSet<StaticConnection>();
-		Map<IIRNode, StaticConnection> iis = in_connects.get(iirn);
+		Map<IRForOneInstruction, StaticConnection> iis = in_connects.get(iirn);
 		if (iis != null)
 		{
 			result.addAll(iis.values());
@@ -129,12 +128,12 @@ public class IRGeneratorForOneProject {
 		return result;
 	}
 	
-	private void OneDirectionRegist(StaticConnection conn, IIRNode source, IIRNode target, Map<IIRNode, Map<IIRNode, StaticConnection>> in_connects)
+	private void OneDirectionRegist(StaticConnection conn, IRForOneInstruction source, IRForOneInstruction target, Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> in_connects)
 	{
-		Map<IIRNode, StaticConnection> ins = in_connects.get(target);
+		Map<IRForOneInstruction, StaticConnection> ins = in_connects.get(target);
 		if (ins == null)
 		{
-			ins = new TreeMap<IIRNode, StaticConnection>();
+			ins = new TreeMap<IRForOneInstruction, StaticConnection>();
 			in_connects.put(target, ins);
 		}
 		StaticConnection origin_conn = ins.get(source);
@@ -148,8 +147,8 @@ public class IRGeneratorForOneProject {
 	
 	public void RegistConnection(StaticConnection conn)
 	{
-		IIRNode source = conn.getSource();
-		IIRNode target = conn.getTarget();
+		IRForOneInstruction source = conn.getSource();
+		IRForOneInstruction target = conn.getTarget();
 		OneDirectionRegist(conn, source, target, in_connects);
 		OneDirectionRegist(conn, target, source, out_connects);
 	}

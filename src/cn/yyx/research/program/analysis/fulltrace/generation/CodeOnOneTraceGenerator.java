@@ -24,7 +24,7 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation;
 
-public class FullTraceGenerator {
+public class CodeOnOneTraceGenerator {
 	
 	private Set<IMethod> visited = new HashSet<IMethod>();
 	
@@ -155,6 +155,7 @@ public class FullTraceGenerator {
 						Map<IIRNode, Set<StaticConnection>> outs = iirn.PrepareOutNodes();
 						Set<IIRNode> okeys = outs.keySet();
 						// TODO
+						
 					}
 				}
 			}

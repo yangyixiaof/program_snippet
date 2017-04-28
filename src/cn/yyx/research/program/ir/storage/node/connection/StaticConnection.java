@@ -1,14 +1,14 @@
 package cn.yyx.research.program.ir.storage.node.connection;
 
-import cn.yyx.research.program.ir.storage.node.IIRNode;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class StaticConnection {
 	
 	private int type = 0;
-	private IIRNode source = null;
-	private IIRNode target = null;
+	private IRForOneInstruction source = null;
+	private IRForOneInstruction target = null;
 	
-	public StaticConnection(IIRNode source, IIRNode target, int type) {
+	public StaticConnection(IRForOneInstruction source, IRForOneInstruction target, int type) {
 		this.setSource(source);
 		this.setTarget(target);
 		this.setType(type);
@@ -24,7 +24,7 @@ public class StaticConnection {
 		return new StaticConnection(source, target, getType() | another_connection.getType());
 	}
 	
-	public boolean IsTarget(IIRNode node)
+	public boolean IsTarget(IRForOneInstruction node)
 	{
 		if (node == getTarget())
 		{
@@ -33,7 +33,7 @@ public class StaticConnection {
 		return false;
 	}
 	
-	public boolean IsSource(IIRNode node)
+	public boolean IsSource(IRForOneInstruction node)
 	{
 		if (node == getSource())
 		{
@@ -42,19 +42,19 @@ public class StaticConnection {
 		return false;
 	}
 
-	public IIRNode getSource() {
+	public IRForOneInstruction getSource() {
 		return source;
 	}
 
-	private void setSource(IIRNode source) {
+	private void setSource(IRForOneInstruction source) {
 		this.source = source;
 	}
 
-	public IIRNode getTarget() {
+	public IRForOneInstruction getTarget() {
 		return target;
 	}
 
-	private void setTarget(IIRNode target) {
+	private void setTarget(IRForOneInstruction target) {
 		this.target = target;
 	}
 	
