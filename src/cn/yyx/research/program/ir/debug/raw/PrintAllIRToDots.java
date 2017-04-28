@@ -2,7 +2,6 @@ package cn.yyx.research.program.ir.debug.raw;
 
 import java.io.File;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
@@ -16,13 +15,12 @@ public class PrintAllIRToDots {
 	
 	public PrintAllIRToDots(IRGeneratorForOneProject irgfop)
 	{
-		Map<IType, IRForOneClass> cirs = irgfop.GetClassIR();
-		Set<IType> ckeys = cirs.keySet();
-		Iterator<IType> citr = ckeys.iterator();
+		Set<IType> types = irgfop.GetAllClasses();
+		Iterator<IType> citr = types.iterator();
 		while (citr.hasNext())
 		{
 			IType it = citr.next();
-			IRForOneClass irfoc = cirs.get(it);
+			IRForOneClass irfoc = irgfop.GetClassIR(it);
 			// debugging.
 			System.out.println(irfoc);
 			

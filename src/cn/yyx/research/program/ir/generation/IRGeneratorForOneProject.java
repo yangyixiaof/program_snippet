@@ -2,6 +2,7 @@ package cn.yyx.research.program.ir.generation;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,8 @@ import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.storage.node.IIRNode;
+import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.node.connection.EdgeTypeUtil;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
@@ -71,6 +74,37 @@ public class IRGeneratorForOneProject {
 		}
 		StaticConnection conn = ocnnts.get(target);
 		return conn;
+	}
+	
+	private Set<IIRNode> GetINodes(Map<IIRNode, Map<IIRNode, StaticConnection>> connects, IIRNode iirn)
+	{
+		HashSet<IIRNode> result = new HashSet<IIRNode>();
+		Map<IIRNode, StaticConnection> is = connects.get(iirn);
+		if (is != null)
+		{
+			Set<IIRNode> ikeys = is.keySet();
+			Iterator<IIRNode> iitr = ikeys.iterator();
+			while (iitr.hasNext())
+			{
+				IIRNode iir = iitr.next();
+				StaticConnection sc = is.get(iir);
+				if (!EdgeTypeUtil.OnlyHasBaseType(sc.getType(), EdgeBaseType.SameOperations))
+				{
+					result.add(iir);
+				}
+			}
+		}
+		return result;
+	}
+	
+	public Set<IIRNode> GetOutINodes(IIRNode iirn)
+	{
+		return GetINodes(out_connects, iirn);
+	}
+
+	public Set<IIRNode> GetInINodes(IIRNode iirn)
+	{
+		return GetINodes(in_connects, iirn);
 	}
 	
 	public Set<StaticConnection> GetOutConnection(IIRNode iirn)
@@ -252,6 +286,16 @@ public class IRGeneratorForOneProject {
 			method_irs.put(im, irmethod);
 		}
 		return irmethod;
+	}
+	
+	public Set<IType> GetAllClasses()
+	{
+		return class_irs.keySet();
+	}
+	
+	public Set<IMethod> GetAllMethods()
+	{
+		return method_irs.keySet();
 	}
 	
 	public IRForOneClass GetClassIR(IType itp)

@@ -1,7 +1,11 @@
 package cn.yyx.research.program.analysis.fulltrace.generation;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
@@ -10,6 +14,8 @@ import org.eclipse.jdt.core.IType;
 
 import cn.yyx.research.program.analysis.fulltrace.FullTrace;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
+import cn.yyx.research.program.ir.storage.node.IIRNode;
+import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
@@ -61,13 +67,106 @@ public class FullTraceGenerator {
 		}
 	}
 	
-	public void ExecuteIRCode(IRForOneMethodInvocation wrap_node, IRCode irc, FullTrace ft_run)
+	private Set<IIRNode> ObtainExecutionPermission(IIRNode one_instr_pc, Set<IIRNode> executed_instrs)
 	{
+		Set<IIRNode> in_nodes = IRGeneratorForOneProject.GetInstance().GetInINodes(one_instr_pc);
+		Iterator<IIRNode> iitr = in_nodes.iterator();
+		while (iitr.hasNext())
+		{
+			IIRNode iirn = iitr.next();
+			if (!executed_instrs.contains(iirn))
+			{
+				return null;
+			}
+		}
+		return in_nodes;
+	}
+	
+	private void HandleChildNodeExtendFromParentNode(IIRNode parent, IIRNode child, StaticConnection shared_conn)
+	{
+		// TODO
+		
+	}
+	
+	public void ExecuteMethodCode(IRForOneMethodInvocation wrap_node, IRForOneMethod irc, FullTrace ft_run)
+	{
+		// wrap_node is used only for the first phase.
+		// now handle wrap_node for depending on method_parameter_connection.
+		Set<IIRNode> executed_instrs = new HashSet<IIRNode>();
+		Set<IIRNode> instr_pc = new HashSet<IIRNode>();
 		Set<IJavaElement> eles = irc.GetAllElements();
+		Iterator<IJavaElement> eitr = eles.iterator();
+		while (eitr.hasNext())
+		{
+			IJavaElement ije = eitr.next();
+			instr_pc.add(irc.GetFirstIRTreeNode(ije));
+		}
+		
+		List<IJavaElement> params = irc.GetParameters();
+		Iterator<IRForOneInstruction> param_depend_itr = wrap_node.VariableParameterIterator();
+		Map<IJavaElement, List<IRForOneInstruction>> inverse_depend = new HashMap<IJavaElement, List<IRForOneInstruction>>();
+		while (param_depend_itr.hasNext())
+		{
+			IRForOneInstruction irfoi = param_depend_itr.next();
+			Integer index = wrap_node.VariableParameterInstrIndex(irfoi);
+			IJavaElement param = params.get(index);
+			List<IRForOneInstruction> depd = inverse_depend.get(param);
+			if (depd == null)
+			{
+				depd = new LinkedList<IRForOneInstruction>();
+				inverse_depend.put(param, depd);
+			}
+			depd.add(irfoi);
+		}
+		Set<IJavaElement> ikeys = inverse_depend.keySet();
+		Iterator<IJavaElement> iitr = ikeys.iterator();
+		while (iitr.hasNext())
+		{
+			IJavaElement ije = iitr.next();
+			IRForOneInstruction first_instr = irc.GetFirstIRTreeNode(ije);
+			List<IRForOneInstruction> depds = inverse_depend.get(ije);
+			Iterator<IRForOneInstruction> ditr = depds.iterator();
+			while (ditr.hasNext())
+			{
+				IRForOneInstruction irfoi = ditr.next();
+				HandleChildNodeExtendFromParentNode(irfoi, first_instr, IRGeneratorForOneProject.GetInstance().GetSpecifiedConnection(irfoi, wrap_node));
+			}
+			executed_instrs.add(first_instr);
+			instr_pc.remove(first_instr);
+			instr_pc.addAll(IRGeneratorForOneProject.GetInstance().GetOutINodes(first_instr));
+		}
 		
 		// do ...
-		// here is the environment.
-		
+		while (true)
+		{
+			boolean could_continue = false;
+			Iterator<IIRNode> instr_itr = instr_pc.iterator();
+			while (instr_itr.hasNext())
+			{
+				IIRNode inode = instr_itr.next();
+				Set<IIRNode> in_nodes = ObtainExecutionPermission(inode, executed_instrs);
+				could_continue = could_continue || (in_nodes != null);
+				if (in_nodes != null)
+				{
+					Iterator<IIRNode> in_itr = in_nodes.iterator();
+					while (in_itr.hasNext())
+					{
+						IIRNode iirn = in_itr.next();
+						Map<IIRNode, Set<StaticConnection>> outs = iirn.PrepareOutNodes();
+						Set<IIRNode> okeys = outs.keySet();
+						// TODO
+					}
+				}
+			}
+			if (!could_continue)
+			{
+				break;
+			}
+		}
+	}
+	
+	public void ExecuteFieldCode(IRForOneField irc, FullTrace ft_run)
+	{
 		
 	}
 	

@@ -50,7 +50,7 @@ public class IRForOneMethodInvocation extends IRForOneInstruction {
 		return para_order_instr_index_map.keySet().iterator();
 	}
 	
-	public Integer VariableParameterInstrIndex(Integer param) {
+	public Integer VariableParameterInstrIndex(IRForOneInstruction param) {
 		return para_order_instr_index_map.get(param);
 	}
 
