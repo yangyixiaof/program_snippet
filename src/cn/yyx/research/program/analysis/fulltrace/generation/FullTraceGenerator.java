@@ -4,21 +4,24 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 
 import cn.yyx.research.program.analysis.fulltrace.FullTrace;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneField;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class FullTraceGenerator {
 	
 	private Set<IMethod> visited = new HashSet<IMethod>();
 	
-	public void GoForwardOneStep(Set<IMethod> will_visit, FullTrace ft)
+	public void GoForwardOneMethod(Set<IMethod> will_visit, FullTrace ft)
 	{
 		Iterator<IMethod> witr = will_visit.iterator();
 		while (witr.hasNext())
@@ -55,6 +58,16 @@ public class FullTraceGenerator {
 				}
 			}
 		}
+	}
+	
+	public void ExecuteIRCode(IRCode irc, FullTrace ft_run)
+	{
+		Set<IJavaElement> eles = irc.GetAllElements();
+		
+		// do ...
+		// here is the environment.
+		
+		
 	}
 	
 }
