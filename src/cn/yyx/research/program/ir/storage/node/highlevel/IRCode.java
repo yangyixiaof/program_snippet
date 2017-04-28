@@ -16,7 +16,8 @@ public abstract class IRCode {
 	protected Map<IJavaElement, Set<IJavaElement>> deps = new HashMap<IJavaElement, Set<IJavaElement>>();
 	protected Map<IJavaElement, IRTreeForOneElement> irs = new HashMap<IJavaElement, IRTreeForOneElement>();
 	protected Map<IJavaElement, IRForOneInstruction> out_nodes = new HashMap<IJavaElement, IRForOneInstruction>();
-
+	protected IJavaElement source_method_receiver_element = null;
+	
 	private IMember im = null;
 
 	public IMember getIm() {
@@ -165,6 +166,14 @@ public abstract class IRCode {
 			env.put(ije, irs.get(ije).GetLastNode());
 		}
 		return env;
+	}
+
+	public void SetSourceMethodElement(IJavaElement source_method_receiver_element) {
+		this.source_method_receiver_element = source_method_receiver_element;
+	}
+	
+	public IRTreeForOneElement GetSourceMethodInvocations() {
+		return irs.get(source_method_receiver_element);
 	}
 	
 //	private void AddDependency(IIRNode source, IIRNode target, EdgeConnectionType et) {

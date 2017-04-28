@@ -8,7 +8,9 @@ import java.util.Set;
 import org.eclipse.jdt.core.IMethod;
 
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
+import cn.yyx.research.program.ir.orgranization.IRTreeForOneElement;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation;
 
 public class AllTraceGenerator {
@@ -32,7 +34,9 @@ public class AllTraceGenerator {
 			if (irfom == null) {
 				continue;
 			} else {
-				
+				IRTreeForOneElement irtree = irfom.GetSourceMethodInvocations();
+				IRForOneInstruction root = irtree.GetRootNode();
+				// TODO
 			}
 		}
 	}
