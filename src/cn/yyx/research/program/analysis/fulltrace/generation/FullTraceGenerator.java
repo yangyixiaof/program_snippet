@@ -16,12 +16,13 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneField;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation;
 
 public class FullTraceGenerator {
 	
 	private Set<IMethod> visited = new HashSet<IMethod>();
 	
-	public void GoForwardOneMethod(Set<IMethod> will_visit, FullTrace ft)
+	public void GoForwardOneMethod(IRForOneMethodInvocation wrap_node, Set<IMethod> will_visit, FullTrace ft)
 	{
 		Iterator<IMethod> witr = will_visit.iterator();
 		while (witr.hasNext())
@@ -60,7 +61,7 @@ public class FullTraceGenerator {
 		}
 	}
 	
-	public void ExecuteIRCode(IRCode irc, FullTrace ft_run)
+	public void ExecuteIRCode(IRForOneMethodInvocation wrap_node, IRCode irc, FullTrace ft_run)
 	{
 		Set<IJavaElement> eles = irc.GetAllElements();
 		
