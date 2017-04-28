@@ -24,6 +24,7 @@ import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeTypeUtil;
+import cn.yyx.research.program.ir.storage.node.connection.JudgeType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
@@ -75,7 +76,7 @@ public class IRGeneratorForOneProject {
 		return conn;
 	}
 	
-	private Set<IRForOneInstruction> GetINodes(Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> connects, IRForOneInstruction iirn)
+	private Set<IRForOneInstruction> GetINodesByJudgeType(Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> connects, IRForOneInstruction iirn, JudgeType jt, int judged_type)
 	{
 		HashSet<IRForOneInstruction> result = new HashSet<IRForOneInstruction>();
 		Map<IRForOneInstruction, StaticConnection> is = connects.get(iirn);
@@ -87,23 +88,36 @@ public class IRGeneratorForOneProject {
 			{
 				IRForOneInstruction iir = iitr.next();
 				StaticConnection sc = is.get(iir);
-				if (!EdgeTypeUtil.OnlyHasBaseType(sc.getType(), EdgeBaseType.SameOperations))
+				if (jt.MeetCondition(sc.getType(), judged_type))
 				{
 					result.add(iir);
 				}
+				
 			}
 		}
 		return result;
 	}
 	
+	// TODO remember to check whether lambda expression method implementations could be searched.
+	
 	public Set<IRForOneInstruction> GetOutINodes(IRForOneInstruction iirn)
 	{
-		return GetINodes(out_connects, iirn);
+		return GetINodesByJudgeType(out_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.getType());
 	}
 
 	public Set<IRForOneInstruction> GetInINodes(IRForOneInstruction iirn)
 	{
-		return GetINodes(in_connects, iirn);
+		return GetINodesByJudgeType(in_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.getType());
+	}
+	
+	public Set<IRForOneInstruction> GetOutINodesByContainingSpecificType(IRForOneInstruction iirn, int type)
+	{
+		return GetINodesByJudgeType(out_connects, iirn, (judge, judged)->{return EdgeTypeUtil.HasSpecificType(judge, judged);}, type);
+	}
+
+	public Set<IRForOneInstruction> GetInINodesByContainingSpecificType(IRForOneInstruction iirn, int type)
+	{
+		return GetINodesByJudgeType(in_connects, iirn, (judge, judged)->{return EdgeTypeUtil.HasSpecificType(judge, judged);}, type);
 	}
 	
 	public Set<StaticConnection> GetOutConnection(IRForOneInstruction iirn)
