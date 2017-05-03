@@ -13,7 +13,7 @@ import org.eclipse.jdt.core.IMethod;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 
-public class IRForOneMethodInvocation extends IRForOneInstruction {
+public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 	
 	// private IJavaElement parent_im = null;
 	private List<IMethod> methods = new LinkedList<IMethod>();
@@ -26,10 +26,14 @@ public class IRForOneMethodInvocation extends IRForOneInstruction {
 	private HashMap<IRForOneInstruction, Integer> para_order_instr_index_map = new HashMap<IRForOneInstruction, Integer>();
 	// this im has already contained the information about which IJavaElement this all about.
 	// TODO remember to check the im is the source_method_element etc.
-	public IRForOneMethodInvocation(IRCode parent_env, IJavaElement im, Collection<IMethod> methods, Class<? extends IIRNodeTask> task_class) {
+	public IRForOneSourceMethodInvocation(IRCode parent_env, IJavaElement im, Collection<IMethod> methods, Class<? extends IIRNodeTask> task_class) {
 		super(im, parent_env, task_class);
 		this.AddMethods(methods);
 		// this.AddVariableParameterOrderInstructionIndexs(para_order_instr_index_map);
+	}
+	
+	public List<IMethod> GetAllMethods() {
+		return methods;
 	}
 
 	public Iterator<IMethod> MethodIterator() {

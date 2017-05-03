@@ -31,7 +31,7 @@ import cn.yyx.research.program.ir.storage.node.execution.RequireHandleTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 import cn.yyx.research.program.ir.task.IRASTNodeTask;
 
@@ -73,7 +73,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// invocation.
 	// this variable is initialized in Construction method. so this is already
 	// be initialized.
-	protected IJavaElement source_method_receiver_element = null; // already
+	protected IJavaElement control_logic_holder_element = null;
+	protected IJavaElement source_method_virtual_holder_element = null; // already
 																	// assigned.
 	// this should be handled. this is no need anymore.
 	// protected HashMap<ASTNode, IJavaElement> source_method_return_element =
@@ -146,8 +147,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public IRGeneratorForOneLogicBlock(IMethod im, IRCode irc) {
 		this.irc = irc;
 		this.parent_im = im;
-		this.source_method_receiver_element = new UncertainReferenceElement(irc.GetScopeIElement().getElementName());
-		this.irc.SetSourceMethodElement(this.source_method_receiver_element);
+		this.source_method_virtual_holder_element = new UncertainReferenceElement(irc.GetScopeIElement().getElementName());
+		this.irc.SetSourceMethodElement(this.source_method_virtual_holder_element);
 	}
 
 	// public Queue<IRTask> GetUndoneTasks() {
@@ -293,8 +294,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				if (jele != null && jele instanceof IMethod) {
 					IMethod im = (IMethod) jele;
 					IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, im, expr, identifier, node);
-					IRForOneMethodInvocation irfomi = (IRForOneMethodInvocation) irc
-							.GetLastIRTreeNode(source_method_receiver_element);
+					IRForOneSourceMethodInvocation irfomi = (IRForOneSourceMethodInvocation) irc
+							.GetLastIRTreeNode(source_method_virtual_holder_element);
 					UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
 					HandleIJavaElement(ure, node);
 					IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, irfomi);

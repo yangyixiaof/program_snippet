@@ -23,7 +23,7 @@ import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.DefaultINodeTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 
 public class IRGeneratorHelper {
@@ -77,7 +77,7 @@ public class IRGeneratorHelper {
 						IRGeneratorForOneProject.GetInstance().AddCalleeCaller(callee, parent_im);
 					}
 				}
-				IRForOneMethodInvocation now = new IRForOneMethodInvocation(irc, source_method_receiver_element,
+				IRForOneSourceMethodInvocation now = new IRForOneSourceMethodInvocation(irc, source_method_receiver_element,
 						methods, DefaultINodeTask.class);
 				Iterator<Expression> nitr = nlist.iterator();
 				int idx = -1;
@@ -265,7 +265,7 @@ public class IRGeneratorHelper {
 	}
 
 	public static void AddMethodReturnVirtualReceiveDependency(IRCode irc, IJavaElement ije,
-			IRForOneMethodInvocation irfomi) {
+			IRForOneSourceMethodInvocation irfomi) {
 		IRForOneInstruction irfoo = irc.GetLastIRTreeNode(ije); // new
 																// IRForOneOperation(irc,
 																// ije,

@@ -22,13 +22,21 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneField;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodInvocation;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 
 public class CodeOnOneTraceGenerator {
 	
 	private Set<IMethod> visited = new HashSet<IMethod>();
 	
-	public void GoForwardOneMethod(IRForOneMethodInvocation wrap_node, Set<IMethod> will_visit, FullTrace ft)
+	private IMethod root = null;
+	private Map<IRForOneSourceMethodInvocation, IMethod> method_invocation = new HashMap<IRForOneSourceMethodInvocation, IMethod>();
+	
+	public CodeOnOneTraceGenerator(IMethod root, Map<IRForOneSourceMethodInvocation, IMethod> method_invocation) {
+		this.root = root;
+		this.method_invocation.putAll(method_invocation);
+	}
+	
+	public void GoForwardOneMethod(IRForOneSourceMethodInvocation wrap_node, FullTrace ft)
 	{
 		Iterator<IMethod> witr = will_visit.iterator();
 		while (witr.hasNext())
@@ -88,7 +96,7 @@ public class CodeOnOneTraceGenerator {
 		
 	}
 	
-	public void ExecuteMethodCode(IRForOneMethodInvocation wrap_node, IRForOneMethod irc, FullTrace ft_run)
+	public void ExecuteMethodCode(IRForOneSourceMethodInvocation wrap_node, IRForOneMethod irc, FullTrace ft_run)
 	{
 		// wrap_node is used only for the first phase.
 		// now handle wrap_node for depending on method_parameter_connection.
@@ -169,6 +177,14 @@ public class CodeOnOneTraceGenerator {
 	public void ExecuteFieldCode(IRForOneField irc, FullTrace ft_run)
 	{
 		
+	}
+
+	public FullTrace Execute() {
+		FullTrace ft_run = new FullTrace();
+		
+		
+		
+		return ft_run;
 	}
 	
 }
