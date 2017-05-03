@@ -147,8 +147,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public IRGeneratorForOneLogicBlock(IMethod im, IRCode irc) {
 		this.irc = irc;
 		this.parent_im = im;
-		this.source_method_virtual_holder_element = new UncertainReferenceElement(irc.GetScopeIElement().getElementName());
+		this.source_method_virtual_holder_element = new UncertainReferenceElement(irc.GetScopeIElement().toString() + "_mholder");
+		this.control_logic_holder_element = new UncertainReferenceElement(irc.GetScopeIElement().toString() + "_clogic");
 		this.irc.SetSourceMethodElement(this.source_method_virtual_holder_element);
+		this.irc.SetControlLogicHolderElement(this.control_logic_holder_element);
+		
 	}
 
 	// public Queue<IRTask> GetUndoneTasks() {

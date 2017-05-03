@@ -54,7 +54,7 @@ public class IRGeneratorHelper {
 		// irgfob.temp_statement_environment_set;
 		// Map<IJavaElement, Integer> all_count = irgfob.all_count;
 		HashMap<IJavaElement, IRForOneInstruction> branch_dependency = irgfob.branchs_var_instr_order.peek();
-		IJavaElement source_method_receiver_element = irgfob.source_method_receiver_element;
+		IJavaElement source_method_receiver_element = irgfob.source_method_virtual_holder_element;
 
 		if (im != null) {// && jele instanceof IMethod
 			// source method invocation.
