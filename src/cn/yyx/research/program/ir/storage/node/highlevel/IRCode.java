@@ -171,10 +171,20 @@ public abstract class IRCode {
 
 	public void SetSourceMethodElement(IJavaElement source_method_receiver_element) {
 		this.source_method_receiver_element = source_method_receiver_element;
+		InitializeIRTreeElement(this.source_method_receiver_element);
 	}
 	
 	public void SetControlLogicHolderElement(IJavaElement control_logic_holder_element) {
 		this.control_logic_holder_element = control_logic_holder_element;
+		InitializeIRTreeElement(this.control_logic_holder_element);
+	}
+	
+	public void InitializeIRTreeElement(IJavaElement ije) {
+		IRTreeForOneElement ir_ele = irs.get(ije);
+		if (ir_ele == null) {
+			ir_ele = new IRTreeForOneElement(ije, this);
+		}
+		irs.put(ije, ir_ele);
 	}
 	
 	public IRTreeForOneElement GetSourceMethodInvocations() {

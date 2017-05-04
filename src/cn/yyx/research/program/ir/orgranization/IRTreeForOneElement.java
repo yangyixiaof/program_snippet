@@ -13,11 +13,15 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 
 public class IRTreeForOneElement {
 	
-	private IRForOneInstruction root_node = null; // sentinel
+	protected IJavaElement im = null;
+	protected IRCode parent_env = null;
 	
-	private IRForOneInstruction last_node = null;
+	protected IRForOneInstruction root_node = null; // sentinel
+	protected IRForOneInstruction last_node = null;
 	
 	public IRTreeForOneElement(IJavaElement ije, IRCode parent_env) {
+		this.im = ije;
+		SetParentEnv(parent_env);
 		SetRootNode(new IRForOneOperation(parent_env, ije, IRMeta.VirtualSentinel, SkipSelfTask.class));
 		SetLastNode(GetRootNode());
 	}
@@ -52,6 +56,14 @@ public class IRTreeForOneElement {
 
 	public void SetLastNode(IRForOneInstruction last_node) {
 		this.last_node = last_node;
+	}
+
+	public IRCode GetParentEnv() {
+		return parent_env;
+	}
+
+	public void SetParentEnv(IRCode parent_env) {
+		this.parent_env = parent_env;
 	}
 	
 }

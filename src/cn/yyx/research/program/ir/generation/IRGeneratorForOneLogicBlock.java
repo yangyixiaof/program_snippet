@@ -30,6 +30,7 @@ import cn.yyx.research.program.ir.storage.node.execution.DefaultINodeTask;
 import cn.yyx.research.program.ir.storage.node.execution.RequireHandleTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
@@ -73,7 +74,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// invocation.
 	// this variable is initialized in Construction method. so this is already
 	// be initialized.
-	protected IJavaElement control_logic_holder_element = null;
+	protected IJavaElement control_logic_holder_element = null; // already assigned.
 	protected IJavaElement source_method_virtual_holder_element = null; // already
 																	// assigned.
 	// this should be handled. this is no need anymore.
@@ -111,8 +112,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		temp_statement_environment_set.clear();
 	}
 
-	protected Stack<HashMap<IJavaElement, IRForOneInstruction>> branchs_var_instr_order = new Stack<HashMap<IJavaElement, IRForOneInstruction>>();
-
 	protected void PushBranchInstructionOrder() {
 		HashMap<IJavaElement, IRForOneInstruction> t_hash = new HashMap<IJavaElement, IRForOneInstruction>();
 		Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
@@ -120,6 +119,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			IJavaElement ije = titr.next();
 			if (irc.HasElement(ije)) {
 				t_hash.put(ije, irc.GetLastIRTreeNode(ije));
+				
 			}
 		}
 		branchs_var_instr_order.push(t_hash);
@@ -399,21 +399,23 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// handling statements.
 
+	// handling branches.
+	
 	// Solved. all branches and loops should handle parallel connections.
-	protected HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>> switch_record = new HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>>();
-
-	private void HandleOneBranch(ASTNode all_in_control, ASTNode then_stat, boolean clear) {
-		if (then_stat != null) {
-			pre_visit_task.Put(then_stat, new Runnable() {
+	protected Map<ASTNode, Map<IJavaElement, IRForOneInstruction>> switch_record = new HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>>();
+	// TODO
+	private void SwitchAndPrepareMergeInBranch(ASTNode all_in_control, ASTNode branch_first_stat, ASTNode branch_last_stat, boolean clear) {
+		if (branch_first_stat != null) {
+			pre_visit_task.Put(branch_first_stat, new Runnable() {
 				@Override
 				public void run() {
-					ast_block_bind.put(then_stat, new HashSet<IJavaElement>());
+					ast_block_bind.put(branch_first_stat, new HashSet<IJavaElement>());
 				}
 			});
-			post_visit_task.Put(then_stat, new Runnable() {
+			post_visit_task.Put(branch_last_stat, new Runnable() {
 				@Override
 				public void run() {
-					HashSet<IJavaElement> eles = ast_block_bind.get(then_stat);
+					HashSet<IJavaElement> eles = ast_block_bind.get(branch_first_stat);
 					Iterator<IJavaElement> eitr = eles.iterator();
 					while (eitr.hasNext()) {
 						IJavaElement ije = eitr.next();
@@ -430,7 +432,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 						}
 						merge_list.add(irc.GetLastIRTreeNode(ije));
 					}
-					ast_block_bind.remove(then_stat);
+					ast_block_bind.remove(branch_first_stat);
 					if (clear) {
 						StatementOverHandle();
 					}
@@ -453,9 +455,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				}
 			}
 		});
-		HandleOneBranch(all_in_control, then_stat, clear);
+		SwitchAndPrepareMergeInBranch(all_in_control, then_stat, clear);
 
-		HandleOneBranch(all_in_control, else_stat, clear);
+		SwitchAndPrepareMergeInBranch(all_in_control, else_stat, clear);
 	}
 
 	private void HandleMerge(ASTNode all_in_control) {
@@ -702,8 +704,159 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public void endVisit(EnhancedForStatement node) {
 		super.endVisit(node);
 	}
+	
+	protected Stack<Set<IJavaElement>> switch_judge_members = new Stack<Set<IJavaElement>>();
+	protected Map<ASTNode, Integer> switch_case_flag = new HashMap<ASTNode, Integer>();
+	protected Map<SwitchStatement, SwitchCase> last_switch_case = new HashMap<SwitchStatement, SwitchCase>();
 
-	// loop statements end.
+	@Override
+	public boolean visit(SwitchStatement node) {
+		// switch_case_bind.push(new HashSet<IBinding>());
+		// switch_case.push(new LinkedList<ASTNode>());
+		//
+		// post_visit_task.put(node.getExpression(), new Runnable() {
+		// @Override
+		// public void run() {
+		// IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irc,
+		// temp_statement_environment_set,
+		// IRMeta.Switch, branchs_var_instr_order.peek());
+		// }
+		// });
+		node_to_merge.put(node, new HashMap<IJavaElement, List<IRForOneInstruction>>());
+		IRGeneratorForOneLogicBlock this_ref = this;
+		post_visit_task.Put(node.getExpression(), new Runnable() {
+			@Override
+			public void run() {
+				switch_judge_members.push(new HashSet<IJavaElement>(temp_statement_environment_set));
+				IRGeneratorHelper.GenerateGeneralIR(this_ref, node, IRMeta.Switch);
+				PushBranchInstructionOrder();
+				switch_record.put(node, irc.CopyEnvironment());
+				StatementOverHandle();
+			}
+		});
+		return super.visit(node);
+	}
+
+	private void PopSwitchBranch(SwitchStatement node) {
+		// branch flag
+		Integer flag = switch_case_flag.get(node);
+		if (flag == null) {
+			flag = 0;
+		}
+		flag = (flag + 1) % 2;
+		switch_case_flag.put(node, flag);
+		if (flag == 0) {
+			PopBranchInstructionOrder();
+		}
+	}
+
+	private void ClearSwitchEnvironment(SwitchStatement node) {
+		switch_case_flag.remove(node);
+		switch_judge_members.pop();
+		switch_record.remove(node);
+		last_switch_case.remove(node);
+		node_to_merge.get(node).clear();
+		node_to_merge.remove(node);
+	}
+
+	private void HandleLastSwitchCase(SwitchStatement switch_statement, SwitchCase node) {
+		SwitchCase sc = last_switch_case.get(switch_statement);
+		if (sc == null) {
+			if (node != null) {
+				last_switch_case.put(switch_statement, node);
+			}
+		} else {
+			HashSet<IJavaElement> bind_elements = ast_block_bind.get(sc);
+			Map<IJavaElement, List<IRForOneInstruction>> merge = node_to_merge.get(switch_statement);
+			PrepareCurrentEnvironmentToMerge(bind_elements, merge);
+
+			ast_block_bind.remove(sc);
+			if (node != null) {
+				last_switch_case.put(switch_statement, node);
+				ast_block_bind.put(node, new HashSet<IJavaElement>());
+			}
+		}
+	}
+
+	// closely related expressions.
+	@Override
+	public boolean visit(SwitchCase node) {
+		// HashSet<IBinding> binds = switch_case_bind.peek();
+		// LinkedList<ASTNode> slist = switch_case.peek();
+		// if (slist.size() > 0) {
+		// ASTNode sc = slist.get(0);
+		// IRGeneratorHelper.GenerateSwitchCaseIR(node, sc, irc, binds);
+		//
+		// slist.removeFirst();
+		// binds.clear();
+		// }
+		// slist.add(node);
+
+		IRGeneratorForOneLogicBlock this_ref = this;
+		SwitchStatement switch_statement = (SwitchStatement) node.getParent();
+
+		// handle previous switch_case.
+		HandleLastSwitchCase(switch_statement, node);
+
+		// switch to direction.
+		Map<IJavaElement, IRForOneInstruction> env = switch_record.get(switch_statement);
+		Set<IJavaElement> ekys = env.keySet();
+		Iterator<IJavaElement> eitr = ekys.iterator();
+		while (eitr.hasNext()) {
+			IJavaElement ije = eitr.next();
+			irc.SwitchDirection(ije, env.get(ije));
+		}
+
+		PopSwitchBranch(switch_statement);
+		Expression expr = node.getExpression();
+		if (expr != null) {
+			post_visit_task.Put(expr, new Runnable() {
+				@Override
+				public void run() {
+					IRGeneratorHelper.GenerateGeneralIR(this_ref, node, IRMeta.Switch_Case_Cause);
+					PushBranchInstructionOrder();
+					StatementOverHandle();
+				}
+			});
+		} else {
+			Set<IJavaElement> members = switch_judge_members.peek();
+			IRGeneratorHelper.GenerateNoVariableBindingIR(this_ref, node, members, IRMeta.Switch_Case_Default);
+			PushBranchInstructionOrder();
+			StatementOverHandle();
+		}
+		return super.visit(node);
+	}
+
+	@Override
+	public void endVisit(SwitchCase node) {
+		// IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irc,
+		// temp_statement_environment_set,
+		// IRMeta.Switch_Case_Cause);
+		// super.endVisit(node);
+	}
+
+	@Override
+	public void endVisit(SwitchStatement node) {
+		// HashSet<IBinding> binds = switch_case_bind.pop();
+		// LinkedList<ASTNode> slist = switch_case.pop();
+		// if (slist.size() > 0) {
+		// ASTNode sc = switch_case.peek().get(0);
+		// IRGeneratorHelper.GenerateSwitchCaseIR(node, sc, irc, binds);
+		// }
+		//
+		// binds.clear();
+		// slist.clear();
+		HandleLastSwitchCase(node, null);
+
+		HandleMerge(node);
+
+		PopSwitchBranch(node);
+		ClearSwitchEnvironment(node);
+		StatementOverHandle();
+	}
+	// TODO
+
+	// branches & loops statements end.
 
 	// Solved. missed to consider the label and will be considered in the
 	// future.
@@ -986,156 +1139,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			}
 		});
 		return super.visit(node);
-	}
-
-	protected Stack<Set<IJavaElement>> switch_judge_members = new Stack<Set<IJavaElement>>();
-	protected Map<ASTNode, Integer> switch_case_flag = new HashMap<ASTNode, Integer>();
-	protected Map<SwitchStatement, SwitchCase> last_switch_case = new HashMap<SwitchStatement, SwitchCase>();
-
-	@Override
-	public boolean visit(SwitchStatement node) {
-		// switch_case_bind.push(new HashSet<IBinding>());
-		// switch_case.push(new LinkedList<ASTNode>());
-		//
-		// post_visit_task.put(node.getExpression(), new Runnable() {
-		// @Override
-		// public void run() {
-		// IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irc,
-		// temp_statement_environment_set,
-		// IRMeta.Switch, branchs_var_instr_order.peek());
-		// }
-		// });
-		node_to_merge.put(node, new HashMap<IJavaElement, List<IRForOneInstruction>>());
-		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.Put(node.getExpression(), new Runnable() {
-			@Override
-			public void run() {
-				switch_judge_members.push(new HashSet<IJavaElement>(temp_statement_environment_set));
-				IRGeneratorHelper.GenerateGeneralIR(this_ref, node, IRMeta.Switch);
-				PushBranchInstructionOrder();
-				switch_record.put(node, irc.CopyEnvironment());
-				StatementOverHandle();
-			}
-		});
-		return super.visit(node);
-	}
-
-	private void PopSwitchBranch(SwitchStatement node) {
-		// branch flag
-		Integer flag = switch_case_flag.get(node);
-		if (flag == null) {
-			flag = 0;
-		}
-		flag = (flag + 1) % 2;
-		switch_case_flag.put(node, flag);
-		if (flag == 0) {
-			PopBranchInstructionOrder();
-		}
-	}
-
-	private void ClearSwitchEnvironment(SwitchStatement node) {
-		switch_case_flag.remove(node);
-		switch_judge_members.pop();
-		switch_record.remove(node);
-		last_switch_case.remove(node);
-		node_to_merge.get(node).clear();
-		node_to_merge.remove(node);
-	}
-
-	private void HandleLastSwitchCase(SwitchStatement switch_statement, SwitchCase node) {
-		SwitchCase sc = last_switch_case.get(switch_statement);
-		if (sc == null) {
-			if (node != null) {
-				last_switch_case.put(switch_statement, node);
-			}
-		} else {
-			HashSet<IJavaElement> bind_elements = ast_block_bind.get(sc);
-			Map<IJavaElement, List<IRForOneInstruction>> merge = node_to_merge.get(switch_statement);
-			PrepareCurrentEnvironmentToMerge(bind_elements, merge);
-
-			ast_block_bind.remove(sc);
-			if (node != null) {
-				last_switch_case.put(switch_statement, node);
-				ast_block_bind.put(node, new HashSet<IJavaElement>());
-			}
-		}
-	}
-
-	// closely related expressions.
-	@Override
-	public boolean visit(SwitchCase node) {
-		// HashSet<IBinding> binds = switch_case_bind.peek();
-		// LinkedList<ASTNode> slist = switch_case.peek();
-		// if (slist.size() > 0) {
-		// ASTNode sc = slist.get(0);
-		// IRGeneratorHelper.GenerateSwitchCaseIR(node, sc, irc, binds);
-		//
-		// slist.removeFirst();
-		// binds.clear();
-		// }
-		// slist.add(node);
-
-		IRGeneratorForOneLogicBlock this_ref = this;
-		SwitchStatement switch_statement = (SwitchStatement) node.getParent();
-
-		// handle previous switch_case.
-		HandleLastSwitchCase(switch_statement, node);
-
-		// switch to direction.
-		Map<IJavaElement, IRForOneInstruction> env = switch_record.get(switch_statement);
-		Set<IJavaElement> ekys = env.keySet();
-		Iterator<IJavaElement> eitr = ekys.iterator();
-		while (eitr.hasNext()) {
-			IJavaElement ije = eitr.next();
-			irc.SwitchDirection(ije, env.get(ije));
-		}
-
-		PopSwitchBranch(switch_statement);
-		Expression expr = node.getExpression();
-		if (expr != null) {
-			post_visit_task.Put(expr, new Runnable() {
-				@Override
-				public void run() {
-					IRGeneratorHelper.GenerateGeneralIR(this_ref, node, IRMeta.Switch_Case_Cause);
-					PushBranchInstructionOrder();
-					StatementOverHandle();
-				}
-			});
-		} else {
-			Set<IJavaElement> members = switch_judge_members.peek();
-			IRGeneratorHelper.GenerateNoVariableBindingIR(this_ref, node, members, IRMeta.Switch_Case_Default);
-			PushBranchInstructionOrder();
-			StatementOverHandle();
-		}
-		return super.visit(node);
-	}
-
-	@Override
-	public void endVisit(SwitchCase node) {
-		// IRGeneratorHelper.GenerateGeneralIR(node, node.getExpression(), irc,
-		// temp_statement_environment_set,
-		// IRMeta.Switch_Case_Cause);
-		// super.endVisit(node);
-	}
-
-	@Override
-	public void endVisit(SwitchStatement node) {
-		// HashSet<IBinding> binds = switch_case_bind.pop();
-		// LinkedList<ASTNode> slist = switch_case.pop();
-		// if (slist.size() > 0) {
-		// ASTNode sc = switch_case.peek().get(0);
-		// IRGeneratorHelper.GenerateSwitchCaseIR(node, sc, irc, binds);
-		// }
-		//
-		// binds.clear();
-		// slist.clear();
-		HandleLastSwitchCase(node, null);
-
-		HandleMerge(node);
-
-		PopSwitchBranch(node);
-		ClearSwitchEnvironment(node);
-		StatementOverHandle();
 	}
 
 	// handling expressions.
