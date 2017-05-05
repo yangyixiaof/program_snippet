@@ -8,6 +8,7 @@ import java.util.Set;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 
+import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneElement;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
@@ -19,7 +20,7 @@ public abstract class IRCode {
 	protected IJavaElement source_method_receiver_element = null;
 	
 	protected IJavaElement control_logic_holder_element = null;
-	
+	protected IRTreeForOneControlElement control_logic_element_ir = null;
 	
 	private IMember im = null;
 
@@ -178,7 +179,7 @@ public abstract class IRCode {
 	
 	public void SetControlLogicHolderElement(IJavaElement control_logic_holder_element) {
 		this.control_logic_holder_element = control_logic_holder_element;
-		InitializeIRTreeElement(this.control_logic_holder_element);
+		control_logic_element_ir = new IRTreeForOneControlElement(control_logic_holder_element, this);
 	}
 	
 	public void InitializeIRTreeElement(IJavaElement ije) {
