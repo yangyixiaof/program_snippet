@@ -12,8 +12,7 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class IRTreeForOneControlElement extends IRTreeForOneElement {
 	
-	// HashMap<IJavaElement, > 
-	protected Stack<IRForOneBranchControl> branchs_var_instr_order = new Stack<IRForOneBranchControl>();
+	
 	
 	public IRTreeForOneControlElement(IJavaElement ije, IRCode parent_env) {
 		super(ije, parent_env);
@@ -25,6 +24,14 @@ public class IRTreeForOneControlElement extends IRTreeForOneElement {
 		// TODO switch logic needs to be completed.
 		IRForOneBranchControl irfobc = new IRForOneBranchControl(im, parent_env, SkipSelfTask.class, IRBranchControlType.Branch);
 		GoForwardANode(irfobc);
+		IRForOneBranchControl now = branchs_var_instr_order.peek();
+		if (now.GetBranchType() == IRBranchControlType.Branch_Over)
+		{
+			
+		}
+	}
+	
+	public void BranchOver() {
 		
 	}
 	

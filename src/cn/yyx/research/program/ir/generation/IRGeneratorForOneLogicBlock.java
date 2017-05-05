@@ -111,6 +111,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		temp_statement_expression_environment_set.clear();
 		temp_statement_environment_set.clear();
 	}
+	
+	protected Stack<Map<IJavaElement, IRForOneInstruction>> branchs_var_instr_order = new Stack<Map<IJavaElement, IRForOneInstruction>>();
 
 	protected void PushBranchInstructionOrder() {
 		HashMap<IJavaElement, IRForOneInstruction> t_hash = new HashMap<IJavaElement, IRForOneInstruction>();
