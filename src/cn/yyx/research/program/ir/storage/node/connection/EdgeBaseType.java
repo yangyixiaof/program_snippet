@@ -5,7 +5,8 @@ public enum EdgeBaseType {
 	SameOperations(1),
 	Sequential(1 << 1),
 	Self(1 << 2 | 1 << 1),
-	Branch(1 << 3);
+	Branch(1 << 3),
+	BranchControl(1 << 4);
 	
 	private int type = 0;
 	
