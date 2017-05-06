@@ -182,6 +182,11 @@ public abstract class IRCode {
 		control_logic_element_ir = new IRTreeForOneControlElement(control_logic_holder_element, this);
 	}
 	
+	public IRTreeForOneControlElement GetControlLogicHolderElementIR()
+	{
+		return control_logic_element_ir;
+	}
+	
 	public void InitializeIRTreeElement(IJavaElement ije) {
 		IRTreeForOneElement ir_ele = irs.get(ije);
 		if (ir_ele == null) {

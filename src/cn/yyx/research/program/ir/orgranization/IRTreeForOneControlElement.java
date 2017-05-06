@@ -1,7 +1,6 @@
 package cn.yyx.research.program.ir.orgranization;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -100,19 +99,18 @@ public class IRTreeForOneControlElement {
 		}
 	}
 	
-	public Set<IRForOneBranchControl> GetControlNodes() {
-		Set<IRForOneBranchControl> result = new HashSet<IRForOneBranchControl>();
+	public IRForOneBranchControl GetControlNode() {
 		if (!branch_judge_stack.isEmpty())
 		{
 			IRForOneBranchControl now_bc_judge = branch_judge_stack.peek();
-			result.add(same_level_branch.get(now_bc_judge).getLast());
 			IRForOneBranchControl inner_over = inner_level_branchover.get(now_bc_judge);
 			if (inner_over != null)
 			{
-				result.add(inner_over);
+				return inner_over;
 			}
+			return same_level_branch.get(now_bc_judge).getLast();
 		}
-		return result;
+		return null;
 	}
 	
 }
