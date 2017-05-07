@@ -14,11 +14,14 @@ import org.eclipse.jdt.core.IType;
 
 import cn.yyx.research.program.analysis.fulltrace.FullTrace;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
+import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
+import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneField;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 
@@ -29,6 +32,37 @@ public class CodeOnOneTraceGenerator {
 	
 	public CodeOnOneTraceGenerator(MethodSelection ms) {
 		this.method_selection = ms;
+	}
+	
+	private void GenerateFullTrace(IMethod now_root)
+	{
+		IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().GetMethodIR(now_root);
+		IRTreeForOneControlElement control_ir = irfom.GetControlLogicHolderElementIR();
+		IRForOneBranchControl control_root = control_ir.GetRoot();
+		
+	}
+	// TODO remember to add virtual branch to every node in only one branch.
+	private void DepthFirstToVisitControlLogic(IRForOneBranchControl now_control_root)
+	{
+		IRGeneratorForOneProject irproj = IRGeneratorForOneProject.GetInstance();
+		Set<IRForOneInstruction> control_outs = irproj.GetOutINodesByContainingSpecificType(now_control_root, EdgeBaseType.BranchControl.Value());
+		Iterator<IRForOneInstruction> coitr = control_outs.iterator();
+		while (coitr.hasNext())
+		{
+			IRForOneInstruction irfoi = coitr.next();
+			if (!(irfoi instanceof IRForOneBranchControl))
+			{
+				System.err.println("Not IRForOneBranchControl? What the fuck!");
+				System.exit(1);
+			}
+			IRForOneBranchControl ir_control = (IRForOneBranchControl)irfoi;
+			
+		}
+	}
+	
+	private void BreadthFirstToVisitIR()
+	{
+		
 	}
 	
 	public void GoForwardOneMethod(IRForOneSourceMethodInvocation wrap_node, FullTrace ft)

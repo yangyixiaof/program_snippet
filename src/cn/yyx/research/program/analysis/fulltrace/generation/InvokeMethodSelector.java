@@ -78,7 +78,7 @@ public class InvokeMethodSelector {
 			while (itr.hasNext())
 			{
 				IRForOneInstruction irfoi = itr.next();
-				Set<IRForOneInstruction> set = IRGeneratorForOneProject.GetInstance().GetOutINodesByContainingSpecificType(irfoi, EdgeBaseType.Self.getType());
+				Set<IRForOneInstruction> set = IRGeneratorForOneProject.GetInstance().GetOutINodesByContainingSpecificType(irfoi, EdgeBaseType.Self.Value());
 				Iterator<IRForOneInstruction> sitr = set.iterator();
 				while (sitr.hasNext())
 				{

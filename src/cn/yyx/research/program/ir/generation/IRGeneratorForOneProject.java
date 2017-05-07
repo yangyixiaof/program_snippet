@@ -102,12 +102,12 @@ public class IRGeneratorForOneProject {
 	
 	public Set<IRForOneInstruction> GetOutINodes(IRForOneInstruction iirn)
 	{
-		return GetINodesByJudgeType(out_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.getType());
+		return GetINodesByJudgeType(out_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.Value());
 	}
 
 	public Set<IRForOneInstruction> GetInINodes(IRForOneInstruction iirn)
 	{
-		return GetINodesByJudgeType(in_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.getType());
+		return GetINodesByJudgeType(in_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.Value());
 	}
 	
 	public Set<IRForOneInstruction> GetOutINodesByContainingSpecificType(IRForOneInstruction iirn, int type)

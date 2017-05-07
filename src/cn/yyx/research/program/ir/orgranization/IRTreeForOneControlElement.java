@@ -57,7 +57,7 @@ public class IRTreeForOneControlElement {
 			}
 			last = list.getLast();
 		}
-		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last, judge, EdgeBaseType.BranchControl.getType()));
+		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last, judge, EdgeBaseType.BranchControl.Value()));
 		
 		if (branch_judge_stack.isEmpty())
 		{
@@ -72,7 +72,7 @@ public class IRTreeForOneControlElement {
 		{
 			IJavaElement lje = litr.next();
 			IRForOneInstruction ir = logic_env.get(lje);
-			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(ir, judge, EdgeBaseType.BranchControl.getType()));
+			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(ir, judge, EdgeBaseType.BranchControl.Value()));
 		}
 	}
 	
@@ -91,7 +91,7 @@ public class IRTreeForOneControlElement {
 		while (itr.hasNext())
 		{
 			IRForOneBranchControl irbc_bc = itr.next();
-			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc_bc, branch_over, EdgeBaseType.BranchControl.getType()));
+			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc_bc, branch_over, EdgeBaseType.BranchControl.Value()));
 		}
 		if (!branch_judge_stack.isEmpty())
 		{
@@ -111,6 +111,10 @@ public class IRTreeForOneControlElement {
 			return same_level_branch.get(now_bc_judge).getLast();
 		}
 		return null;
+	}
+	
+	public IRForOneBranchControl GetRoot() {
+		return root;
 	}
 	
 }

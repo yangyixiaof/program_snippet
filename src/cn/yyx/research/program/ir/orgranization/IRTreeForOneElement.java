@@ -38,7 +38,7 @@ public class IRTreeForOneElement {
 	
 	public void GoForwardANode(IRForOneInstruction child)
 	{
-		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last_node, child, EdgeBaseType.Self.getType()));
+		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last_node, child, EdgeBaseType.Self.Value()));
 		SetLastNode(child);
 	}
 

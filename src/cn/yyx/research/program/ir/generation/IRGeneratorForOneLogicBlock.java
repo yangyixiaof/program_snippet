@@ -960,7 +960,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 						IJavaElement ije = kitr.next();
 						IRForOneInstruction ir_instr = eles.get(ije);
 						IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(ir_instr,
-								irc.GetLastIRTreeNode(ije), EdgeBaseType.Self.getType()));
+								irc.GetLastIRTreeNode(ije), EdgeBaseType.Self.Value()));
 					}
 				}
 			});
@@ -1037,7 +1037,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		while (itr.hasNext()) {
 			IJavaElement t_ije = itr.next();
 			IRForOneInstruction last_node = irc.GetLastIRTreeNode(t_ije);
-			last_node.SetRequireType(EdgeBaseType.Self.getType());
+			last_node.SetRequireType(EdgeBaseType.Self.Value());
 
 			Set<IJavaElement> ekeys = env.keySet();
 			Iterator<IJavaElement> eitr = ekeys.iterator();
@@ -1046,7 +1046,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				if (e_ije != t_ije) {
 					IRForOneInstruction ir_instr = env.get(e_ije);
 					IRGeneratorForOneProject.GetInstance().RegistConnection(
-							new StaticConnection(ir_instr, last_node, EdgeBaseType.Sequential.getType()));
+							new StaticConnection(ir_instr, last_node, EdgeBaseType.Sequential.Value()));
 				}
 			}
 		}
@@ -1054,7 +1054,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		IJavaElement ije = WholeExpressionIsAnElement(right);
 		if (ije != null) {
 			IRForOneInstruction last = irc.GetLastIRTreeNode(ije);
-			last.SetRequireType(EdgeBaseType.Self.getType());
+			last.SetRequireType(EdgeBaseType.Self.Value());
 			irc.AddAssignDependency(ije, new HashSet<IJavaElement>(env.keySet()));
 		}
 
@@ -1131,7 +1131,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 							IJavaElement t_ije = titr.next();
 							IRForOneInstruction iru = irc.GetLastIRTreeNode(t_ije);
 							if (iru != null) {
-								iru.SetAcceptType(EdgeBaseType.Self.getType());
+								iru.SetAcceptType(EdgeBaseType.Self.Value());
 								iru.SetOutConnectionMergeTask(new RequireHandleTask(iru));
 							}
 						}
@@ -1490,7 +1490,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		while (litr.hasNext()) {
 			IRForOneInstruction tn = litr.next();
 			IRGeneratorForOneProject.GetInstance()
-					.RegistConnection(new StaticConnection(tn, irfop, EdgeBaseType.Self.getType()));
+					.RegistConnection(new StaticConnection(tn, irfop, EdgeBaseType.Self.Value()));
 		}
 		irc.SwitchDirection(ije, irfop);
 	}

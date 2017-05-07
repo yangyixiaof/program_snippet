@@ -95,7 +95,7 @@ public class IRGeneratorHelper {
 
 						boolean is_self = jele_is_self.get(ije);
 						if (is_self) {
-							StaticConnection conn = new StaticConnection(source, now, EdgeBaseType.Self.getType());
+							StaticConnection conn = new StaticConnection(source, now, EdgeBaseType.Self.Value());
 							IRGeneratorForOneProject.GetInstance().RegistConnection(conn);
 						}
 					}
@@ -259,7 +259,7 @@ public class IRGeneratorHelper {
 			IRForOneInstruction pt = branch_dependency.get(bim);
 			if (pt != null) {
 				IRGeneratorForOneProject.GetInstance()
-						.RegistConnection(new StaticConnection(pt, now, EdgeBaseType.Branch.getType()));
+						.RegistConnection(new StaticConnection(pt, now, EdgeBaseType.Branch.Value()));
 			}
 		}
 	}
@@ -275,7 +275,7 @@ public class IRGeneratorHelper {
 		// HandleNodeSelfAndBranchDependency(irc, ije, irfoo, null);
 		if (irfoo != null) {
 			IRGeneratorForOneProject.GetInstance()
-					.RegistConnection(new StaticConnection(irfomi, irfoo, EdgeBaseType.Sequential.getType()));
+					.RegistConnection(new StaticConnection(irfomi, irfoo, EdgeBaseType.Sequential.Value()));
 		}
 		// irfomi.PutConnectionMergeTask(conn, new MethodReturnPassTask());
 	}
@@ -320,9 +320,9 @@ public class IRGeneratorHelper {
 					break;
 				}
 				IRGeneratorForOneProject.GetInstance().RegistConnection(
-						new StaticConnection(irfop_inner, irfop, EdgeBaseType.SameOperations.getType()));
+						new StaticConnection(irfop_inner, irfop, EdgeBaseType.SameOperations.Value()));
 				IRGeneratorForOneProject.GetInstance().RegistConnection(
-						new StaticConnection(irfop, irfop_inner, EdgeBaseType.SameOperations.getType()));
+						new StaticConnection(irfop, irfop_inner, EdgeBaseType.SameOperations.Value()));
 			}
 		}
 	}

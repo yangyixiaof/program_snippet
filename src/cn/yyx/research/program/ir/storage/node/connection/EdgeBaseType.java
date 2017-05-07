@@ -14,7 +14,7 @@ public enum EdgeBaseType {
 		this.type = type;
 	}
 	
-	public int getType(){
+	public int Value(){
         return type;
     }
 	
