@@ -12,6 +12,24 @@ public class IRForOneDynamicUnit {
 		this.instr = instr;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+        int result = id;
+        result = prime * result + ((instr == null) ? 0 : instr.hashCode());
+		return result;
+	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof IRForOneDynamicUnit) {
+			IRForOneDynamicUnit irfod = (IRForOneDynamicUnit)obj;
+			if (id == irfod.id && instr == irfod.instr) {
+				return true;
+			}
+			return false;
+		}
+		return super.equals(obj);
+	}
 	
 }
