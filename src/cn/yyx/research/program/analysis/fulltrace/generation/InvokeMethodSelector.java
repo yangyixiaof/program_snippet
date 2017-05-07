@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.eclipse.jdt.core.IMethod;
 
-import cn.yyx.research.program.analysis.fulltrace.FullTrace;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneElement;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
@@ -18,12 +17,12 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 
-public class AllTraceGenerator {
+public class InvokeMethodSelector {
 	
 	private IMethod root = null;
 	private Map<IRForOneSourceMethodInvocation, IMethod> method_invocation = new HashMap<IRForOneSourceMethodInvocation, IMethod>();
 	
-	private List<FullTrace> traces = new LinkedList<FullTrace>();
+	private List<MethodSelection> method_selections = new LinkedList<MethodSelection>();
 	
 	public boolean SelectOneMethod(IRForOneSourceMethodInvocation irfomi, Set<IMethod> methods, boolean is_last)
 	{
@@ -59,9 +58,8 @@ public class AllTraceGenerator {
 				}
 				if (!over_choice && is_last)
 				{
-					CodeOnOneTraceGenerator cootg = new CodeOnOneTraceGenerator(root, method_invocation);
-					FullTrace one_full_trace = cootg.Execute();
-					traces.add(one_full_trace);
+					MethodSelection ms = new MethodSelection(root, method_invocation);
+					method_selections.add(ms);
 				}
 			}
 		}
@@ -96,6 +94,10 @@ public class AllTraceGenerator {
 			level.addAll(new_level);
 		}
 		return result;
+	}
+
+	public List<MethodSelection> GetMethodSelections() {
+		return method_selections;
 	}
 	
 }

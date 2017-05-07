@@ -571,7 +571,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		LinkedList<ASTNode> nelist = new LinkedList<ASTNode>();
 		nelist.add(node.getThenExpression());
 		nelist.add(node.getElseExpression());
-		PreVisitBranch(node, IRMeta.If, node.getExpression(), ntlist, nelist, false);
+		PreVisitBranch(node, IRMeta.ConditionExpression, node.getExpression(), ntlist, nelist, false);
 		// IRGeneratorForOneLogicBlock this_ref = this;
 		// post_visit_task.Put(node.getExpression(), new Runnable() {
 		// @Override

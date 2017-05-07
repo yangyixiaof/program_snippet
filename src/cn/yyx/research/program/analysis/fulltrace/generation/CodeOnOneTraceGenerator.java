@@ -14,9 +14,7 @@ import org.eclipse.jdt.core.IType;
 
 import cn.yyx.research.program.analysis.fulltrace.FullTrace;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
-import cn.yyx.research.program.ir.storage.node.IIRNode;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
-import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneField;
@@ -27,13 +25,10 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvo
 public class CodeOnOneTraceGenerator {
 	
 	private Set<IMethod> visited = new HashSet<IMethod>();
+	private MethodSelection method_selection = null;
 	
-	private IMethod root = null;
-	private Map<IRForOneSourceMethodInvocation, IMethod> method_invocation = new HashMap<IRForOneSourceMethodInvocation, IMethod>();
-	
-	public CodeOnOneTraceGenerator(IMethod root, Map<IRForOneSourceMethodInvocation, IMethod> method_invocation) {
-		this.root = root;
-		this.method_invocation.putAll(method_invocation);
+	public CodeOnOneTraceGenerator(MethodSelection ms) {
+		this.method_selection = ms;
 	}
 	
 	public void GoForwardOneMethod(IRForOneSourceMethodInvocation wrap_node, FullTrace ft)

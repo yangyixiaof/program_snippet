@@ -5,6 +5,7 @@ public class IRMeta {
 	public static final String MethodInvocation = "@MethodInvocation_";
 	// public static final String User_Defined_Function = "@UserDefine";
 	public static final String If = "@If";
+	public static final String ConditionExpression = "@Cond_Exp";
 	// public static final String IfThen = "@IfThen";
 	// public static final String IfElse = "@IfElse";
 	public static final String While = "@While";
