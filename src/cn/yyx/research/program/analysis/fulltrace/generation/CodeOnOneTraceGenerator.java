@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
@@ -30,20 +31,34 @@ public class CodeOnOneTraceGenerator {
 	private Set<IMethod> visited = new HashSet<IMethod>();
 	private MethodSelection method_selection = null;
 	
+	private LinkedList<IRForOneBranchControl> branch_control_stack = new LinkedList<IRForOneBranchControl>();
+	private Map<IRForOneMethod, Integer> same_method_id = new HashMap<IRForOneMethod, Integer>();
+	// private Map<IRForOneMethod, Stack<Set<IRForOneBranchControl>>> activaton_node = new HashMap<IRForOneMethod, Stack<Set<IRForOneBranchControl>>>();
+	
 	public CodeOnOneTraceGenerator(MethodSelection ms) {
 		this.method_selection = ms;
 	}
 	
-	private void GenerateFullTrace(IMethod now_root)
+	private void GenerateFullTrace(, IMethod now_method, IRForOneSourceMethodInvocation now_instruction)
 	{
 		IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().GetMethodIR(now_root);
 		IRTreeForOneControlElement control_ir = irfom.GetControlLogicHolderElementIR();
 		IRForOneBranchControl control_root = control_ir.GetRoot();
 		
+		HashSet<IRForOneBranchControl> activaton_node = new HashSet<IRForOneBranchControl>();
+		
+		int last_size = branch_control_stack.size();
+		DepthFirstToVisitControlLogic(control_root, irfom, activaton_node);
+		List<IRForOneBranchControl> new_list = branch_control_stack.subList(0, last_size);
+		branch_control_stack.clear();
+		branch_control_stack.addAll(new_list);
 	}
-	// TODO remember to add virtual branch to every node in only one branch.
-	private void DepthFirstToVisitControlLogic(IRForOneBranchControl now_control_root)
+	// TODO remember to add virtual branch to every node in only one branch£¬ such as if(){} without else branch.
+	private void DepthFirstToVisitControlLogic(IRForOneBranchControl now_control_root, IRForOneMethod irfom, HashSet<IRForOneBranchControl> activaton_node)
 	{
+		activaton_node.add(now_control_root);
+		
+		
 		IRGeneratorForOneProject irproj = IRGeneratorForOneProject.GetInstance();
 		Set<IRForOneInstruction> control_outs = irproj.GetOutINodesByContainingSpecificType(now_control_root, EdgeBaseType.BranchControl.Value());
 		Iterator<IRForOneInstruction> coitr = control_outs.iterator();
@@ -56,7 +71,9 @@ public class CodeOnOneTraceGenerator {
 				System.exit(1);
 			}
 			IRForOneBranchControl ir_control = (IRForOneBranchControl)irfoi;
-			
+			branch_control_stack.add(ir_control);
+			DepthFirstToVisitControlLogic(ir_control, irfom, activaton_node);
+			branch_control_stack.removeLast();
 		}
 	}
 	

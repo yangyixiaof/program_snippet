@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.core.IMethod;
 
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneSourceMethodInvocation;
 
 public class MethodSelection {
 	

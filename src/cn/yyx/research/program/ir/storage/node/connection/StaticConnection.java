@@ -1,6 +1,6 @@
 package cn.yyx.research.program.ir.storage.node.connection;
 
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneInstruction;
 
 public class StaticConnection {
 	

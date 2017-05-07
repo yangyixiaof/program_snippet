@@ -13,9 +13,9 @@ import org.eclipse.jdt.core.IMethod;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneElement;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
-import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
+import cn.yyx.research.program.ir.storage.node.zstatic.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneSourceMethodInvocation;
 
 public class InvokeMethodSelector {
 	

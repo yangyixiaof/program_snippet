@@ -7,9 +7,9 @@ import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.SkipSelfTask;
-import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
+import cn.yyx.research.program.ir.storage.node.zstatic.highlevel.IRCode;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneOperation;
 
 public class IRTreeForOneElement {
 	

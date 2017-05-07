@@ -26,10 +26,10 @@ import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeTypeUtil;
 import cn.yyx.research.program.ir.storage.node.connection.JudgeType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
-import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
-import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
-import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.zstatic.highlevel.IRForOneClass;
+import cn.yyx.research.program.ir.storage.node.zstatic.highlevel.IRForOneConstructor;
+import cn.yyx.research.program.ir.storage.node.zstatic.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneInstruction;
 
 public class IRGeneratorForOneProject {
 	// TODO two things: first, mark whether a method is constructor and its IType. second, test caller-roots method and JavaSearch Engine.

@@ -24,7 +24,7 @@ import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.JavaModelException;
 
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneInstruction;
 
 public class UnresolvedLambdaUniqueElement implements IMethod {
 	

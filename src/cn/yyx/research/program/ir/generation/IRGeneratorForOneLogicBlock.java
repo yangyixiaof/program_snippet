@@ -29,12 +29,12 @@ import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.DefaultINodeTask;
 import cn.yyx.research.program.ir.storage.node.execution.RequireHandleTask;
-import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
-import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
+import cn.yyx.research.program.ir.storage.node.zstatic.highlevel.IRCode;
+import cn.yyx.research.program.ir.storage.node.zstatic.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneBranchControl;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneOperation;
+import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneSourceMethodInvocation;
 import cn.yyx.research.program.ir.task.IRASTNodeTask;
 
 public class IRGeneratorForOneLogicBlock extends ASTVisitor {
