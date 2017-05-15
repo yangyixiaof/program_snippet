@@ -1,10 +1,10 @@
-package cn.yyx.research.program.ir.storage.node.zstatic.lowlevel;
+package cn.yyx.research.program.ir.storage.node.lowlevel;
 
 import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.program.ir.storage.node.IIREnergyNode;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
-import cn.yyx.research.program.ir.storage.node.zstatic.highlevel.IRCode;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.systemutil.ReflectionInvoke;
 
 public abstract class IRForOneInstruction implements IIREnergyNode {

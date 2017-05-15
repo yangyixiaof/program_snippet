@@ -15,7 +15,7 @@ import cn.yyx.research.program.eclipse.exception.WrongArgumentException;
 import cn.yyx.research.program.eclipse.project.AnalysisEnvironment;
 import cn.yyx.research.program.eclipse.project.ProjectInfo;
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICallGraph;
-import cn.yyx.research.program.ir.IRControl;
+import cn.yyx.research.program.ir.IRControlMeta;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.systemutil.SystemUtil;
 import cn.yyx.research.test.TestJavaSearch;
@@ -46,7 +46,7 @@ public class SnippetExtractor implements IApplication {
 		IJavaProject java_project = LoadProjectAccordingToArgs((String[])context.getArguments().get(IApplicationContext.APPLICATION_ARGS));
 				
 		// testing.
-		if (IRControl.test) {
+		if (IRControlMeta.test) {
 			TestJavaSearch.TestInAll(java_project);
 		} else {
 			IRGeneratorForOneProject.GenerateForAllICompilationUnits(java_project);

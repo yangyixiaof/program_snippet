@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.storage.node.zstatic.highlevel;
+package cn.yyx.research.program.ir.storage.node.highlevel;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;

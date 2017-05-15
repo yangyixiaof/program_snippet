@@ -1,6 +1,6 @@
 package cn.yyx.research.program.ir;
 
-public class IRControl {
+public class IRControlMeta {
 	
 	public static final boolean debug = true;
 	public static final boolean test = false;

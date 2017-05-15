@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.storage.node.zstatic.lowlevel;
+package cn.yyx.research.program.ir.storage.node.lowlevel;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
-import cn.yyx.research.program.ir.storage.node.zstatic.highlevel.IRCode;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 
 public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 	

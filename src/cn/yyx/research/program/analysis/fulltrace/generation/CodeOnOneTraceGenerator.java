@@ -13,7 +13,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 
-import cn.yyx.research.program.analysis.fulltrace.FullTrace;
+import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
@@ -31,33 +31,40 @@ public class CodeOnOneTraceGenerator {
 	private Set<IMethod> visited = new HashSet<IMethod>();
 	private MethodSelection method_selection = null;
 	
-	private LinkedList<IRForOneBranchControl> branch_control_stack = new LinkedList<IRForOneBranchControl>();
-	private Map<IRForOneMethod, Integer> same_method_id = new HashMap<IRForOneMethod, Integer>();
+	private Stack<IRForOneBranchControl> branch_control_stack = new Stack<IRForOneBranchControl>();
+	private Map<IRForOneMethod, Integer> same_method_max_id = new HashMap<IRForOneMethod, Integer>();
+	private Map<IRForOneMethod, Stack<Integer>> same_method_id = new HashMap<IRForOneMethod, Stack<Integer>>();
 	// private Map<IRForOneMethod, Stack<Set<IRForOneBranchControl>>> activaton_node = new HashMap<IRForOneMethod, Stack<Set<IRForOneBranchControl>>>();
 	
 	public CodeOnOneTraceGenerator(MethodSelection ms) {
 		this.method_selection = ms;
 	}
 	
-	private void GenerateFullTrace(, IMethod now_method, IRForOneSourceMethodInvocation now_instruction)
+	private void GenerateFullTrace(IMethod now_method, IRForOneSourceMethodInvocation now_instruction)
 	{
-		IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().GetMethodIR(now_root);
+		IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().GetMethodIR(now_method);
 		IRTreeForOneControlElement control_ir = irfom.GetControlLogicHolderElementIR();
 		IRForOneBranchControl control_root = control_ir.GetRoot();
 		
 		HashSet<IRForOneBranchControl> activaton_node = new HashSet<IRForOneBranchControl>();
 		
 		int last_size = branch_control_stack.size();
-		DepthFirstToVisitControlLogic(control_root, irfom, activaton_node);
 		List<IRForOneBranchControl> new_list = branch_control_stack.subList(0, last_size);
+		
+		// TODO new FullTrace();
+		// TODO should handle the before connection to parameters.
+		// TODO remember to add root dynamic node if now_instruction is null which means now_method is the root.
+		DepthFirstToVisitControlLogic(control_root, irfom, activaton_node);
+		
 		branch_control_stack.clear();
 		branch_control_stack.addAll(new_list);
 	}
+	
 	// TODO remember to add virtual branch to every node in only one branch£¬ such as if(){} without else branch.
-	private void DepthFirstToVisitControlLogic(IRForOneBranchControl now_control_root, IRForOneMethod irfom, HashSet<IRForOneBranchControl> activaton_node)
+	private void DepthFirstToVisitControlLogic(IRForOneBranchControl now_control_root, IRForOneMethod irfom, HashSet<IRForOneBranchControl> activaton_node, Map<IJavaElement, IRForOneInstruction> execution_memory)
 	{
 		activaton_node.add(now_control_root);
-		
+		BreadthFirstToVisitIR(activaton_node, execution_memory);
 		
 		IRGeneratorForOneProject irproj = IRGeneratorForOneProject.GetInstance();
 		Set<IRForOneInstruction> control_outs = irproj.GetOutINodesByContainingSpecificType(now_control_root, EdgeBaseType.BranchControl.Value());
@@ -72,12 +79,12 @@ public class CodeOnOneTraceGenerator {
 			}
 			IRForOneBranchControl ir_control = (IRForOneBranchControl)irfoi;
 			branch_control_stack.add(ir_control);
-			DepthFirstToVisitControlLogic(ir_control, irfom, activaton_node);
-			branch_control_stack.removeLast();
+			DepthFirstToVisitControlLogic(ir_control, irfom, activaton_node, execution_memory);
+			branch_control_stack.pop();
 		}
 	}
 	
-	private void BreadthFirstToVisitIR()
+	private void BreadthFirstToVisitIR(HashSet<IRForOneBranchControl> activaton_node, Map<IJavaElement, IRForOneInstruction> execution_memory)
 	{
 		
 	}

@@ -14,10 +14,10 @@ import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.IgnoreSelfTask;
-import cn.yyx.research.program.ir.storage.node.zstatic.highlevel.IRCode;
-import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRBranchControlType;
-import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneBranchControl;
-import cn.yyx.research.program.ir.storage.node.zstatic.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRBranchControlType;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class IRTreeForOneControlElement {
 	

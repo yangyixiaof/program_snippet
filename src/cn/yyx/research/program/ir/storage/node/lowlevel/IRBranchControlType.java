@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.storage.node.zstatic.lowlevel;
+package cn.yyx.research.program.ir.storage.node.lowlevel;
 
 public enum IRBranchControlType {
 	

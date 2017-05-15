@@ -1,9 +1,9 @@
-package cn.yyx.research.program.ir.storage.node.zstatic.lowlevel;
+package cn.yyx.research.program.ir.storage.node.lowlevel;
 
 import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
-import cn.yyx.research.program.ir.storage.node.zstatic.highlevel.IRCode;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 
 public class IRForOneBranchControl extends IRForOneInstruction {
 	
