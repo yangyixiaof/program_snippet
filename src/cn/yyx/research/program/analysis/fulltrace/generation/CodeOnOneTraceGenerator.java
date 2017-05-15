@@ -61,7 +61,7 @@ public class CodeOnOneTraceGenerator {
 	}
 	
 	// TODO remember to add virtual branch to every node in only one branch£¬ such as if(){} without else branch.
-	private void DepthFirstToVisitControlLogic(IRForOneBranchControl now_control_root, IRForOneMethod irfom, HashSet<IRForOneBranchControl> activaton_node, Map<IJavaElement, IRForOneInstruction> execution_memory)
+	private void DepthFirstToVisitControlLogic(IRForOneBranchControl now_control_root, IRForOneMethod irfom, HashSet<IRForOneBranchControl> activaton_node, ExecutionMemory execution_memory)
 	{
 		activaton_node.add(now_control_root);
 		BreadthFirstToVisitIR(activaton_node, execution_memory);
@@ -84,9 +84,53 @@ public class CodeOnOneTraceGenerator {
 		}
 	}
 	
-	private void BreadthFirstToVisitIR(HashSet<IRForOneBranchControl> activaton_node, Map<IJavaElement, IRForOneInstruction> execution_memory)
+	private void BreadthFirstToVisitIR(HashSet<IRForOneBranchControl> activaton_node, ExecutionMemory memory)
 	{
-		
+		// do ...
+		while (true)
+		{
+			boolean could_continue = false;
+			Set<IJavaElement> exe_keys = memory.last_execution.keySet();
+			Iterator<IJavaElement> exe_itr = exe_keys.iterator();
+			while (exe_itr.hasNext())
+			{
+				IJavaElement ije = exe_itr.next();
+				IRForOneInstruction inode = memory.last_execution.get(ije);
+				Set<IRForOneInstruction> in_nodes = ObtainExecutionPermission(inode, memory.executed_nodes);
+				could_continue = could_continue || (in_nodes != null);
+				if (in_nodes != null)
+				{
+					Iterator<IIRNode> in_itr = in_nodes.iterator();
+					while (in_itr.hasNext())
+					{
+						IIRNode iirn = in_itr.next();
+						Map<IIRNode, Set<StaticConnection>> outs = iirn.PrepareOutNodes();
+						Set<IIRNode> okeys = outs.keySet();
+						// TODO
+						
+					}
+				}
+			}
+			if (!could_continue)
+			{
+				break;
+			}
+		}
+	}
+	
+	private Set<IIRNode> ObtainExecutionPermission(IIRNode one_instr_pc, Set<IIRNode> executed_instrs)
+	{
+		Set<IIRNode> in_nodes = IRGeneratorForOneProject.GetInstance().GetInINodes(one_instr_pc);
+		Iterator<IIRNode> iitr = in_nodes.iterator();
+		while (iitr.hasNext())
+		{
+			IIRNode iirn = iitr.next();
+			if (!executed_instrs.contains(iirn))
+			{
+				return null;
+			}
+		}
+		return in_nodes;
 	}
 	
 	public void GoForwardOneMethod(IRForOneSourceMethodInvocation wrap_node, FullTrace ft)
@@ -126,21 +170,6 @@ public class CodeOnOneTraceGenerator {
 				}
 			}
 		}
-	}
-	
-	private Set<IIRNode> ObtainExecutionPermission(IIRNode one_instr_pc, Set<IIRNode> executed_instrs)
-	{
-		Set<IIRNode> in_nodes = IRGeneratorForOneProject.GetInstance().GetInINodes(one_instr_pc);
-		Iterator<IIRNode> iitr = in_nodes.iterator();
-		while (iitr.hasNext())
-		{
-			IIRNode iirn = iitr.next();
-			if (!executed_instrs.contains(iirn))
-			{
-				return null;
-			}
-		}
-		return in_nodes;
 	}
 	
 	private void HandleChildNodeExtendFromParentNode(IIRNode parent, IIRNode child, StaticConnection shared_conn)
@@ -197,34 +226,6 @@ public class CodeOnOneTraceGenerator {
 			instr_pc.addAll(IRGeneratorForOneProject.GetInstance().GetOutINodes(first_instr));
 		}
 		
-		// do ...
-		while (true)
-		{
-			boolean could_continue = false;
-			Iterator<IIRNode> instr_itr = instr_pc.iterator();
-			while (instr_itr.hasNext())
-			{
-				IIRNode inode = instr_itr.next();
-				Set<IIRNode> in_nodes = ObtainExecutionPermission(inode, executed_instrs);
-				could_continue = could_continue || (in_nodes != null);
-				if (in_nodes != null)
-				{
-					Iterator<IIRNode> in_itr = in_nodes.iterator();
-					while (in_itr.hasNext())
-					{
-						IIRNode iirn = in_itr.next();
-						Map<IIRNode, Set<StaticConnection>> outs = iirn.PrepareOutNodes();
-						Set<IIRNode> okeys = outs.keySet();
-						// TODO
-						
-					}
-				}
-			}
-			if (!could_continue)
-			{
-				break;
-			}
-		}
 	}
 	
 	public void ExecuteFieldCode(IRForOneField irc, FullTrace ft_run)
