@@ -45,8 +45,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// Solved. return and assign right should add special task.
 	// Solved. variable declarations should be removed, only assignment in it
 	// should be retained.
-	// TODO how to recognize the global relationship, eclipse jdt offers?
-	// Solved. Important!!!!!!!, dependencies between differernt variables seem
+	// TODO how to recognize the global relationship, eclipse jdt offers? 
+	// TODO how to recognize relationships including code snippet not on the execution path from main root?.
+	// Solved. Important!!!!!!!, dependencies between different variables seem
 	// not handled, some are not needed but some are needed.
 
 	// Solved. switch case mechanism is not as tree or graph and is sequential
