@@ -33,7 +33,6 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvo
 
 public class CodeOnOneTraceGenerator {
 	
-	private Set<IMethod> visited = new HashSet<IMethod>();
 	private MethodSelection method_selection = null;
 	
 	private Stack<IRForOneBranchControl> branch_control_stack = new Stack<IRForOneBranchControl>();
@@ -56,12 +55,21 @@ public class CodeOnOneTraceGenerator {
 		return id;
 	}
 	
-	private void GenerateFullTrace(IMethod now_method, IRForOneSourceMethodInvocation now_instruction)
+	private void GenerateFullTrace(IRCode irfom, IRForOneSourceMethodInvocation now_instruction, int env_idx)
 	{
-		IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().GetMethodIR(now_method);
-		// TODO handle constructor later here.
+		// Solved. handle constructor here.
+		if (irfom instanceof IRForOneConstructor) {
+			IRForOneConstructor irfoc = (IRForOneConstructor)irfom;
+			IType it = irfoc.getWrap_class();
+			IRForOneClass irfot = IRGeneratorForOneProject.GetInstance().GetClassIR(it);
+			if (irfot != null) {
+				IRForOneField field_level = irfot.GetFieldLevel();
+				if (field_level != null) {
+					GenerateFullTrace(irfoc, null, GetID(irfoc));
+				}
+			}
+		}
 		
-		int env_idx = GetID(irfom);
 		Stack<Map<IRForOneSourceMethodInvocation, Integer>> id_stack = method_id.get(irfom);
 		if (id_stack == null) {
 			id_stack = new Stack<Map<IRForOneSourceMethodInvocation, Integer>>();
@@ -87,7 +95,7 @@ public class CodeOnOneTraceGenerator {
 	}
 	
 	// TODO remember to add virtual branch to every node in only one branch£¬ such as if(){} without else branch.
-	private void DepthFirstToVisitControlLogic(FullTrace ft, IRForOneBranchControl now_control_root, IRForOneMethod irfom, ExecutionMemory execution_memory, int env_idx)
+	private void DepthFirstToVisitControlLogic(FullTrace ft, IRForOneBranchControl now_control_root, IRCode irfom, ExecutionMemory execution_memory, int env_idx)
 	{
 		Set<StaticConnection> out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(now_control_root);
 		execution_memory.executed_conns.addAll(out_conns);
@@ -124,7 +132,7 @@ public class CodeOnOneTraceGenerator {
 				IJavaElement ije = exe_itr.next();
 				IRForOneInstruction inode = memory.last_execution.get(ije);
 				
-				// TODO handle operations first, remember to handle IRForMethodInvocation which is totally different.
+				// Solved. handle operations first, remember to handle IRForMethodInvocation which is totally different.
 				
 				Set<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory.executed_conns);
 				could_continue = could_continue || ((in_conns != null) && (in_conns.size() > 0));
@@ -142,15 +150,11 @@ public class CodeOnOneTraceGenerator {
 							IRForOneSourceMethodInvocation irfosm = (IRForOneSourceMethodInvocation)target;
 							IMethod select_method = method_selection.GetMethodSelection(irfosm);
 							IRForOneMethod select_method_ir = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(select_method);
-							IMember im = select_method_ir.getIm();
-							if (!(im instanceof IMethod))
-							{
-								System.err.println("Strange, the imember in IRForOneMethod is not IMethod");
-								System.exit(1);
-							}
-							IMethod imd = (IMethod)im;
-							GenerateFullTrace(imd, irfosm);
+							int id = GetID(select_method_ir);
+							method_id.get(irfosm.getParentEnv()).peek().put(irfosm, id);
+							GenerateFullTrace(select_method_ir, irfosm, id);
 						}
+						// TODO need to handle hidden inherit link.
 						IIRNodeTask out_task = source.GetOutConnectionMergeTask();
 						if (source instanceof IRForOneSourceMethodInvocation) {
 							IRForOneSourceMethodInvocation irmethod_source = (IRForOneSourceMethodInvocation) source;
@@ -194,50 +198,44 @@ public class CodeOnOneTraceGenerator {
 		return in_conns;
 	}
 	
-	public void GoForwardOneMethod(IRForOneSourceMethodInvocation wrap_node, FullTrace ft)
-	{
-		Iterator<IMethod> witr = will_visit.iterator();
-		while (witr.hasNext())
-		{
-			IMethod im = witr.next();
-			if (!visited.contains(im))
-			{
-				visited.add(im);
-				IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().GetMethodIR(im);
-				if (irfom == null)
-				{
-					continue;
-				}
-				FullTrace ft_run = new FullTrace(ft);
-				if (irfom instanceof IRForOneConstructor)
-				{
-					IRForOneConstructor irfoc = (IRForOneConstructor)irfom;
-					IType it = irfoc.getWrap_class();
-					IRForOneClass irfot = IRGeneratorForOneProject.GetInstance().GetClassIR(it);
-					if (irfot != null)
-					{
-						IRForOneField field_level = irfot.GetFieldLevel();
-						if (field_level != null)
-						{
-							// TODO execute field_level.
-							ft_run.ExecuteFieldCode(field_level, this);
-						}
-					}
-				}
-				if (irfom != null)
-				{
-					// TODO execute irfom.
-					ft_run.ExecuteMethodCode(irfom, this);
-				}
-			}
-		}
-	}
-	
-	private void HandleChildNodeExtendFromParentNode(IIRNode parent, IIRNode child, StaticConnection shared_conn)
-	{
-		// TODO
-		
-	}
+//	public void GoForwardOneMethod(IRForOneSourceMethodInvocation wrap_node, FullTrace ft)
+//	{
+//		Iterator<IMethod> witr = will_visit.iterator();
+//		while (witr.hasNext())
+//		{
+//			IMethod im = witr.next();
+//			if (!visited.contains(im))
+//			{
+//				visited.add(im);
+//				IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().GetMethodIR(im);
+//				if (irfom == null)
+//				{
+//					continue;
+//				}
+//				FullTrace ft_run = new FullTrace(ft);
+//				if (irfom instanceof IRForOneConstructor)
+//				{
+//					IRForOneConstructor irfoc = (IRForOneConstructor)irfom;
+//					IType it = irfoc.getWrap_class();
+//					IRForOneClass irfot = IRGeneratorForOneProject.GetInstance().GetClassIR(it);
+//					if (irfot != null)
+//					{
+//						IRForOneField field_level = irfot.GetFieldLevel();
+//						if (field_level != null)
+//						{
+//							// execute field_level.
+//							ft_run.ExecuteFieldCode(field_level, this);
+//						}
+//					}
+//				}
+//				if (irfom != null)
+//				{
+//					// execute irfom.
+//					ft_run.ExecuteMethodCode(irfom, this);
+//				}
+//			}
+//		}
+//	}
 	
 	public void ExecuteMethodCode(IRForOneSourceMethodInvocation wrap_node, IRForOneMethod irc, FullTrace ft_run)
 	{
@@ -287,19 +285,6 @@ public class CodeOnOneTraceGenerator {
 			instr_pc.addAll(IRGeneratorForOneProject.GetInstance().GetOutINodes(first_instr));
 		}
 		
-	}
-	
-	public void ExecuteFieldCode(IRForOneField irc, FullTrace ft_run)
-	{
-		
-	}
-
-	public FullTrace Execute() {
-		FullTrace ft_run = new FullTrace();
-		
-		
-		
-		return ft_run;
 	}
 	
 }
