@@ -94,4 +94,9 @@ public class StaticConnection {
 		this.type = type;
 	}
 	
+	public StaticConnectionInfo GetStaticConnectionInfo()
+	{
+		return new StaticConnectionInfo(type);
+	}
+	
 }

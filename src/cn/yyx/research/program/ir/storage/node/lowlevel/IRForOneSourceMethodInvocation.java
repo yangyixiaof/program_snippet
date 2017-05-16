@@ -25,7 +25,7 @@ public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 	
 	private HashMap<IRForOneInstruction, Integer> para_order_instr_index_map = new HashMap<IRForOneInstruction, Integer>();
 	// this im has already contained the information about which IJavaElement this all about.
-	// TODO remember to check the im is the source_method_element etc.
+	// TODO HashMap<IRForOneInstruction, Integer> should be reversed.
 	public IRForOneSourceMethodInvocation(IRCode parent_env, IJavaElement im, Collection<IMethod> methods, Class<? extends IIRNodeTask> task_class) {
 		super(im, parent_env, task_class);
 		this.AddMethods(methods);
@@ -44,11 +44,11 @@ public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 		this.methods.addAll(methods);
 	}
 	
-	public Iterator<IRForOneInstruction> VariableParameterIterator() {
+	public Iterator<IRForOneInstruction> ParameterDependentNodeIterator() {
 		return para_order_instr_index_map.keySet().iterator();
 	}
 	
-	public Integer VariableParameterInstrIndex(IRForOneInstruction param) {
+	public Integer ParameterIndexNodeDependsTo(IRForOneInstruction param) {
 		return para_order_instr_index_map.get(param);
 	}
 

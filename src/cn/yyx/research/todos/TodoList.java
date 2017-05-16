@@ -8,4 +8,5 @@ public class TodoList {
 	
 	// TODO Construction method need to be reconsidered method and its class should be a map.
 	
+	// TODO remember to add virtual branch to every node in only one branch£¬ such as if(){} without else branch.
 }

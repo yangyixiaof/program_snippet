@@ -4,24 +4,24 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
+import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
+import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
@@ -55,7 +55,7 @@ public class CodeOnOneTraceGenerator {
 		return id;
 	}
 	
-	private void GenerateFullTrace(IRCode irfom, IRForOneSourceMethodInvocation now_instruction, int env_idx)
+	private void GenerateFullTrace(IRCode irfom, IRForOneSourceMethodInvocation now_instruction, int env_idx, FullTrace ft)
 	{
 		// Solved. handle constructor here.
 		if (irfom instanceof IRForOneConstructor) {
@@ -65,7 +65,7 @@ public class CodeOnOneTraceGenerator {
 			if (irfot != null) {
 				IRForOneField field_level = irfot.GetFieldLevel();
 				if (field_level != null) {
-					GenerateFullTrace(irfoc, null, GetID(irfoc));
+					GenerateFullTrace(irfoc, null, GetID(irfoc), ft);
 				}
 			}
 		}
@@ -83,10 +83,8 @@ public class CodeOnOneTraceGenerator {
 		int last_size = branch_control_stack.size();
 		List<IRForOneBranchControl> new_list = branch_control_stack.subList(0, last_size);
 		
-		FullTrace ft = new FullTrace();
 		ExecutionMemory memory = new ExecutionMemory();
-		// TODO should handle the before connection to parameters.
-		// TODO remember to add root dynamic node if now_instruction is null which means now_method is the root.
+		HandleCallerToCallee(irfom, now_instruction, ft, env_idx);
 		DepthFirstToVisitControlLogic(ft, control_root, irfom, memory, env_idx);
 		
 		method_id.get(irfom).pop();
@@ -94,7 +92,6 @@ public class CodeOnOneTraceGenerator {
 		branch_control_stack.addAll(new_list);
 	}
 	
-	// TODO remember to add virtual branch to every node in only one branch£¬ such as if(){} without else branch.
 	private void DepthFirstToVisitControlLogic(FullTrace ft, IRForOneBranchControl now_control_root, IRCode irfom, ExecutionMemory execution_memory, int env_idx)
 	{
 		Set<StaticConnection> out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(now_control_root);
@@ -142,37 +139,8 @@ public class CodeOnOneTraceGenerator {
 					while (in_itr.hasNext())
 					{
 						StaticConnection sc = in_itr.next();
-						IRForOneInstruction source = sc.getSource();
-						IRForOneInstruction target = sc.getTarget();
-						DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
-						DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
-						if (target instanceof IRForOneSourceMethodInvocation) {
-							IRForOneSourceMethodInvocation irfosm = (IRForOneSourceMethodInvocation)target;
-							IMethod select_method = method_selection.GetMethodSelection(irfosm);
-							IRForOneMethod select_method_ir = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(select_method);
-							int id = GetID(select_method_ir);
-							method_id.get(irfosm.getParentEnv()).peek().put(irfosm, id);
-							GenerateFullTrace(select_method_ir, irfosm, id);
-						}
-						// TODO need to handle hidden inherit link.
-						IIRNodeTask out_task = source.GetOutConnectionMergeTask();
-						if (source instanceof IRForOneSourceMethodInvocation) {
-							IRForOneSourceMethodInvocation irmethod_source = (IRForOneSourceMethodInvocation) source;
-							IMethod select_im = method_selection.GetMethodSelection(irmethod_source);
-							IRForOneMethod im = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(select_im);
-							Map<IJavaElement, IRForOneInstruction> out_nodes = im.GetOutNodes();
-							Collection<IRForOneInstruction> ovals = out_nodes.values();
-							Iterator<IRForOneInstruction> oitr = ovals.iterator();
-							while (oitr.hasNext())
-							{
-								IRForOneInstruction irfoi = oitr.next();
-								DynamicNode precise_source_dn = new DynamicNode(irfoi, irfoi.getParentEnv(), method_id.get(irmethod_source.getParentEnv()).peek().get(irmethod_source));
-								IIRNodeTask precise_task = irfoi.GetOutConnectionMergeTask();
-								precise_task.HandleOutConnection(precise_source_dn, target_dn, sc, ft);
-							}
-						} else {
-							out_task.HandleOutConnection(source_dn, target_dn, sc, ft);
-						}
+						HandleStaticConnectionForTarget(ft, sc.getSource(), sc.getTarget(), sc.GetStaticConnectionInfo(), env_idx);
+						HandleStaticConnectionForSource(ft, sc.getSource(), sc.getTarget(), sc.GetStaticConnectionInfo(), env_idx);
 					}
 				}
 			}
@@ -180,6 +148,42 @@ public class CodeOnOneTraceGenerator {
 			{
 				break;
 			}
+		}
+	}
+	
+	private void HandleStaticConnectionForTarget(FullTrace ft, IRForOneInstruction source, IRForOneInstruction target, StaticConnectionInfo sc_info, int env_idx)
+	{
+		if (target instanceof IRForOneSourceMethodInvocation) {
+			IRForOneSourceMethodInvocation irfosm = (IRForOneSourceMethodInvocation)target;
+			IMethod select_method = method_selection.GetMethodSelection(irfosm);
+			IRForOneMethod select_method_ir = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(select_method);
+			int id = GetID(select_method_ir);
+			method_id.get(irfosm.getParentEnv()).peek().put(irfosm, id);
+			GenerateFullTrace(select_method_ir, irfosm, id, ft);
+		}
+	}
+	
+	private void HandleStaticConnectionForSource(FullTrace ft, IRForOneInstruction source, IRForOneInstruction target, StaticConnectionInfo sc_info, int env_idx)
+	{
+		DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
+		DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
+		IIRNodeTask out_task = source.GetOutConnectionMergeTask();
+		if (source instanceof IRForOneSourceMethodInvocation) {
+			IRForOneSourceMethodInvocation irmethod_source = (IRForOneSourceMethodInvocation) source;
+			IMethod select_im = method_selection.GetMethodSelection(irmethod_source);
+			IRForOneMethod im = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(select_im);
+			Map<IJavaElement, IRForOneInstruction> out_nodes = im.GetOutNodes();
+			Collection<IRForOneInstruction> ovals = out_nodes.values();
+			Iterator<IRForOneInstruction> oitr = ovals.iterator();
+			while (oitr.hasNext())
+			{
+				IRForOneInstruction irfoi = oitr.next();
+				DynamicNode precise_source_dn = new DynamicNode(irfoi, irfoi.getParentEnv(), method_id.get(irmethod_source.getParentEnv()).peek().get(irmethod_source));
+				IIRNodeTask precise_task = irfoi.GetOutConnectionMergeTask();
+				precise_task.HandleOutConnection(precise_source_dn, target_dn, sc_info, ft);
+			}
+		} else {
+			out_task.HandleOutConnection(source_dn, target_dn, sc_info, ft);
 		}
 	}
 	
@@ -196,6 +200,99 @@ public class CodeOnOneTraceGenerator {
 			}
 		}
 		return in_conns;
+	}
+	
+	private void HandleCallerToCallee(IRCode irc, IRForOneSourceMethodInvocation wrap_node, FullTrace ft_run, int env_idx)
+	{
+		// Solved. need to handle hidden inherit link.
+		// Solved. should handle the before connection to parameters.
+		
+		// Solved: no need to do that. remember to add root dynamic node if now_instruction is null which means now_method is the root or field initialization.
+		
+		// wrap_node is used only for the first phase.
+		// now handle wrap_node for depending on method_parameter_connection.
+		// Set<IIRNode> executed_instrs = new HashSet<IIRNode>();
+		Set<IRForOneInstruction> instr_pc = new HashSet<IRForOneInstruction>();
+		Set<IJavaElement> eles = irc.GetAllElements();
+		Iterator<IJavaElement> eitr = eles.iterator();
+		while (eitr.hasNext())
+		{
+			IJavaElement ije = eitr.next();
+			instr_pc.add(irc.GetFirstIRTreeNode(ije));
+		}
+		
+		if (wrap_node != null) {
+			// irc must be of type IRForOneMethod.
+			IRForOneMethod irfom = (IRForOneMethod) irc;
+			List<IJavaElement> params = irfom.GetParameters();
+			Iterator<IRForOneInstruction> param_depend_itr = wrap_node.ParameterDependentNodeIterator();
+			
+			while (param_depend_itr.hasNext())
+			{
+				IRForOneInstruction irfoi = param_depend_itr.next();
+				int index = wrap_node.ParameterIndexNodeDependsTo(irfoi);
+				IJavaElement param = params.get(index);
+				IRForOneInstruction irpara = irc.GetFirstIRTreeNode(param);
+				HandleStaticConnectionForSource(ft_run, irfoi, irpara, new StaticConnectionInfo(EdgeBaseType.Sequential.Value()), env_idx);
+			}
+			Set<IJavaElement> all_eles = new HashSet<>(irfom.GetAllElements());
+			all_eles.removeAll(params);
+			Iterator<IJavaElement> aitr = all_eles.iterator();
+			while (aitr.hasNext())
+			{
+				IJavaElement ije = aitr.next();
+				IRForOneInstruction irpara = irc.GetFirstIRTreeNode(ije);
+				DynamicNode dn = ft_run.GetLastPC(ije);
+				DynamicNode here_dn = new DynamicNode(irpara, irc, env_idx);
+				if (dn == null) {
+					ft_run.PutLastPC(ije, here_dn);
+				} else {
+					DynamicConnection dc = new DynamicConnection(dn, here_dn, EdgeBaseType.Self.Value());
+					ft_run.AddConnection(dc);
+				}
+			}
+		} else {
+			if (irc instanceof IRForOneMethod) {
+				// root
+				// IRForOneMethod irfom = (IRForOneMethod) irc;
+				// do nothing.
+			} else {
+				// field code.
+				// IRForOneField irfom = (IRForOneField) irc;
+				// do nothing.
+			}
+		}
+		
+//		while (param_depend_itr.hasNext())
+//		{
+//			IRForOneInstruction irfoi = param_depend_itr.next();
+//			Integer index = wrap_node.ParameterIndexNodeDependsTo(irfoi);
+//			IJavaElement param = params.get(index);
+//			List<IRForOneInstruction> depd = inverse_depend.get(param);
+//			if (depd == null)
+//			{
+//				depd = new LinkedList<IRForOneInstruction>();
+//				inverse_depend.put(param, depd);
+//			}
+//			depd.add(irfoi);
+//		}
+//		Set<IJavaElement> ikeys = inverse_depend.keySet();
+//		Iterator<IJavaElement> iitr = ikeys.iterator();
+//		while (iitr.hasNext())
+//		{
+//			IJavaElement ije = iitr.next();
+//			IRForOneInstruction first_instr = irc.GetFirstIRTreeNode(ije);
+//			List<IRForOneInstruction> depds = inverse_depend.get(ije);
+//			Iterator<IRForOneInstruction> ditr = depds.iterator();
+//			while (ditr.hasNext())
+//			{
+//				IRForOneInstruction irfoi = ditr.next();
+//				HandleChildNodeExtendFromParentNode(irfoi, first_instr, IRGeneratorForOneProject.GetInstance().GetSpecifiedConnection(irfoi, wrap_node));
+//			}
+//			executed_instrs.add(first_instr);
+//			instr_pc.remove(first_instr);
+//			instr_pc.addAll(IRGeneratorForOneProject.GetInstance().GetOutINodes(first_instr));
+//		}
 	}
 	
 //	public void GoForwardOneMethod(IRForOneSourceMethodInvocation wrap_node, FullTrace ft)
@@ -236,55 +333,5 @@ public class CodeOnOneTraceGenerator {
 //			}
 //		}
 //	}
-	
-	public void ExecuteMethodCode(IRForOneSourceMethodInvocation wrap_node, IRForOneMethod irc, FullTrace ft_run)
-	{
-		// wrap_node is used only for the first phase.
-		// now handle wrap_node for depending on method_parameter_connection.
-		Set<IIRNode> executed_instrs = new HashSet<IIRNode>();
-		Set<IIRNode> instr_pc = new HashSet<IIRNode>();
-		Set<IJavaElement> eles = irc.GetAllElements();
-		Iterator<IJavaElement> eitr = eles.iterator();
-		while (eitr.hasNext())
-		{
-			IJavaElement ije = eitr.next();
-			instr_pc.add(irc.GetFirstIRTreeNode(ije));
-		}
-		
-		List<IJavaElement> params = irc.GetParameters();
-		Iterator<IRForOneInstruction> param_depend_itr = wrap_node.VariableParameterIterator();
-		Map<IJavaElement, List<IRForOneInstruction>> inverse_depend = new HashMap<IJavaElement, List<IRForOneInstruction>>();
-		while (param_depend_itr.hasNext())
-		{
-			IRForOneInstruction irfoi = param_depend_itr.next();
-			Integer index = wrap_node.VariableParameterInstrIndex(irfoi);
-			IJavaElement param = params.get(index);
-			List<IRForOneInstruction> depd = inverse_depend.get(param);
-			if (depd == null)
-			{
-				depd = new LinkedList<IRForOneInstruction>();
-				inverse_depend.put(param, depd);
-			}
-			depd.add(irfoi);
-		}
-		Set<IJavaElement> ikeys = inverse_depend.keySet();
-		Iterator<IJavaElement> iitr = ikeys.iterator();
-		while (iitr.hasNext())
-		{
-			IJavaElement ije = iitr.next();
-			IRForOneInstruction first_instr = irc.GetFirstIRTreeNode(ije);
-			List<IRForOneInstruction> depds = inverse_depend.get(ije);
-			Iterator<IRForOneInstruction> ditr = depds.iterator();
-			while (ditr.hasNext())
-			{
-				IRForOneInstruction irfoi = ditr.next();
-				HandleChildNodeExtendFromParentNode(irfoi, first_instr, IRGeneratorForOneProject.GetInstance().GetSpecifiedConnection(irfoi, wrap_node));
-			}
-			executed_instrs.add(first_instr);
-			instr_pc.remove(first_instr);
-			instr_pc.addAll(IRGeneratorForOneProject.GetInstance().GetOutINodes(first_instr));
-		}
-		
-	}
 	
 }
