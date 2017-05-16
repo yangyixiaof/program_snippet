@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.IType;
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
+import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
@@ -46,25 +47,26 @@ public class CodeOnOneTraceGenerator {
 		IRTreeForOneControlElement control_ir = irfom.GetControlLogicHolderElementIR();
 		IRForOneBranchControl control_root = control_ir.GetRoot();
 		
-		HashSet<IRForOneBranchControl> activaton_node = new HashSet<IRForOneBranchControl>();
-		
 		int last_size = branch_control_stack.size();
 		List<IRForOneBranchControl> new_list = branch_control_stack.subList(0, last_size);
 		
-		// TODO new FullTrace();
+		FullTrace ft = new FullTrace();
+		ExecutionMemory memory = new ExecutionMemory();
 		// TODO should handle the before connection to parameters.
 		// TODO remember to add root dynamic node if now_instruction is null which means now_method is the root.
-		DepthFirstToVisitControlLogic(control_root, irfom, activaton_node);
+		DepthFirstToVisitControlLogic(ft, control_root, irfom, memory);
 		
 		branch_control_stack.clear();
 		branch_control_stack.addAll(new_list);
 	}
 	
 	// TODO remember to add virtual branch to every node in only one branch£¬ such as if(){} without else branch.
-	private void DepthFirstToVisitControlLogic(IRForOneBranchControl now_control_root, IRForOneMethod irfom, HashSet<IRForOneBranchControl> activaton_node, ExecutionMemory execution_memory)
+	private void DepthFirstToVisitControlLogic(FullTrace ft, IRForOneBranchControl now_control_root, IRForOneMethod irfom, ExecutionMemory execution_memory)
 	{
-		activaton_node.add(now_control_root);
-		BreadthFirstToVisitIR(activaton_node, execution_memory);
+		Set<StaticConnection> out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(now_control_root);
+		execution_memory.executed_conns.addAll(out_conns);
+		
+		BreadthFirstToVisitIR(ft, execution_memory);
 		
 		IRGeneratorForOneProject irproj = IRGeneratorForOneProject.GetInstance();
 		Set<IRForOneInstruction> control_outs = irproj.GetOutINodesByContainingSpecificType(now_control_root, EdgeBaseType.BranchControl.Value());
@@ -79,12 +81,12 @@ public class CodeOnOneTraceGenerator {
 			}
 			IRForOneBranchControl ir_control = (IRForOneBranchControl)irfoi;
 			branch_control_stack.add(ir_control);
-			DepthFirstToVisitControlLogic(ir_control, irfom, activaton_node, execution_memory);
+			DepthFirstToVisitControlLogic(ft, ir_control, irfom, execution_memory);
 			branch_control_stack.pop();
 		}
 	}
 	
-	private void BreadthFirstToVisitIR(HashSet<IRForOneBranchControl> activaton_node, ExecutionMemory memory)
+	private void BreadthFirstToVisitIR(FullTrace ft, ExecutionMemory memory)
 	{
 		// do ...
 		while (true)
@@ -96,15 +98,31 @@ public class CodeOnOneTraceGenerator {
 			{
 				IJavaElement ije = exe_itr.next();
 				IRForOneInstruction inode = memory.last_execution.get(ije);
-				Set<IRForOneInstruction> in_nodes = ObtainExecutionPermission(inode, memory.executed_nodes);
-				could_continue = could_continue || (in_nodes != null);
-				if (in_nodes != null)
+				
+				// TODO handle operations first, remember to handle IRForMethodInvocation which is totally different.
+				
+				Set<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory.executed_conns);
+				could_continue = could_continue || ((in_conns != null) && (in_conns.size() > 0));
+				if (in_conns != null && in_conns.size() > 0)
 				{
-					Iterator<IIRNode> in_itr = in_nodes.iterator();
+					Iterator<StaticConnection> in_itr = in_conns.iterator();
 					while (in_itr.hasNext())
 					{
-						IIRNode iirn = in_itr.next();
-						Map<IIRNode, Set<StaticConnection>> outs = iirn.PrepareOutNodes();
+						StaticConnection sc = in_itr.next();
+						IRForOneInstruction source = sc.getSource();
+						IRForOneInstruction target = sc.getTarget();
+						if (target instanceof IRForOneSourceMethodInvocation) {
+							
+						}
+						IIRNodeTask out_task = source.GetOutConnectionMergeTask();
+						if (source instanceof IRForOneSourceMethodInvocation) {
+							IRForOneSourceMethodInvocation irmethod_source = (IRForOneSourceMethodInvocation) source;
+							
+						} else {
+							out_task.HandleOutConnection(sc, ft);
+						}
+						
+						Map<IIRNode, Set<StaticConnection>> outs = sc.PrepareOutNodes();
 						Set<IIRNode> okeys = outs.keySet();
 						// TODO
 						
@@ -118,19 +136,19 @@ public class CodeOnOneTraceGenerator {
 		}
 	}
 	
-	private Set<IIRNode> ObtainExecutionPermission(IIRNode one_instr_pc, Set<IIRNode> executed_instrs)
+	private Set<StaticConnection> ObtainExecutionPermission(IRForOneInstruction one_instr_pc, Set<StaticConnection> executed_conns)
 	{
-		Set<IIRNode> in_nodes = IRGeneratorForOneProject.GetInstance().GetInINodes(one_instr_pc);
-		Iterator<IIRNode> iitr = in_nodes.iterator();
+		Set<StaticConnection> in_conns = IRGeneratorForOneProject.GetInstance().GetInConnections(one_instr_pc);
+		Iterator<StaticConnection> iitr = in_conns.iterator();
 		while (iitr.hasNext())
 		{
-			IIRNode iirn = iitr.next();
-			if (!executed_instrs.contains(iirn))
+			StaticConnection iirn = iitr.next();
+			if (!executed_conns.contains(iirn))
 			{
 				return null;
 			}
 		}
-		return in_nodes;
+		return in_conns;
 	}
 	
 	public void GoForwardOneMethod(IRForOneSourceMethodInvocation wrap_node, FullTrace ft)

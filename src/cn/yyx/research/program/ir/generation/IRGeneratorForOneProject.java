@@ -34,6 +34,7 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 public class IRGeneratorForOneProject {
 	// TODO two things: first, mark whether a method is constructor and its IType. second, test caller-roots method and JavaSearch Engine.
 	// TODO remember to check if searched method are null, if null, what to handle?
+	// TODO lambda expressions are needed to be treated as IMethod.
 	private IJavaProject java_project = null;
 	
 	private HashMap<IType, IRForOneClass> class_irs = new HashMap<IType, IRForOneClass>();
@@ -98,6 +99,27 @@ public class IRGeneratorForOneProject {
 		return result;
 	}
 	
+	private Set<StaticConnection> GetStaticConnectionsByJudgeType(Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> connects, IRForOneInstruction iirn, JudgeType jt, int judged_type)
+	{
+		HashSet<StaticConnection> result = new HashSet<StaticConnection>();
+		Map<IRForOneInstruction, StaticConnection> is = connects.get(iirn);
+		if (is != null)
+		{
+			Set<IRForOneInstruction> ikeys = is.keySet();
+			Iterator<IRForOneInstruction> iitr = ikeys.iterator();
+			while (iitr.hasNext())
+			{
+				IRForOneInstruction iir = iitr.next();
+				StaticConnection sc = is.get(iir);
+				if (jt.MeetCondition(sc.getType(), judged_type))
+				{
+					result.add(sc);
+				}
+			}
+		}
+		return result;
+	}
+	
 	// TODO remember to check whether lambda expression method implementations could be searched.
 	
 	public Set<IRForOneInstruction> GetOutINodes(IRForOneInstruction iirn)
@@ -120,26 +142,14 @@ public class IRGeneratorForOneProject {
 		return GetINodesByJudgeType(in_connects, iirn, (judge, judged)->{return EdgeTypeUtil.HasSpecificType(judge, judged);}, type);
 	}
 	
-	public Set<StaticConnection> GetOutConnection(IRForOneInstruction iirn)
+	public Set<StaticConnection> GetOutConnections(IRForOneInstruction iirn)
 	{
-		HashSet<StaticConnection> result = new HashSet<StaticConnection>();
-		Map<IRForOneInstruction, StaticConnection> ios = out_connects.get(iirn);
-		if (ios != null)
-		{
-			result.addAll(ios.values());
-		}
-		return result;
+		return GetStaticConnectionsByJudgeType(out_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.Value());
 	}
 	
-	public Set<StaticConnection> GetInConnection(IRForOneInstruction iirn)
+	public Set<StaticConnection> GetInConnections(IRForOneInstruction iirn)
 	{
-		HashSet<StaticConnection> result = new HashSet<StaticConnection>();
-		Map<IRForOneInstruction, StaticConnection> iis = in_connects.get(iirn);
-		if (iis != null)
-		{
-			result.addAll(iis.values());
-		}
-		return result;
+		return GetStaticConnectionsByJudgeType(in_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.Value());
 	}
 	
 	private void OneDirectionRegist(StaticConnection conn, IRForOneInstruction source, IRForOneInstruction target, Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> in_connects)
