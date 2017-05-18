@@ -1,8 +1,10 @@
 package cn.yyx.research.program.ir.generation;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,13 +24,17 @@ import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICompilationUn
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
+import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeTypeUtil;
 import cn.yyx.research.program.ir.storage.node.connection.JudgeType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
+import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneField;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class IRGeneratorForOneProject {
@@ -48,6 +54,8 @@ public class IRGeneratorForOneProject {
 	private Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> out_connects = new HashMap<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>>();
 	
 	private Map<IMethod, Set<IMethod>> callee_callers = new HashMap<IMethod, Set<IMethod>>();
+	
+	private Map<IRForOneBranchControl, Set<IRForOneBranchControl>> children_of_control = new HashMap<IRForOneBranchControl, Set<IRForOneBranchControl>>();
 	
 	public void AddCalleeCaller(IMethod callee, IMethod caller)
 	{
@@ -256,6 +264,7 @@ public class IRGeneratorForOneProject {
 			IRGeneratorForClassesInICompilationUnit irgfcicu = new IRGeneratorForClassesInICompilationUnit();
 			cu.accept(irgfcicu);
 		}
+		GetInstance().HandleToAddAllChildrenSetForAllControl();
 	}
 	
 //	private void SelfAddToMethodIR(IMethod it, IRForOneMethod irfocbu)
@@ -337,6 +346,48 @@ public class IRGeneratorForOneProject {
 
 	private void setJava_project(IJavaProject java_project) {
 		this.java_project = java_project;
+	}
+	
+	public void HandleToAddAllChildrenSetForAllControl()
+	{
+		Collection<IRForOneClass> types = class_irs.values();
+		Iterator<IRForOneClass> titr = types.iterator();
+		List<IRCode> ircs = new LinkedList<IRCode>();
+		while (titr.hasNext())
+		{
+			IRForOneClass irfoc = titr.next();
+			IRForOneField fl = irfoc.GetFieldLevel();
+			if (fl != null) {
+				ircs.add(fl);
+			}
+			ircs.addAll(irfoc.GetMethodLevel());
+		}
+		Iterator<IRCode> iitr = ircs.iterator();
+		while (iitr.hasNext()) {
+			IRCode irc = iitr.next();
+			IRTreeForOneControlElement control_ir = irc.GetControlLogicHolderElementIR();
+			IRForOneBranchControl control_root = control_ir.GetRoot();
+			GetAllChildrenOfControl(control_root);
+		}
+	}
+	
+	private Set<IRForOneBranchControl> GetAllChildrenOfControl(IRForOneBranchControl control)
+	{
+		Set<IRForOneBranchControl> children = new HashSet<IRForOneBranchControl>();
+		Set<IRForOneInstruction> outs = GetOutINodesByContainingSpecificType(control, EdgeBaseType.BranchControl.Value());
+		Iterator<IRForOneInstruction> oitr = outs.iterator();
+		while (oitr.hasNext())
+		{
+			IRForOneInstruction out = oitr.next();
+			IRForOneBranchControl irfobc = (IRForOneBranchControl) out;
+			children.addAll(GetAllChildrenOfControl(irfobc));
+		}
+		children_of_control.put(control, children);
+		return children;
+	}
+	
+	public Set<IRForOneBranchControl> GetChildrenOfControl(IRForOneBranchControl control) {
+		return children_of_control.get(control);
 	}
 	
 }

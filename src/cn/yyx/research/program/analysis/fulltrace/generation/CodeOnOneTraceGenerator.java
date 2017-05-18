@@ -37,7 +37,8 @@ public class CodeOnOneTraceGenerator {
 	
 	private Map<IRCode, Stack<BranchControlForOneIRCode>> branch_control_stack_foreach_ircode = new HashMap<IRCode, Stack<BranchControlForOneIRCode>>();
 	// private Stack<BranchControlForOneIRCode> branch_control_stack = new Stack<BranchControlForOneIRCode>();
-	
+	// TODO for common instructions, IJavaElement Self connection sill needs to be added.
+	// TODO all branches must be have nodes.
 	private Map<IRCode, Integer> method_max_id = new HashMap<IRCode, Integer>();
 	private Map<IRCode, Stack<Map<IRForOneSourceMethodInvocation, Integer>>> method_id = new HashMap<IRCode, Stack<Map<IRForOneSourceMethodInvocation, Integer>>>();
 	
@@ -93,9 +94,11 @@ public class CodeOnOneTraceGenerator {
 			branch_control_stack = new Stack<BranchControlForOneIRCode>();
 			branch_control_stack_foreach_ircode.put(irfom, branch_control_stack);
 		}
+		Stack<BranchControlForOneIRCode> branch_control_stack_copy = new Stack<BranchControlForOneIRCode>();
+		branch_control_stack_copy.addAll(branch_control_stack);
 		BranchControlForOneIRCode branch_control = new BranchControlForOneIRCode(irfom);
 		branch_control_stack.push(branch_control);
-		DepthFirstToVisitControlLogic(ft, branch_control, control_root, irfom, memory, env_idx);
+		DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, control_root, irfom, memory, env_idx);
 		branch_control_stack.pop();
 		
 		method_id.get(irfom).pop();
@@ -105,8 +108,27 @@ public class CodeOnOneTraceGenerator {
 		branch_control_stack_foreach_ircode.putAll(copy_env);
 	}
 	
-	private void DepthFirstToVisitControlLogic(FullTrace ft, BranchControlForOneIRCode branch_control, IRForOneBranchControl now_control_root, IRCode irfom, ExecutionMemory execution_memory, int env_idx)
+	private void DepthFirstToVisitControlLogic(FullTrace ft, Stack<BranchControlForOneIRCode> branch_control_stack_copy, BranchControlForOneIRCode branch_control, IRForOneBranchControl now_control_root, IRCode irfom, ExecutionMemory execution_memory, int env_idx)
 	{
+		Set<IRForOneBranchControl> already_visited = new HashSet<IRForOneBranchControl>();
+		branch_control.already_branch_path.push(now_control_root);
+		Iterator<BranchControlForOneIRCode> bitr = branch_control_stack_copy.iterator();
+		while (bitr.hasNext()) {
+			BranchControlForOneIRCode bcfoi = bitr.next();
+			if (bcfoi.IsStartWithTheParameterSpecified(branch_control)) {
+				Set<IRForOneBranchControl> children = IRGeneratorForOneProject.GetInstance().GetChildrenOfControl(bcfoi.already_branch_path.lastElement());
+				children.addAll(bcfoi.already_branch_path);
+				already_visited.addAll(children);
+			}
+		}
+		Set<IRForOneBranchControl> curr_visited = new HashSet<IRForOneBranchControl>();
+		curr_visited.addAll(branch_control.already_branch_path);
+		curr_visited.addAll(IRGeneratorForOneProject.GetInstance().GetChildrenOfControl(now_control_root));
+		if (already_visited.containsAll(curr_visited)) {
+			branch_control.already_branch_path.pop();
+			return;
+		}
+		
 		Set<StaticConnection> out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(now_control_root);
 		execution_memory.executed_conns.addAll(out_conns);
 		
@@ -124,10 +146,10 @@ public class CodeOnOneTraceGenerator {
 				System.exit(1);
 			}
 			IRForOneBranchControl ir_control = (IRForOneBranchControl)irfoi;
-			branch_control.already_branch_path.add(ir_control);
-			DepthFirstToVisitControlLogic(ft, branch_control, ir_control, irfom, execution_memory, env_idx);
-			branch_control.already_branch_path.pop();
+			DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, ir_control, irfom, execution_memory, env_idx);
 		}
+		
+		branch_control.already_branch_path.pop();
 	}
 	
 	private void BreadthFirstToVisitIR(FullTrace ft, ExecutionMemory memory, int env_idx)

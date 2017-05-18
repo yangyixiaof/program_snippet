@@ -168,10 +168,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		
 	}
 
-	// public Queue<IRTask> GetUndoneTasks() {
-	// return undone_tasks;
-	// }
-
 	@Override
 	public void preVisit(ASTNode node) {
 		if (node instanceof Block) {
