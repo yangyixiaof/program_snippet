@@ -26,7 +26,7 @@ public class DynamicConnection {
 		return target;
 	}
 
-	private void setTarget(DynamicNode target) {
+	public void setTarget(DynamicNode target) {
 		this.target = target;
 	}
 
@@ -34,7 +34,7 @@ public class DynamicConnection {
 		return type;
 	}
 
-	private void setType(int type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 	

@@ -1,5 +1,6 @@
 package cn.yyx.research.program.analysis.fulltrace.storage;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,6 +24,10 @@ public class FullTrace {
 	
 	public FullTrace() {
 		
+	}
+	
+	public Collection<DynamicConnection> GetInConnections(DynamicNode node) {
+		return in_conns.get(node).values();
 	}
 	
 	private void HandleConnection(DynamicNode source, DynamicNode target, DynamicConnection conn, Map<DynamicNode, Map<DynamicNode, DynamicConnection>> conns)
