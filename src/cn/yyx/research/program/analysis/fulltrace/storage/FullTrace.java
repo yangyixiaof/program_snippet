@@ -28,7 +28,7 @@ public class FullTrace {
 		Map<DynamicNode, DynamicConnection> source_map = conns.get(source);
 		if (source_map == null) {
 			source_map = new HashMap<DynamicNode, DynamicConnection>();
-			in_conns.put(source, source_map);
+			conns.put(source, source_map);
 		}
 		DynamicConnection cn = source_map.get(target);
 		if (cn != null) {
@@ -40,6 +40,12 @@ public class FullTrace {
 	
 	public void AddConnection(DynamicConnection conn)
 	{
+		DynamicNode source_dn = conn.GetSource();
+		IJavaElement ije = source_dn.getInstr().getIm();
+		Set<DynamicNode> created_nodes = ele_nodes.get(ije);
+		if (!created_nodes.contains(source_dn)) {
+			return;
+		}
 		HandleConnection(conn.GetTarget(), conn.GetSource(), conn, in_conns);
 		HandleConnection(conn.GetSource(), conn.GetTarget(), conn, out_conns);
 	}

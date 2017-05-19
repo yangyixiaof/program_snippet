@@ -15,8 +15,7 @@ public class IgnoreSelfTask extends IIRNodeTask {
 	@Override
 	public void HandleOutConnection(DynamicNode source, DynamicNode target, StaticConnectionInfo connect_info,
 			FullTrace ft) {
-		// TODO Auto-generated method stub
-		
+		// do nothing.
 	}
 	
 }
