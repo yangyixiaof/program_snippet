@@ -13,6 +13,13 @@ public abstract class IIRNodeTask {
 		this.iirnode = iirnode;
 	}
 	
+	/**
+	 * Remember that connections with no exist source nodes should not be added.
+	 * @param source
+	 * @param target
+	 * @param connect_info
+	 * @param ft
+	 */
 	public abstract void HandleOutConnection(DynamicNode source, DynamicNode target, StaticConnectionInfo connect_info, FullTrace ft);
 	
 }
