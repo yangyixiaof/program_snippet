@@ -11,8 +11,8 @@ public class TodoList {
 	// TODO remember to add virtual branch to every node in only one branch£¬ such as if(){} without else branch.
 	// TODO how to recognize the global relationship, eclipse jdt offers? 
 	// TODO how to recognize relationships including code snippet not on the execution path from main root?.
-	// TODO remember to check whether lambda expression method implementations could be searched.
 	// TODO lambda expressions are needed to be treated as IMethod.
+	// TODO remember to check whether lambda expression method implementations could be searched.
 	// TODO method declaration remember to check parameter list, add null if
 	
 }
