@@ -38,9 +38,8 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class IRGeneratorForOneProject {
-	// TODO two things: first, mark whether a method is constructor and its IType. second, test caller-roots method and JavaSearch Engine.
-	// TODO remember to check if searched method are null, if null, what to handle?
-	// TODO lambda expressions are needed to be treated as IMethod.
+	// Solved. two things: first, mark whether a method is constructor and its IType. second, test caller-roots method and JavaSearch Engine.
+	// Solved. remember to check if searched method are null, if null, what to handle?
 	private IJavaProject java_project = null;
 	
 	private HashMap<IType, IRForOneClass> class_irs = new HashMap<IType, IRForOneClass>();
@@ -127,8 +126,6 @@ public class IRGeneratorForOneProject {
 		}
 		return result;
 	}
-	
-	// TODO remember to check whether lambda expression method implementations could be searched.
 	
 	public Set<IRForOneInstruction> GetOutINodes(IRForOneInstruction iirn)
 	{

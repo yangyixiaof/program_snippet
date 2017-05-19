@@ -27,12 +27,11 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 
 public class IRGeneratorHelper {
-	// TODO method declaration remember to check parameter list, add null if
 	// necessary. remember to add virtual node to each parameter.
 	// Solved. Solution is to add every virtual node when an IRTreeForOneElement
 	// is created. Important!!! every parameter needs a virtual node with
 	// skip_self_task and require_self flag.
-	// TODO all things need to be checked that the only one self true node needs
+	// Solved. all things need to be checked that the only one self true node needs
 	// to add a distinct node.
 	// can only be invoked in end_visit_method_invocation.
 	public static void GenerateMethodInvocationIR(IRGeneratorForOneLogicBlock irgfob, List<Expression> nlist,
@@ -69,7 +68,7 @@ public class IRGeneratorHelper {
 				e.printStackTrace();
 			}
 			if (methods != null && methods.size() > 0) {
-				Map<IRForOneInstruction, Integer> para_order_instr_index_map = new HashMap<IRForOneInstruction, Integer>();
+				Map<IRForOneInstruction, List<Integer>> para_order_instr_index_map = new HashMap<IRForOneInstruction, List<Integer>>();
 				if (parent_im != null) {
 					Iterator<IMethod> mitr = methods.iterator();
 					while (mitr.hasNext()) {
@@ -78,7 +77,7 @@ public class IRGeneratorHelper {
 					}
 				}
 				IRForOneSourceMethodInvocation now = new IRForOneSourceMethodInvocation(irc, source_method_receiver_element,
-						methods, DefaultINodeTask.class);
+						methods, DefaultINodeTask.class, para_order_instr_index_map);
 				Iterator<Expression> nitr = nlist.iterator();
 				int idx = -1;
 				while (nitr.hasNext()) {
@@ -91,8 +90,13 @@ public class IRGeneratorHelper {
 					while (eitr.hasNext()) {
 						IJavaElement ije = eitr.next();
 						IRForOneInstruction source = jele_order.get(ije);
-						para_order_instr_index_map.put(source, idx);
-
+						List<Integer> order_instrs = para_order_instr_index_map.get(source);
+						if (order_instrs == null) {
+							order_instrs = new LinkedList<Integer>();
+							para_order_instr_index_map.put(source, order_instrs);
+						}
+						order_instrs.add(idx);
+						
 						boolean is_self = jele_is_self.get(ije);
 						if (is_self) {
 							StaticConnection conn = new StaticConnection(source, now, EdgeBaseType.Self.Value());

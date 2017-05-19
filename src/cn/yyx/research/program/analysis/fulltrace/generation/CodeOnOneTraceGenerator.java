@@ -36,8 +36,6 @@ public class CodeOnOneTraceGenerator {
 	
 	private Map<IRCode, Stack<BranchControlForOneIRCode>> branch_control_stack_foreach_ircode = new HashMap<IRCode, Stack<BranchControlForOneIRCode>>();
 	// private Stack<BranchControlForOneIRCode> branch_control_stack = new Stack<BranchControlForOneIRCode>();
-	// TODO for common instructions, IJavaElement Self connection sill needs to be added.
-	// TODO all branches must be have nodes.
 	private Map<IRCode, Integer> method_max_id = new HashMap<IRCode, Integer>();
 	private Map<IRCode, Stack<Map<IRForOneSourceMethodInvocation, Integer>>> method_id = new HashMap<IRCode, Stack<Map<IRForOneSourceMethodInvocation, Integer>>>();
 	
@@ -265,10 +263,14 @@ public class CodeOnOneTraceGenerator {
 			while (param_depend_itr.hasNext())
 			{
 				IRForOneInstruction irfoi = param_depend_itr.next();
-				int index = wrap_node.ParameterIndexNodeDependsTo(irfoi);
-				IJavaElement param = params.get(index);
-				IRForOneInstruction irpara = irc.GetFirstIRTreeNode(param);
-				HandleStaticConnectionForSource(ft_run, irfoi, irpara, new StaticConnectionInfo(EdgeBaseType.Sequential.Value()), env_idx);
+				List<Integer> indexs = wrap_node.ParameterIndexNodeDependsTo(irfoi);
+				Iterator<Integer> iitr = indexs.iterator();
+				while (iitr.hasNext()) {
+					int index = iitr.next();
+					IJavaElement param = params.get(index);
+					IRForOneInstruction irpara = irc.GetFirstIRTreeNode(param);
+					HandleStaticConnectionForSource(ft_run, irfoi, irpara, new StaticConnectionInfo(EdgeBaseType.Sequential.Value()), env_idx);
+				}
 			}
 			Set<IJavaElement> all_eles = new HashSet<>(irfom.GetAllElements());
 			all_eles.removeAll(params);
