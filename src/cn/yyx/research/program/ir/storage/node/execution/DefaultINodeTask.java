@@ -1,8 +1,9 @@
 package cn.yyx.research.program.ir.storage.node.execution;
 
-import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
+import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
+import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
+import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class DefaultINodeTask extends IIRNodeTask {
@@ -10,11 +11,12 @@ public class DefaultINodeTask extends IIRNodeTask {
 	public DefaultINodeTask(IRForOneInstruction iirnode) {
 		super(iirnode);
 	}
-	
+
 	@Override
-	public DynamicConnection HandleOutConnection(StaticConnection child_in_connect) {
-		// TODO
-		return null;
+	public void HandleOutConnection(DynamicNode source, DynamicNode target, StaticConnectionInfo connect_info,
+			FullTrace ft) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
