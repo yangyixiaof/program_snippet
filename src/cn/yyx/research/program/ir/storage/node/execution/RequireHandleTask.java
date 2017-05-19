@@ -1,6 +1,7 @@
 package cn.yyx.research.program.ir.storage.node.execution;
 
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
+import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
@@ -11,12 +12,20 @@ public class RequireHandleTask extends IIRNodeTask {
 	public RequireHandleTask(IRForOneInstruction iirnode) {
 		super(iirnode);
 	}
-
+	
+	public int ComputeFinalType(DynamicNode source, DynamicNode target, StaticConnectionInfo connect_info) {
+		int accept_type = source.getInstr().GetAcceptType();
+		int require_type = target.getInstr().GetRequireType();
+		int final_type = connect_info.getType() | (accept_type & require_type);
+		return final_type;
+	}
+	
 	@Override
 	public void HandleOutConnection(DynamicNode source, DynamicNode target, StaticConnectionInfo connect_info,
 			FullTrace ft) {
-		// TODO Auto-generated method stub
-		
+		int final_type = ComputeFinalType(source, target, connect_info);
+		DynamicConnection conn = new DynamicConnection(source, target, final_type);
+		ft.AddConnection(conn);
 	}
 	
 }
