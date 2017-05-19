@@ -14,7 +14,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
-import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
@@ -202,6 +201,7 @@ public class CodeOnOneTraceGenerator {
 	{
 		DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
 		DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
+		ft.NodeCreated(target.getIm(), target_dn);
 		IIRNodeTask out_task = source.GetOutConnectionMergeTask();
 		if (source instanceof IRForOneSourceMethodInvocation) {
 			IRForOneSourceMethodInvocation irmethod_source = (IRForOneSourceMethodInvocation) source;
@@ -277,14 +277,7 @@ public class CodeOnOneTraceGenerator {
 			{
 				IJavaElement ije = aitr.next();
 				IRForOneInstruction irpara = irc.GetFirstIRTreeNode(ije);
-				DynamicNode dn = ft_run.GetLastPC(ije);
-				DynamicNode here_dn = new DynamicNode(irpara, irc, env_idx);
-				if (dn == null) {
-					ft_run.PutLastPC(ije, here_dn);
-				} else {
-					DynamicConnection dc = new DynamicConnection(dn, here_dn, EdgeBaseType.Self.Value());
-					ft_run.AddConnection(dc);
-				}
+				ft_run.NodeCreated(ije, new DynamicNode(irpara, irc, env_idx));
 			}
 		} else {
 			if (irc instanceof IRForOneMethod) {

@@ -1,12 +1,15 @@
 package cn.yyx.research.program.analysis.fulltrace.storage;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
+import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 
 public class FullTrace {
 	
@@ -14,6 +17,7 @@ public class FullTrace {
 	Map<DynamicNode, Map<DynamicNode, DynamicConnection>> out_conns = new HashMap<DynamicNode, Map<DynamicNode, DynamicConnection>>();
 	
 	Map<IJavaElement, DynamicNode> last_pc = new HashMap<IJavaElement, DynamicNode>();
+	Map<IJavaElement, Set<DynamicNode>> ele_nodes = new HashMap<IJavaElement, Set<DynamicNode>>();
 	
 	public FullTrace() {
 		
@@ -40,14 +44,21 @@ public class FullTrace {
 		HandleConnection(conn.GetSource(), conn.GetTarget(), conn, out_conns);
 	}
 	
-	public DynamicNode GetLastPC(IJavaElement ije)
+	public void NodeCreated(IJavaElement ije, DynamicNode new_dn)
 	{
-		return last_pc.get(ije);
-	}
-	
-	public void PutLastPC(IJavaElement ije, DynamicNode dn)
-	{
-		last_pc.put(ije, dn);
+		DynamicNode last_dn = last_pc.get(ije);
+		Set<DynamicNode> nset = ele_nodes.get(ije);
+		if (nset == null) {
+			nset = new HashSet<DynamicNode>();
+			ele_nodes.put(ije, nset);
+		}
+		if (!nset.contains(new_dn)) {
+			last_pc.put(ije, new_dn);
+			if (last_dn != null) {
+				DynamicConnection dc = new DynamicConnection(last_dn, new_dn, EdgeBaseType.Self.Value());
+				AddConnection(dc);
+			}
+		}
 	}
 	
 }
