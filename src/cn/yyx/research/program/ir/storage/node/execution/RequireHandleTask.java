@@ -13,17 +13,10 @@ public class RequireHandleTask extends IIRNodeTask {
 		super(iirnode);
 	}
 	
-	public int ComputeFinalType(DynamicNode source, DynamicNode target, StaticConnectionInfo connect_info) {
-		int accept_type = source.getInstr().GetAcceptType();
-		int require_type = target.getInstr().GetRequireType();
-		int final_type = connect_info.getType() | (accept_type & require_type);
-		return final_type;
-	}
-	
 	@Override
 	public void HandleOutConnection(DynamicNode source, DynamicNode target, StaticConnectionInfo connect_info,
 			FullTrace ft) {
-		int final_type = ComputeFinalType(source, target, connect_info);
+		int final_type = TaskExecutionHelper.ComputeFinalType(source, target, connect_info);
 		DynamicConnection conn = new DynamicConnection(source, target, final_type);
 		ft.AddConnection(conn);
 	}
