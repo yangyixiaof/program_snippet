@@ -10,7 +10,7 @@ public class IRMeta {
 	// public static final String IfElse = "@IfElse";
 	public static final String While = "@While";
 	public static final String DoWhile = "@Do_While";
-	// public static final String For = "@For";
+	public static final String For = "@For";
 	public static final String For_Initial = "@For_Ini";
 	public static final String For_Judge = "@For_Jdg";
 	public static final String For_Update = "@For_Upd";
