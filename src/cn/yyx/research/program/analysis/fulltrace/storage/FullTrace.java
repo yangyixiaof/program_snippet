@@ -10,6 +10,8 @@ import org.eclipse.jdt.core.IJavaElement;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class FullTrace {
 	
@@ -41,9 +43,10 @@ public class FullTrace {
 	public void AddConnection(DynamicConnection conn)
 	{
 		DynamicNode source_dn = conn.GetSource();
-		IJavaElement ije = source_dn.getInstr().getIm();
+		IRForOneInstruction instr = source_dn.getInstr();
+		IJavaElement ije = instr.getIm();
 		Set<DynamicNode> created_nodes = ele_nodes.get(ije);
-		if (!created_nodes.contains(source_dn)) {
+		if (instr instanceof IRForOneBranchControl || !created_nodes.contains(source_dn)) {
 			return;
 		}
 		HandleConnection(conn.GetTarget(), conn.GetSource(), conn, in_conns);
@@ -52,6 +55,10 @@ public class FullTrace {
 	
 	public void NodeCreated(IJavaElement ije, DynamicNode new_dn)
 	{
+		IRForOneInstruction instr = new_dn.getInstr();
+		if (instr instanceof IRForOneBranchControl) {
+			return;
+		}
 		DynamicNode last_dn = last_pc.get(ije);
 		Set<DynamicNode> nset = ele_nodes.get(ije);
 		if (nset == null) {
