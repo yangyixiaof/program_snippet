@@ -3,6 +3,7 @@ package cn.yyx.research.program.analysis.fulltrace.storage;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,10 +12,14 @@ import org.eclipse.jdt.core.IJavaElement;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.visual.node.IVNode;
+import cn.yyx.research.program.ir.visual.node.connection.IVConnection;
+import cn.yyx.research.program.ir.visual.node.container.IVNodeContainer;
 
-public class FullTrace {
+public class FullTrace implements IVNodeContainer {
 	
 	Map<DynamicNode, Map<DynamicNode, DynamicConnection>> in_conns = new HashMap<DynamicNode, Map<DynamicNode, DynamicConnection>>();
 	Map<DynamicNode, Map<DynamicNode, DynamicConnection>> out_conns = new HashMap<DynamicNode, Map<DynamicNode, DynamicConnection>>();
@@ -77,6 +82,21 @@ public class FullTrace {
 				AddConnection(dc);
 			}
 		}
+	}
+
+	@Override
+	public Set<IVConnection> GetOutConnection(IVNode source) {
+		Set<IVConnection> result = new HashSet<IVConnection>();
+		Map<DynamicNode, DynamicConnection> out_map = out_conns.get(source);
+		Set<DynamicNode> okeys = out_map.keySet();
+		Iterator<DynamicNode> oitr = okeys.iterator();
+		while (oitr.hasNext()) {
+			DynamicNode irfoi = oitr.next();
+			DynamicConnection sc = out_map.get(irfoi);
+			IVConnection ivc = new IVConnection(source, irfoi, new StaticConnectionInfo(sc.getType()));
+			result.add(ivc);
+		}
+		return result;
 	}
 	
 }

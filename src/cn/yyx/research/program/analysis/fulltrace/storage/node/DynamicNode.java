@@ -63,7 +63,7 @@ public class DynamicNode implements IVNode {
 
 	@Override
 	public String ToVisual() {
-		return instr.hashCode() + "#" + idx;
+		return instr.ToVisual() + "#" + idx;
 	}
 
 }

@@ -351,6 +351,18 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 	
 	public void HandleToAddAllChildrenSetForAllControl()
 	{
+		List<IRCode> ircs = GetAllIRCodes();
+		Iterator<IRCode> iitr = ircs.iterator();
+		while (iitr.hasNext()) {
+			IRCode irc = iitr.next();
+			IRTreeForOneControlElement control_ir = irc.GetControlLogicHolderElementIR();
+			IRForOneBranchControl control_root = control_ir.GetRoot();
+			GetAllChildrenOfControl(control_root);
+		}
+	}
+	
+	public List<IRCode> GetAllIRCodes()
+	{
 		Collection<IRForOneClass> types = class_irs.values();
 		Iterator<IRForOneClass> titr = types.iterator();
 		List<IRCode> ircs = new LinkedList<IRCode>();
@@ -363,13 +375,7 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 			}
 			ircs.addAll(irfoc.GetMethodLevel());
 		}
-		Iterator<IRCode> iitr = ircs.iterator();
-		while (iitr.hasNext()) {
-			IRCode irc = iitr.next();
-			IRTreeForOneControlElement control_ir = irc.GetControlLogicHolderElementIR();
-			IRForOneBranchControl control_root = control_ir.GetRoot();
-			GetAllChildrenOfControl(control_root);
-		}
+		return ircs;
 	}
 	
 	private Set<IRForOneBranchControl> GetAllChildrenOfControl(IRForOneBranchControl control)
@@ -393,6 +399,7 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 
 	@Override
 	public Set<IVConnection> GetOutConnection(IVNode source) {
+		Set<IVConnection> result = new HashSet<IVConnection>();
 		Map<IRForOneInstruction, StaticConnection> out_map = out_connects.get(source);
 		Set<IRForOneInstruction> okeys = out_map.keySet();
 		Iterator<IRForOneInstruction> oitr = okeys.iterator();
@@ -400,8 +407,9 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 			IRForOneInstruction irfoi = oitr.next();
 			StaticConnection sc = out_map.get(irfoi);
 			IVConnection ivc = new IVConnection(source, irfoi, new StaticConnectionInfo(sc.getType()));
+			result.add(ivc);
 		}
-		return null;
+		return result;
 	}
 	
 }
