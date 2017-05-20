@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -258,6 +259,7 @@ public class CodeOnOneTraceGenerator {
 			// irc must be of type IRForOneMethod.
 			IRForOneMethod irfom = (IRForOneMethod) irc;
 			List<IJavaElement> params = irfom.GetParameters();
+			List<IJavaElement> non_null_params = new LinkedList<IJavaElement>();
 			Iterator<IRForOneInstruction> param_depend_itr = wrap_node.ParameterDependentNodeIterator();
 			
 			while (param_depend_itr.hasNext())
@@ -268,12 +270,15 @@ public class CodeOnOneTraceGenerator {
 				while (iitr.hasNext()) {
 					int index = iitr.next();
 					IJavaElement param = params.get(index);
-					IRForOneInstruction irpara = irc.GetFirstIRTreeNode(param);
-					HandleStaticConnectionForSource(ft_run, irfoi, irpara, new StaticConnectionInfo(EdgeBaseType.Sequential.Value()), env_idx);
+					if (param != null) {
+						non_null_params.add(param);
+						IRForOneInstruction irpara = irc.GetFirstIRTreeNode(param);
+						HandleStaticConnectionForSource(ft_run, irfoi, irpara, new StaticConnectionInfo(EdgeBaseType.Sequential.Value()), env_idx);
+					}
 				}
 			}
-			Set<IJavaElement> all_eles = new HashSet<>(irfom.GetAllElements());
-			all_eles.removeAll(params);
+			Set<IJavaElement> all_eles = new HashSet<IJavaElement>(irfom.GetAllElements());
+			all_eles.removeAll(non_null_params);
 			Iterator<IJavaElement> aitr = all_eles.iterator();
 			while (aitr.hasNext())
 			{
