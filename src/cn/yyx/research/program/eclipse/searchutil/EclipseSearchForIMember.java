@@ -17,6 +17,10 @@ public class EclipseSearchForIMember {
 			throws CoreException {
 		// Create search pattern
 		DebugLogger.Log("SearchForImplementation, method is:" + method);
+		if (method == null) {
+			DebugLogger.Log("Search method is null, stop searching.");
+			return;
+		}
 		SearchPattern pattern = SearchPattern.createPattern(method, IJavaSearchConstants.DECLARATIONS);
 		if (pattern == null)
 		{
@@ -31,6 +35,10 @@ public class EclipseSearchForIMember {
 			throws CoreException {
 		// Create search pattern
 		DebugLogger.Log("SearchForImplementation, type is:" + type);
+		if (type == null) {
+			DebugLogger.Log("Search type is null, stop searching.");
+			return;
+		}
 		SearchPattern pattern = SearchPattern.createPattern(type, IJavaSearchConstants.IMPLEMENTORS);
 		if (pattern == null)
 		{

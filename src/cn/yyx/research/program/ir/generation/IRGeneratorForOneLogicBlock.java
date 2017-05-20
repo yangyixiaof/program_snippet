@@ -205,6 +205,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				if (ije instanceof IJavaElement) {
 					irc.AddParameter((IJavaElement) ije);
 				}
+			} else {
+				irc.AddParameter(null);
 			}
 		}
 		return super.visit(node);

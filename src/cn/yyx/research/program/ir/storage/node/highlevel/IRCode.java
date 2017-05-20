@@ -2,6 +2,7 @@ package cn.yyx.research.program.ir.storage.node.highlevel;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,8 +16,8 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 public abstract class IRCode {
 	
 	final static IRCode root_irc_holder = new IRCode(null) {
-		@Override
 		public void AddParameter(IJavaElement im) {}
+		public List<IJavaElement> GetParameters() {return null;}
 	};
 
 	protected Map<IJavaElement, Set<IJavaElement>> deps = new HashMap<IJavaElement, Set<IJavaElement>>();
@@ -106,6 +107,7 @@ public abstract class IRCode {
 	}
 
 	public abstract void AddParameter(IJavaElement im);
+	public abstract List<IJavaElement> GetParameters();
 
 //	public IRTreeForOneElement GetOneAllIRUnits(IJavaElement ivb) {
 //		return irs.get(ivb);

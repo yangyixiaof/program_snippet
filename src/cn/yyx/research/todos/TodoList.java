@@ -9,8 +9,8 @@ public class TodoList {
 	// Solved. for common instructions, IJavaElement Self connection sill needs to be added.
 	
 	// Solved. remember to add virtual branch to every node in only one branch£¬ such as if(){} without else branch.
-	// TODO lambda expressions are needed to be treated as IMethod.
-	// TODO remember to check whether lambda expression method implementations could be searched.
+	// Solved. lambda expressions are needed to be treated as IMethod.
+	// Solved. remember to check whether lambda expression method implementations could be searched.
 	// TODO method declaration remember to check parameter list, add null if
 	
 	// TODO how to recognize the global relationship, eclipse jdt offers? 
