@@ -2,8 +2,9 @@ package cn.yyx.research.program.analysis.fulltrace.storage.node;
 
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.visual.node.IVNode;
 
-public class DynamicNode {
+public class DynamicNode implements IVNode {
 
 	private IRForOneInstruction instr = null;
 	private IRCode irc = null;
@@ -58,6 +59,11 @@ public class DynamicNode {
 
 	private void setIdx(int idx) {
 		this.idx = idx;
+	}
+
+	@Override
+	public String ToVisual() {
+		return instr.hashCode() + "#" + idx;
 	}
 
 }

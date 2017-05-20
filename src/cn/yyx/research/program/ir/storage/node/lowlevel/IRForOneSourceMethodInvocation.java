@@ -15,6 +15,7 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 	
 	// private IJavaElement parent_im = null;
+	private String method_name = null;
 	private List<IMethod> methods = new LinkedList<IMethod>();
 	// this is set when handling a MethodInvocation.
 	// private HashMap<IJavaElement, Integer> variable_parameter_order = new HashMap<IJavaElement, Integer>();
@@ -25,8 +26,9 @@ public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 	private Map<IRForOneInstruction, List<Integer>> para_order_instr_index_map = null;
 	// this im has already contained the information about which IJavaElement this all about.
 	// Solved. HashMap<IRForOneInstruction, Integer> should be HashMap<IRForOneInstruction, List<Integer>>.
-	public IRForOneSourceMethodInvocation(IRCode parent_env, IJavaElement im, Collection<IMethod> methods, Class<? extends IIRNodeTask> task_class, Map<IRForOneInstruction, List<Integer>> para_order_instr_index_map) {
+	public IRForOneSourceMethodInvocation(String method_name, IRCode parent_env, IJavaElement im, Collection<IMethod> methods, Class<? extends IIRNodeTask> task_class, Map<IRForOneInstruction, List<Integer>> para_order_instr_index_map) {
 		super(im, parent_env, task_class);
+		this.method_name = method_name;
 		this.AddMethods(methods);
 		this.para_order_instr_index_map = para_order_instr_index_map;
 	}
@@ -49,6 +51,11 @@ public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 	
 	public List<Integer> ParameterIndexNodeDependsTo(IRForOneInstruction param) {
 		return para_order_instr_index_map.get(param);
+	}
+
+	@Override
+	public String ToVisual() {
+		return "Method:" + method_name + "#" + hashCode();
 	}
 
 //	public void AddVariableParameterOrderInstructionIndexs(Map<IRForOneInstruction, List<Integer>> para_order_instr_index_map) {

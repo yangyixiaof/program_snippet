@@ -22,6 +22,11 @@ public class IRForOneOperation extends IRForOneInstruction {
 		this.ir = ir;
 	}
 
+	@Override
+	public String ToVisual() {
+		return "Op:" + ir + "#" + hashCode();
+	}
+
 //	@Override
 //	public Map<IIRNode, Set<StaticConnection>> PrepareOutNodes() {
 //		Map<IIRNode, Set<StaticConnection>> irmap = new HashMap<IIRNode, Set<StaticConnection>>();

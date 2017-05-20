@@ -5,9 +5,10 @@ import org.eclipse.jdt.core.IJavaElement;
 import cn.yyx.research.program.ir.storage.node.IIREnergyNode;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
+import cn.yyx.research.program.ir.visual.node.IVNode;
 import cn.yyx.research.program.systemutil.ReflectionInvoke;
 
-public abstract class IRForOneInstruction implements IIREnergyNode {
+public abstract class IRForOneInstruction implements IIREnergyNode, IVNode {
 	
 	protected IJavaElement im = null;
 	protected IRCode parent_env = null;

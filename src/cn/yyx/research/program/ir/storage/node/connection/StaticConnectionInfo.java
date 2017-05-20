@@ -16,4 +16,16 @@ public class StaticConnectionInfo {
 		this.type = type;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof StaticConnectionInfo) {
+			StaticConnectionInfo sci = (StaticConnectionInfo)obj;
+			if (type == sci.type) {
+				return true;
+			}
+			return false;
+		}
+		return super.equals(obj);
+	}
+	
 }

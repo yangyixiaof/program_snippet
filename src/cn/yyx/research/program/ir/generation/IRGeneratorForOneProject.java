@@ -29,6 +29,7 @@ import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeTypeUtil;
 import cn.yyx.research.program.ir.storage.node.connection.JudgeType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
+import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
@@ -36,8 +37,11 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneField;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.visual.node.IVNode;
+import cn.yyx.research.program.ir.visual.node.connection.IVConnection;
+import cn.yyx.research.program.ir.visual.node.container.IVNodeContainer;
 
-public class IRGeneratorForOneProject {
+public class IRGeneratorForOneProject implements IVNodeContainer {
 	// Solved. two things: first, mark whether a method is constructor and its IType. second, test caller-roots method and JavaSearch Engine.
 	// Solved. remember to check if searched method are null, if null, what to handle?
 	private IJavaProject java_project = null;
@@ -385,6 +389,19 @@ public class IRGeneratorForOneProject {
 	
 	public Set<IRForOneBranchControl> GetChildrenOfControl(IRForOneBranchControl control) {
 		return children_of_control.get(control);
+	}
+
+	@Override
+	public Set<IVConnection> GetOutConnection(IVNode source) {
+		Map<IRForOneInstruction, StaticConnection> out_map = out_connects.get(source);
+		Set<IRForOneInstruction> okeys = out_map.keySet();
+		Iterator<IRForOneInstruction> oitr = okeys.iterator();
+		while (oitr.hasNext()) {
+			IRForOneInstruction irfoi = oitr.next();
+			StaticConnection sc = out_map.get(irfoi);
+			IVConnection ivc = new IVConnection(source, irfoi, new StaticConnectionInfo(sc.getType()));
+		}
+		return null;
 	}
 	
 }

@@ -76,7 +76,7 @@ public class IRGeneratorHelper {
 						IRGeneratorForOneProject.GetInstance().AddCalleeCaller(callee, parent_im);
 					}
 				}
-				IRForOneSourceMethodInvocation now = new IRForOneSourceMethodInvocation(irc, source_method_receiver_element,
+				IRForOneSourceMethodInvocation now = new IRForOneSourceMethodInvocation(im.getElementName(), irc, source_method_receiver_element,
 						methods, DefaultINodeTask.class, para_order_instr_index_map);
 				Iterator<Expression> nitr = nlist.iterator();
 				int idx = -1;
