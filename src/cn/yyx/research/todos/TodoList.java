@@ -13,6 +13,8 @@ public class TodoList {
 	// Solved. remember to check whether lambda expression method implementations could be searched.
 	// Solved. method declaration remember to check parameter list, add null if
 	
+	// TODO variable count and two/three further steps' environment are no longer needed.
+	
 	// TODO how to recognize the global relationship, eclipse jdt offers? 
 	// TODO how to recognize relationships including code snippet not on the execution path from main root?.
 	
