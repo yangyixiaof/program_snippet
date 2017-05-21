@@ -4,21 +4,36 @@ import java.util.HashSet;
 import java.util.Set;
 
 import cn.yyx.research.program.ir.visual.node.IVNode;
+import cn.yyx.research.program.ir.visual.node.connection.IVConnection;
 
 public class DotCluster {
 	
-	Set<IVNode> ivns = new HashSet<IVNode>();
+	private Set<IVNode> ivns = new HashSet<IVNode>();
+	private Set<IVConnection> ivn_conns = new HashSet<IVConnection>();
 	
 	public DotCluster(IVNode ivn) {
-		ivns.add(ivn);
+		GetIvns().add(ivn);
 	}
 	
 	public void AddIVNode(IVNode ivn) {
-		ivns.add(ivn);
+		GetIvns().add(ivn);
+	}
+	
+	public void AddIVConnection(IVConnection ivn_conn) {
+		GetIvnConns().add(ivn_conn);
 	}
 	
 	public void Merge(DotCluster cluster) {
-		ivns.addAll(cluster.ivns);
+		GetIvns().addAll(cluster.GetIvns());
+		GetIvnConns().addAll(cluster.GetIvnConns());
+	}
+
+	public Set<IVNode> GetIvns() {
+		return ivns;
+	}
+
+	public Set<IVConnection> GetIvnConns() {
+		return ivn_conns;
 	}
 	
 }

@@ -41,8 +41,8 @@ public class GenerateDotForEachIRCodeInIRProject {
 				IJavaElement ije = eitr.next();
 				pc.add(irc.GetFirstIRTreeNode(ije));
 			}
-			CommonDotGenerator cdg = new CommonDotGenerator(pc, IRGeneratorForOneProject.GetInstance());
-			cdg.GenerateDot(dot_generation_dir + "/" + "IRCode" + idx + ".dot");
+			CommonDotGenerator cdg = new CommonDotGenerator(pc, IRGeneratorForOneProject.GetInstance(), dot_generation_dir + "/" + "IRCode" + idx + ".dot");
+			cdg.GenerateDot();
 		}
 	}
 	
