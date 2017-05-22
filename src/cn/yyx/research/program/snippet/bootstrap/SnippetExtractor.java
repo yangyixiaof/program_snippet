@@ -30,11 +30,9 @@ public class SnippetExtractor implements IApplication {
 	
 	public static IJavaProject LoadProjectAccordingToArgs(String[] args) throws Exception 
 	{
-		if (args.length != 2)
-		{
+		if (args.length != 2) {
 			throw new WrongArgumentException();
 		}
-		
 		DebugLogger.Log("Just for test, this is the args:", args);
 		
 		// load projects
