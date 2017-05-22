@@ -11,9 +11,10 @@ import org.eclipse.jdt.core.IJavaElement;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
+import cn.yyx.research.program.ir.visual.dot.DotGenerator;
 import cn.yyx.research.program.ir.visual.node.IVNode;
 
-public class GenerateDotForEachIRCodeInIRProject {
+public class GenerateDotForEachIRCodeInIRProject implements DotGenerator {
 	
 	String dot_generation_dir = null;
 	
@@ -25,6 +26,7 @@ public class GenerateDotForEachIRCodeInIRProject {
 		}
 	}
 	
+	@Override
 	public void GenerateDots() {
 		int idx = 0;
 		List<IRCode> ircodes = IRGeneratorForOneProject.GetInstance().GetAllIRCodes();

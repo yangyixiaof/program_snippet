@@ -34,7 +34,7 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvo
 public class CodeOnOneTraceGenerator {
 	
 	private MethodSelection method_selection = null;
-	
+	private FullTrace full_trace = new FullTrace();
 	private Map<IRCode, Stack<BranchControlForOneIRCode>> branch_control_stack_foreach_ircode = new HashMap<IRCode, Stack<BranchControlForOneIRCode>>();
 	// private Stack<BranchControlForOneIRCode> branch_control_stack = new Stack<BranchControlForOneIRCode>();
 	private Map<IRCode, Integer> method_max_id = new HashMap<IRCode, Integer>();
@@ -42,6 +42,13 @@ public class CodeOnOneTraceGenerator {
 	
 	public CodeOnOneTraceGenerator(MethodSelection ms) {
 		this.method_selection = ms;
+		IRForOneMethod root_code = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(ms.GetRoot());
+		int env_idx = GetID(root_code);
+		GenerateFullTrace(root_code, null, env_idx, full_trace);
+	}
+	
+	public FullTrace GetFullTrace() {
+		return full_trace;
 	}
 	
 	private int GetID(IRCode irc)

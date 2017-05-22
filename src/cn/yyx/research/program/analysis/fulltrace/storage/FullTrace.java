@@ -24,11 +24,18 @@ public class FullTrace implements IVNodeContainer {
 	Map<DynamicNode, Map<DynamicNode, DynamicConnection>> in_conns = new HashMap<DynamicNode, Map<DynamicNode, DynamicConnection>>();
 	Map<DynamicNode, Map<DynamicNode, DynamicConnection>> out_conns = new HashMap<DynamicNode, Map<DynamicNode, DynamicConnection>>();
 	
+	Map<IJavaElement, DynamicNode> root_pc = new HashMap<IJavaElement, DynamicNode>();
 	Map<IJavaElement, DynamicNode> last_pc = new HashMap<IJavaElement, DynamicNode>();
 	Map<IJavaElement, Set<DynamicNode>> ele_nodes = new HashMap<IJavaElement, Set<DynamicNode>>();
 	
 	public FullTrace() {
 		
+	}
+	
+	public Set<IVNode> GetRootsForVisual() {
+		Set<IVNode> result = new HashSet<IVNode>();
+		result.addAll(root_pc.values());
+		return result;
 	}
 	
 	public Collection<DynamicConnection> GetInConnections(DynamicNode node) {
@@ -76,10 +83,13 @@ public class FullTrace implements IVNodeContainer {
 			ele_nodes.put(ije, nset);
 		}
 		if (!nset.contains(new_dn)) {
+			nset.add(new_dn);
 			last_pc.put(ije, new_dn);
 			if (last_dn != null) {
 				DynamicConnection dc = new DynamicConnection(last_dn, new_dn, EdgeBaseType.Self.Value());
 				AddConnection(dc);
+			} else {
+				root_pc.put(ije, new_dn);
 			}
 		}
 	}
