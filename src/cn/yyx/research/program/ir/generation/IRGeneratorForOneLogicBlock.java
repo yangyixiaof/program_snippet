@@ -189,15 +189,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.ProcessAndRemoveTask(node);
 		super.postVisit(node);
 	}
-
-	@Override
-	public boolean visit(MethodDeclaration node) {
-		@SuppressWarnings("unchecked")
-		List<SingleVariableDeclaration> svds = node.parameters();
-		Iterator<SingleVariableDeclaration> itr = svds.iterator();
+	
+	private void HandleMethodDeclarationParameters(IRCode ircode, List<SimpleName> sns) {
+		Iterator<SimpleName> itr = sns.iterator();
 		while (itr.hasNext()) {
-			SingleVariableDeclaration svd = itr.next();
-			SimpleName sn = svd.getName();
+			SimpleName sn = itr.next();
 			IBinding ib = sn.resolveBinding();
 			if ((ib != null) && (ib instanceof IVariableBinding)) {
 				IVariableBinding ivb = (IVariableBinding) ib;
@@ -209,7 +205,53 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				irc.AddParameter(null);
 			}
 		}
+	}
+	
+	@Override
+	public boolean visit(MethodDeclaration node) {
+		List<SimpleName> sns = new LinkedList<SimpleName>();
+		@SuppressWarnings("unchecked")
+		List<SingleVariableDeclaration> svds = node.parameters();
+		Iterator<SingleVariableDeclaration> sitr = svds.iterator();
+		while (sitr.hasNext()) {
+			VariableDeclaration vd = sitr.next();
+			sns.add(vd.getName());
+		}
+		HandleMethodDeclarationParameters(irc, sns);
 		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(LambdaExpression node) {
+		boolean handled = false;
+		IMethodBinding imb = node.resolveMethodBinding();
+		if (imb != null) {
+			IJavaElement jele = imb.getJavaElement();
+			if (jele != null && jele instanceof IMethod) {
+				IMethod im = (IMethod) jele;
+				HandleIJavaElement(im, node);
+				handled = true;
+				
+				// handle method declaration.
+				List<SimpleName> sns = new LinkedList<SimpleName>();
+				@SuppressWarnings("unchecked")
+				List<VariableDeclaration> paras = node.parameters();
+				Iterator<VariableDeclaration> pitr = paras.iterator();
+				while (pitr.hasNext()) {
+					VariableDeclaration vd = pitr.next();
+					sns.add(vd.getName());
+				}
+				IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(im);
+				HandleMethodDeclarationParameters(irfom, sns);
+				IRGeneratorForOneLogicBlock irgfocb = new IRGeneratorForOneLogicBlock(null, irfom);
+				node.getBody().accept(irgfocb);
+			}
+		}
+		if (!handled) {
+			HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchUnresolvedLambdaUniqueElement(
+					node.toString(), (IMember) irc.GetScopeIElement(), irc.CopyEnvironment()), node);
+		}
+		return false;
 	}
 
 	// method invocation.
@@ -1676,29 +1718,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(ThisExpression node) {
 		// do not need to handle.
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(LambdaExpression node) {
-		boolean handled = false;
-		IMethodBinding imb = node.resolveMethodBinding();
-		if (imb != null) {
-			IJavaElement jele = imb.getJavaElement();
-			if (jele != null && jele instanceof IMethod) {
-				IMethod im = (IMethod) jele;
-				HandleIJavaElement(im, node);
-				handled = true;
-
-				IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(im);
-				IRGeneratorForOneLogicBlock irgfocb = new IRGeneratorForOneLogicBlock(null, irfom);
-				node.accept(irgfocb);
-			}
-		}
-		if (!handled) {
-			HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchUnresolvedLambdaUniqueElement(
-					node.toString(), (IMember) irc.GetScopeIElement(), irc.CopyEnvironment()), node);
-		}
 		return super.visit(node);
 	}
 
