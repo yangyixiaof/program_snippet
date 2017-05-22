@@ -25,7 +25,7 @@ public abstract class IRForOneInstruction implements IIREnergyNode, IVNode {
 		// , int start, int end, IRInstrKind ir_kind
 		this.setIm(im);
 		this.setParentEnv(parent_env);
-		ReflectionInvoke.InvokeConstructor(task_class, new Object[]{this});
+		iirtask = (IIRNodeTask) ReflectionInvoke.InvokeConstructor(task_class, new Object[]{this});
 		if (iirtask == null) {
 			System.err.println("IIRTask not initialized, serious errors, the system will exit.");
 			System.exit(1);
