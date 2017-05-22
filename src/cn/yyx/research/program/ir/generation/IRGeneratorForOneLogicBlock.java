@@ -1082,7 +1082,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment(temp_statement_environment_set);
 		StatementOverHandle();
 
-		right.accept(this);
+		left.accept(this);
 
 		Iterator<IJavaElement> itr = temp_statement_environment_set.iterator();
 		while (itr.hasNext()) {
