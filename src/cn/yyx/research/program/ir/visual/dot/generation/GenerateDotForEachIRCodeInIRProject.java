@@ -1,6 +1,5 @@
 package cn.yyx.research.program.ir.visual.dot.generation;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
 
+import cn.yyx.research.program.fileutil.FileUtil;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
@@ -23,10 +23,8 @@ public class GenerateDotForEachIRCodeInIRProject implements DotGenerator {
 	public GenerateDotForEachIRCodeInIRProject(String dot_generation_dir, String dot_pic_dir) {
 		this.dot_pic_dir = dot_pic_dir;
 		this.dot_generation_dir = dot_generation_dir;
-		File dir = new File(dot_generation_dir);
-		if (!dir.exists()) {
-			dir.mkdirs();
-		}
+		FileUtil.EnsureDirectoryExist(dot_generation_dir);
+		FileUtil.EnsureDirectoryExist(dot_pic_dir);
 	}
 	
 	@Override

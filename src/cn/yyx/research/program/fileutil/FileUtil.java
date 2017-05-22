@@ -11,7 +11,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class FileUtil {
-
+	
+	public static void EnsureDirectoryExist(String dir) {
+		File d = new File(dir);
+		if (!d.exists()) {
+			d.mkdirs();
+		}
+	}
+	
 	public static String ReadFromFile(File f) {
 		BufferedReader reader = null;
 		try {

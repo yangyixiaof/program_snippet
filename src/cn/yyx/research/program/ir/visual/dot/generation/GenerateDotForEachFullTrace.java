@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
+import cn.yyx.research.program.fileutil.FileUtil;
 import cn.yyx.research.program.ir.visual.DotView;
 import cn.yyx.research.program.ir.visual.dot.DotGenerator;
 
@@ -17,6 +18,8 @@ public class GenerateDotForEachFullTrace implements DotGenerator {
 		this.dots_dir = dots_dir;
 		this.pics_dir = pics_dir;
 		this.full_traces = ft_traces;
+		FileUtil.EnsureDirectoryExist(dots_dir);
+		FileUtil.EnsureDirectoryExist(pics_dir);
 	}
 
 	@Override
