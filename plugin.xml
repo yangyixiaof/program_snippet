@@ -8,7 +8,7 @@
             cardinality="singleton-global"
             thread="main"
             visible="true">
-      	<run class="cn.yyx.research.program.snippet.extract.SnippetExtractor"/>
+      	<run class="cn.yyx.research.program.snippet.bootstrap.SnippetExtractor"/>
       </application>
    </extension>
 </plugin>

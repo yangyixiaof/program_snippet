@@ -1,4 +1,4 @@
-package cn.yyx.research.program.snippet.extract;
+package cn.yyx.research.program.snippet.bootstrap;
 
 import java.util.Iterator;
 import java.util.LinkedList;
