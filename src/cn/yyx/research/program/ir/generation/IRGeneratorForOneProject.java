@@ -42,43 +42,41 @@ import cn.yyx.research.program.ir.visual.node.connection.IVConnection;
 import cn.yyx.research.program.ir.visual.node.container.IVNodeContainer;
 
 public class IRGeneratorForOneProject implements IVNodeContainer {
-	// Solved. two things: first, mark whether a method is constructor and its IType. second, test caller-roots method and JavaSearch Engine.
-	// Solved. remember to check if searched method are null, if null, what to handle?
+	// Solved. two things: first, mark whether a method is constructor and its
+	// IType. second, test caller-roots method and JavaSearch Engine.
+	// Solved. remember to check if searched method are null, if null, what to
+	// handle?
 	private IJavaProject java_project = null;
-	
+
 	private HashMap<IType, IRForOneClass> class_irs = new HashMap<IType, IRForOneClass>();
 	private HashMap<IMethod, IRForOneMethod> method_irs = new HashMap<IMethod, IRForOneMethod>();
-	
+
 	private Map<String, UnresolvedTypeElement> unresolved_type_element_cache = new TreeMap<String, UnresolvedTypeElement>();
 	private Map<String, UnresolvedLambdaUniqueElement> unresolved_lambda_unique_element_cache = new TreeMap<String, UnresolvedLambdaUniqueElement>();
 	private Map<String, ConstantUniqueElement> constant_unique_element_cache = new TreeMap<String, ConstantUniqueElement>();
-	
+
 	private Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> in_connects = new HashMap<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>>();
 	private Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> out_connects = new HashMap<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>>();
-	
+
 	private Map<IMethod, Set<IMethod>> callee_callers = new HashMap<IMethod, Set<IMethod>>();
-	
+
 	private Map<IRForOneBranchControl, Set<IRForOneBranchControl>> children_of_control = new HashMap<IRForOneBranchControl, Set<IRForOneBranchControl>>();
-	
-	public void AddCalleeCaller(IMethod callee, IMethod caller)
-	{
+
+	public void AddCalleeCaller(IMethod callee, IMethod caller) {
 		Set<IMethod> callers = callee_callers.get(callee);
-		if (callers == null)
-		{
+		if (callers == null) {
 			callers = new HashSet<IMethod>();
 			callee_callers.put(callee, callers);
 		}
-		if (caller != null)
-		{
+		if (caller != null) {
 			callers.add(caller);
 		}
 	}
-	
-	public Map<IMethod, Set<IMethod>> GetInverseCallGraph()
-	{
+
+	public Map<IMethod, Set<IMethod>> GetInverseCallGraph() {
 		return callee_callers;
 	}
-	
+
 	public StaticConnection GetSpecifiedConnection(IRForOneInstruction source, IRForOneInstruction target) {
 		Map<IRForOneInstruction, StaticConnection> ocnnts = out_connects.get(source);
 		if (ocnnts == null) {
@@ -87,108 +85,107 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		StaticConnection conn = ocnnts.get(target);
 		return conn;
 	}
-	
-	private Set<IRForOneInstruction> GetINodesByJudgeType(Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> connects, IRForOneInstruction iirn, JudgeType jt, int judged_type)
-	{
+
+	private Set<IRForOneInstruction> GetINodesByJudgeType(
+			Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> connects, IRForOneInstruction iirn,
+			JudgeType jt, int judged_type) {
 		HashSet<IRForOneInstruction> result = new HashSet<IRForOneInstruction>();
 		Map<IRForOneInstruction, StaticConnection> is = connects.get(iirn);
-		if (is != null)
-		{
+		if (is != null) {
 			Set<IRForOneInstruction> ikeys = is.keySet();
 			Iterator<IRForOneInstruction> iitr = ikeys.iterator();
-			while (iitr.hasNext())
-			{
+			while (iitr.hasNext()) {
 				IRForOneInstruction iir = iitr.next();
 				StaticConnection sc = is.get(iir);
-				if (jt.MeetCondition(sc.getType(), judged_type))
-				{
+				if (jt.MeetCondition(sc.getType(), judged_type)) {
 					result.add(iir);
 				}
 			}
 		}
 		return result;
 	}
-	
-	private Set<StaticConnection> GetStaticConnectionsByJudgeType(Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> connects, IRForOneInstruction iirn, JudgeType jt, int judged_type)
-	{
+
+	private Set<StaticConnection> GetStaticConnectionsByJudgeType(
+			Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> connects, IRForOneInstruction iirn,
+			JudgeType jt, int judged_type) {
 		HashSet<StaticConnection> result = new HashSet<StaticConnection>();
 		Map<IRForOneInstruction, StaticConnection> is = connects.get(iirn);
-		if (is != null)
-		{
+		if (is != null) {
 			Set<IRForOneInstruction> ikeys = is.keySet();
 			Iterator<IRForOneInstruction> iitr = ikeys.iterator();
-			while (iitr.hasNext())
-			{
+			while (iitr.hasNext()) {
 				IRForOneInstruction iir = iitr.next();
 				StaticConnection sc = is.get(iir);
-				if (jt.MeetCondition(sc.getType(), judged_type))
-				{
+				if (jt.MeetCondition(sc.getType(), judged_type)) {
 					result.add(sc);
 				}
 			}
 		}
 		return result;
 	}
-	
-	public Set<IRForOneInstruction> GetOutINodes(IRForOneInstruction iirn)
-	{
-		return GetINodesByJudgeType(out_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.Value());
+
+	public Set<IRForOneInstruction> GetOutINodes(IRForOneInstruction iirn) {
+		return GetINodesByJudgeType(out_connects, iirn, (judge, judged) -> {
+			return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);
+		}, EdgeBaseType.SameOperations.Value());
 	}
 
-	public Set<IRForOneInstruction> GetInINodes(IRForOneInstruction iirn)
-	{
-		return GetINodesByJudgeType(in_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.Value());
-	}
-	
-	public Set<IRForOneInstruction> GetOutINodesByContainingSpecificType(IRForOneInstruction iirn, int type)
-	{
-		return GetINodesByJudgeType(out_connects, iirn, (judge, judged)->{return EdgeTypeUtil.HasSpecificType(judge, judged);}, type);
+	public Set<IRForOneInstruction> GetInINodes(IRForOneInstruction iirn) {
+		return GetINodesByJudgeType(in_connects, iirn, (judge, judged) -> {
+			return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);
+		}, EdgeBaseType.SameOperations.Value());
 	}
 
-	public Set<IRForOneInstruction> GetInINodesByContainingSpecificType(IRForOneInstruction iirn, int type)
-	{
-		return GetINodesByJudgeType(in_connects, iirn, (judge, judged)->{return EdgeTypeUtil.HasSpecificType(judge, judged);}, type);
+	public Set<IRForOneInstruction> GetOutINodesByContainingSpecificType(IRForOneInstruction iirn, int type) {
+		return GetINodesByJudgeType(out_connects, iirn, (judge, judged) -> {
+			return EdgeTypeUtil.HasSpecificType(judge, judged);
+		}, type);
 	}
-	
-	public Set<StaticConnection> GetOutConnections(IRForOneInstruction iirn)
-	{
-		return GetStaticConnectionsByJudgeType(out_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.Value());
+
+	public Set<IRForOneInstruction> GetInINodesByContainingSpecificType(IRForOneInstruction iirn, int type) {
+		return GetINodesByJudgeType(in_connects, iirn, (judge, judged) -> {
+			return EdgeTypeUtil.HasSpecificType(judge, judged);
+		}, type);
 	}
-	
-	public Set<StaticConnection> GetInConnections(IRForOneInstruction iirn)
-	{
-		return GetStaticConnectionsByJudgeType(in_connects, iirn, (judge, judged)->{return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);}, EdgeBaseType.SameOperations.Value());
+
+	public Set<StaticConnection> GetOutConnections(IRForOneInstruction iirn) {
+		return GetStaticConnectionsByJudgeType(out_connects, iirn, (judge, judged) -> {
+			return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);
+		}, EdgeBaseType.SameOperations.Value());
 	}
-	
-	private void OneDirectionRegist(StaticConnection conn, IRForOneInstruction source, IRForOneInstruction target, Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> in_connects)
-	{
+
+	public Set<StaticConnection> GetInConnections(IRForOneInstruction iirn) {
+		return GetStaticConnectionsByJudgeType(in_connects, iirn, (judge, judged) -> {
+			return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);
+		}, EdgeBaseType.SameOperations.Value());
+	}
+
+	private void OneDirectionRegist(StaticConnection conn, IRForOneInstruction source, IRForOneInstruction target,
+			Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> in_connects) {
 		Map<IRForOneInstruction, StaticConnection> ins = in_connects.get(target);
-		if (ins == null)
-		{
+		if (ins == null) {
 			ins = new HashMap<IRForOneInstruction, StaticConnection>();
 			in_connects.put(target, ins);
 		}
 		StaticConnection origin_conn = ins.get(source);
 		StaticConnection new_conn = conn;
-		if (origin_conn != null)
-		{
+		if (origin_conn != null) {
 			new_conn = new_conn.MergeStaticConnection(origin_conn);
 		}
 		ins.put(source, new_conn);
 	}
-	
-	public void RegistConnection(StaticConnection conn)
-	{
+
+	public void RegistConnection(StaticConnection conn) {
 		IRForOneInstruction source = conn.getSource();
 		IRForOneInstruction target = conn.getTarget();
 		OneDirectionRegist(conn, source, target, in_connects);
 		OneDirectionRegist(conn, target, source, out_connects);
 	}
-	
-	// Solved. source type is dependent on unresolved operations, how to model that dependency?
-	
-	public ConstantUniqueElement FetchConstantUniqueElement(String represent)
-	{
+
+	// Solved. source type is dependent on unresolved operations, how to model
+	// that dependency?
+
+	public ConstantUniqueElement FetchConstantUniqueElement(String represent) {
 		ConstantUniqueElement yce = constant_unique_element_cache.get(represent);
 		if (yce == null) {
 			yce = new ConstantUniqueElement(represent);
@@ -196,9 +193,9 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		}
 		return yce;
 	}
-	
-	public UnresolvedLambdaUniqueElement FetchUnresolvedLambdaUniqueElement(String represent, IMember parent_im, Map<IJavaElement, IRForOneInstruction> env)
-	{
+
+	public UnresolvedLambdaUniqueElement FetchUnresolvedLambdaUniqueElement(String represent, IMember parent_im,
+			Map<IJavaElement, IRForOneInstruction> env) {
 		UnresolvedLambdaUniqueElement yce = unresolved_lambda_unique_element_cache.get(represent);
 		if (yce == null) {
 			yce = new UnresolvedLambdaUniqueElement(represent, parent_im, env);
@@ -206,9 +203,8 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		}
 		return yce;
 	}
-	
-	public UnresolvedTypeElement FetchUnresolvedTypeElement(String represent)
-	{
+
+	public UnresolvedTypeElement FetchUnresolvedTypeElement(String represent) {
 		UnresolvedTypeElement yce = unresolved_type_element_cache.get(represent);
 		if (yce == null) {
 			yce = new UnresolvedTypeElement(represent);
@@ -216,22 +212,19 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		}
 		return yce;
 	}
-	
+
 	private static IRGeneratorForOneProject irgfop = null;
-	
-	public static IRGeneratorForOneProject GetInstance()
-	{
+
+	public static IRGeneratorForOneProject GetInstance() {
 		return irgfop;
 	}
-	
+
 	private IRGeneratorForOneProject(IJavaProject java_project) {
 		this.setJava_project(java_project);
 	}
-	
-	private static void Initial(IJavaProject java_project)
-	{
-		if (irgfop != null)
-		{
+
+	private static void Initial(IJavaProject java_project) {
+		if (irgfop != null) {
 			irgfop.Clear();
 		}
 		irgfop = null;
@@ -244,7 +237,7 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		}
 		irgfop = new IRGeneratorForOneProject(java_project);
 	}
-	
+
 	private void Clear() {
 		unresolved_type_element_cache.clear();
 		unresolved_lambda_unique_element_cache.clear();
@@ -253,9 +246,8 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		method_irs.clear();
 		setJava_project(null);
 	}
-	
-	public static void GenerateForAllICompilationUnits(IJavaProject java_project) throws JavaModelException
-	{
+
+	public static void GenerateForAllICompilationUnits(IJavaProject java_project) throws JavaModelException {
 		Initial(java_project);
 		List<ICompilationUnit> units = EclipseSearchForICompilationUnits.SearchForAllICompilationUnits(java_project);
 		// System.err.println("unit_size:" + units.size());
@@ -266,77 +258,67 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		}
 		GetInstance().HandleToAddAllChildrenSetForAllControl();
 	}
-	
-//	private void SelfAddToMethodIR(IMethod it, IRForOneMethod irfocbu)
-//	{
-//		method_irs.put(it, irfocbu);
-//	}
-//	
-//	private void SelfAddToClassIR(IType im, IRForOneClass irfoc)
-//	{
-//		class_irs.put(im, irfoc);
-//	}
-//	
-//	public static void AddToMethodIR(IMethod it, IRForOneMethod irfocbu)
-//	{
-//		irgfop.SelfAddToMethodIR(it, irfocbu);
-//	}
-//	
-//	public static void AddToClassIR(IType im, IRForOneClass irfoc)
-//	{
-//		irgfop.SelfAddToClassIR(im, irfoc);
-//	}
-	
-	public IRForOneClass FetchITypeIR(IType it)
-	{
+
+	// private void SelfAddToMethodIR(IMethod it, IRForOneMethod irfocbu)
+	// {
+	// method_irs.put(it, irfocbu);
+	// }
+	//
+	// private void SelfAddToClassIR(IType im, IRForOneClass irfoc)
+	// {
+	// class_irs.put(im, irfoc);
+	// }
+	//
+	// public static void AddToMethodIR(IMethod it, IRForOneMethod irfocbu)
+	// {
+	// irgfop.SelfAddToMethodIR(it, irfocbu);
+	// }
+	//
+	// public static void AddToClassIR(IType im, IRForOneClass irfoc)
+	// {
+	// irgfop.SelfAddToClassIR(im, irfoc);
+	// }
+
+	public IRForOneClass FetchITypeIR(IType it) {
 		IRForOneClass irclass = class_irs.get(it);
-		if (irclass == null)
-		{
+		if (irclass == null) {
 			irclass = new IRForOneClass(it);
 			class_irs.put(it, irclass);
 		}
 		return irclass;
 	}
-	
-	public IRForOneMethod FetchIConstructorIR(IMethod im, IType it)
-	{
+
+	public IRForOneMethod FetchIConstructorIR(IMethod im, IType it) {
 		IRForOneMethod irmethod = method_irs.get(im);
-		if (irmethod == null)
-		{
+		if (irmethod == null) {
 			irmethod = new IRForOneConstructor(im, it);
 			method_irs.put(im, irmethod);
 		}
 		return irmethod;
 	}
-	
-	public IRForOneMethod FetchIMethodIR(IMethod im)
-	{
+
+	public IRForOneMethod FetchIMethodIR(IMethod im) {
 		IRForOneMethod irmethod = method_irs.get(im);
-		if (irmethod == null)
-		{
+		if (irmethod == null) {
 			irmethod = new IRForOneMethod(im);
 			method_irs.put(im, irmethod);
 		}
 		return irmethod;
 	}
-	
-	public Set<IType> GetAllClasses()
-	{
+
+	public Set<IType> GetAllClasses() {
 		return class_irs.keySet();
 	}
-	
-	public Set<IMethod> GetAllMethods()
-	{
+
+	public Set<IMethod> GetAllMethods() {
 		return method_irs.keySet();
 	}
-	
-	public IRForOneClass GetClassIR(IType itp)
-	{
+
+	public IRForOneClass GetClassIR(IType itp) {
 		return class_irs.get(itp);
 	}
-	
-	public IRForOneMethod GetMethodIR(IMethod imd)
-	{
+
+	public IRForOneMethod GetMethodIR(IMethod imd) {
 		return method_irs.get(imd);
 	}
 
@@ -347,9 +329,8 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 	private void setJava_project(IJavaProject java_project) {
 		this.java_project = java_project;
 	}
-	
-	public void HandleToAddAllChildrenSetForAllControl()
-	{
+
+	public void HandleToAddAllChildrenSetForAllControl() {
 		List<IRCode> ircs = GetAllIRCodes();
 		Iterator<IRCode> iitr = ircs.iterator();
 		while (iitr.hasNext()) {
@@ -359,14 +340,12 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 			GetAllChildrenOfControl(control_root);
 		}
 	}
-	
-	public List<IRCode> GetAllIRCodes()
-	{
+
+	public List<IRCode> GetAllIRCodes() {
 		Collection<IRForOneClass> types = class_irs.values();
 		Iterator<IRForOneClass> titr = types.iterator();
 		List<IRCode> ircs = new LinkedList<IRCode>();
-		while (titr.hasNext())
-		{
+		while (titr.hasNext()) {
 			IRForOneClass irfoc = titr.next();
 			IRForOneField fl = irfoc.GetFieldLevel();
 			if (fl != null) {
@@ -376,14 +355,13 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		}
 		return ircs;
 	}
-	
-	private Set<IRForOneBranchControl> GetAllChildrenOfControl(IRForOneBranchControl control)
-	{
+
+	private Set<IRForOneBranchControl> GetAllChildrenOfControl(IRForOneBranchControl control) {
 		Set<IRForOneBranchControl> children = new HashSet<IRForOneBranchControl>();
-		Set<IRForOneInstruction> outs = GetOutINodesByContainingSpecificType(control, EdgeBaseType.BranchControl.Value());
+		Set<IRForOneInstruction> outs = GetOutINodesByContainingSpecificType(control,
+				EdgeBaseType.BranchControl.Value());
 		Iterator<IRForOneInstruction> oitr = outs.iterator();
-		while (oitr.hasNext())
-		{
+		while (oitr.hasNext()) {
 			IRForOneInstruction out = oitr.next();
 			IRForOneBranchControl irfobc = (IRForOneBranchControl) out;
 			children.addAll(GetAllChildrenOfControl(irfobc));
@@ -391,7 +369,7 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		children_of_control.put(control, children);
 		return children;
 	}
-	
+
 	public Set<IRForOneBranchControl> GetChildrenOfControl(IRForOneBranchControl control) {
 		return children_of_control.get(control);
 	}
@@ -400,15 +378,17 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 	public Set<IVConnection> GetOutConnection(IVNode source) {
 		Set<IVConnection> result = new HashSet<IVConnection>();
 		Map<IRForOneInstruction, StaticConnection> out_map = out_connects.get(source);
-		Set<IRForOneInstruction> okeys = out_map.keySet();
-		Iterator<IRForOneInstruction> oitr = okeys.iterator();
-		while (oitr.hasNext()) {
-			IRForOneInstruction irfoi = oitr.next();
-			StaticConnection sc = out_map.get(irfoi);
-			IVConnection ivc = new IVConnection(source, irfoi, new StaticConnectionInfo(sc.getType()));
-			result.add(ivc);
+		if (out_map != null) {
+			Set<IRForOneInstruction> okeys = out_map.keySet();
+			Iterator<IRForOneInstruction> oitr = okeys.iterator();
+			while (oitr.hasNext()) {
+				IRForOneInstruction irfoi = oitr.next();
+				StaticConnection sc = out_map.get(irfoi);
+				IVConnection ivc = new IVConnection(source, irfoi, new StaticConnectionInfo(sc.getType()));
+				result.add(ivc);
+			}
 		}
 		return result;
 	}
-	
+
 }
