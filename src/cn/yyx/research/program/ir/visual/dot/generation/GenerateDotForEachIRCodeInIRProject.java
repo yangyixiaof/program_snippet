@@ -11,14 +11,17 @@ import org.eclipse.jdt.core.IJavaElement;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
+import cn.yyx.research.program.ir.visual.DotView;
 import cn.yyx.research.program.ir.visual.dot.DotGenerator;
 import cn.yyx.research.program.ir.visual.node.IVNode;
 
 public class GenerateDotForEachIRCodeInIRProject implements DotGenerator {
 	
 	String dot_generation_dir = null;
+	String dot_pic_dir = null;
 	
-	public GenerateDotForEachIRCodeInIRProject(String dot_generation_dir) {
+	public GenerateDotForEachIRCodeInIRProject(String dot_generation_dir, String dot_pic_dir) {
+		this.dot_pic_dir = dot_pic_dir;
 		this.dot_generation_dir = dot_generation_dir;
 		File dir = new File(dot_generation_dir);
 		if (!dir.exists()) {
@@ -46,6 +49,8 @@ public class GenerateDotForEachIRCodeInIRProject implements DotGenerator {
 			CommonDotGenerator cdg = new CommonDotGenerator(pc, IRGeneratorForOneProject.GetInstance(), dot_generation_dir + "/" + "IRCode" + idx + ".dot");
 			cdg.GenerateDot();
 		}
+		DotView dv = new DotView();
+		dv.HandleAllDotsInDirectory(dot_generation_dir, dot_pic_dir);
 	}
 	
 }

@@ -11,7 +11,12 @@ public class DotView {
 	
 	public void HandleAllDotsInDirectory()
 	{
-		FileIterator fi = new FileIterator(IRVisualMeta.dot_directory, ".*\\.dot$");
+		HandleAllDotsInDirectory(IRVisualMeta.dot_directory, IRVisualMeta.dot_pics_directory);
+	}
+	
+	public void HandleAllDotsInDirectory(String dot_directory, String pic_directory)
+	{
+		FileIterator fi = new FileIterator(dot_directory, ".*\\.dot$");
 		Iterator<File> fitr = fi.EachFileIterator();
 		while (fitr.hasNext())
 		{
@@ -19,7 +24,7 @@ public class DotView {
 			System.out.print("Handling " + f.getName() + " ......");
 			String fname = f.getName();
 			String dotname = fname.substring(0, fname.lastIndexOf(".dot"));
-			String cmd = IRVisualMeta.DOT_EXE + " -Tjpg " + f.getAbsolutePath() + " -o " + IRVisualMeta.dot_pics_directory + "/" + dotname + ".jpg";
+			String cmd = IRVisualMeta.DOT_EXE + " -Tjpg " + f.getAbsolutePath() + " -o " + pic_directory + "/" + dotname + ".jpg";
 			try {
 				ProcessBuilder pb = new ProcessBuilder(cmd.split(" "));
 				pb.redirectError(Redirect.INHERIT);
