@@ -86,8 +86,18 @@ public abstract class IRCode {
 	
 	public IRTreeForOneElement GetIRTreeForOneElement(IJavaElement ije)
 	{
-		return irs.get(ije);
+		IRTreeForOneElement ir_ele = irs.get(ije);
+		if (ir_ele == null) {
+			ir_ele = new IRTreeForOneElement(ije, this);
+			irs.put(ije, ir_ele);
+		}
+		return ir_ele;
 	}
+	
+//	public IRTreeForOneElement GetIRTreeForOneElement(IJavaElement ije)
+//	{
+//		return irs.get(ije);
+//	}
 	
 	public void SwitchDirection(IJavaElement ije, IRForOneInstruction switch_to_last_node)
 	{
@@ -181,7 +191,8 @@ public abstract class IRCode {
 
 	public void SetSourceMethodElement(IJavaElement source_method_receiver_element) {
 		this.source_method_receiver_element = source_method_receiver_element;
-		InitializeIRTreeElement(this.source_method_receiver_element);
+		GetIRTreeForOneElement(source_method_receiver_element);
+		// InitializeIRTreeElement(this.source_method_receiver_element);
 	}
 	
 	public void SetControlLogicHolderElement(IJavaElement control_logic_holder_element) {
@@ -194,13 +205,13 @@ public abstract class IRCode {
 		return control_logic_element_ir;
 	}
 	
-	public void InitializeIRTreeElement(IJavaElement ije) {
-		IRTreeForOneElement ir_ele = irs.get(ije);
-		if (ir_ele == null) {
-			ir_ele = new IRTreeForOneElement(ije, this);
-		}
-		irs.put(ije, ir_ele);
-	}
+//	public void InitializeIRTreeElement(IJavaElement ije) {
+//		IRTreeForOneElement ir_ele = irs.get(ije);
+//		if (ir_ele == null) {
+//			ir_ele = new IRTreeForOneElement(ije, this);
+//		}
+//		irs.put(ije, ir_ele);
+//	}
 	
 	public IRTreeForOneElement GetSourceMethodInvocations() {
 		return irs.get(source_method_receiver_element);
