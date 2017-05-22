@@ -1,5 +1,6 @@
 package cn.yyx.research.program.ir.storage.node.highlevel;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jdt.core.IType;
@@ -7,7 +8,7 @@ import org.eclipse.jdt.core.IType;
 public class IRForOneClass {
 	
 	private IRForOneField field_level = null;
-	private List<IRForOneMethod> method_level = null;
+	private List<IRForOneMethod> method_level = new LinkedList<IRForOneMethod>();
 	
 	private IType it = null;
 	

@@ -1294,7 +1294,15 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 		if (jele instanceof IMember) {
 			IMember im = (IMember) jele;
-			if (im.getDeclaringType().isBinary()) {
+			IType dec_type = im.getDeclaringType();
+			if (im instanceof IType) {
+				dec_type = (IType)im;
+			}
+			if (dec_type == null) {
+				System.err.println("Strange! the declared type is null. Strange im is:" + im + ";Strange IJavaElement is:" + jele);
+				System.exit(1);
+			}
+			if (dec_type.isBinary()) {
 				return false;
 			}
 		} else {
