@@ -7,6 +7,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
@@ -15,7 +16,7 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 
 public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 	
-	private Initializer node = null;
+	private Initializer initial_node = null;
 	private IType it = null;
 	
 	public IRGeneratorForOneClass(IType it) {
@@ -24,7 +25,7 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 		
 	@Override
 	public boolean visit(Initializer node) {
-		this.node = node;
+		this.initial_node = node;
 		return false;
 	}
 
@@ -57,10 +58,37 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 	public void postVisit(ASTNode node) {
 		if (node instanceof AbstractTypeDeclaration || node instanceof AnonymousClassDeclaration)
 		{
-			this.node.accept(this);
-			IRGeneratorForOneProject.GetInstance().FetchITypeIR((it)).SetFieldLevel((IRForOneField)irc);
+			IType resolved_type = NodeBinding(node);
+			if (resolved_type == it && this.initial_node != null) {
+				this.initial_node.accept(this);
+				IRGeneratorForOneProject.GetInstance().FetchITypeIR((it)).SetFieldLevel((IRForOneField)irc);
+			}
 		}
 		super.postVisit(node);
+	}
+	
+	private IType NodeBinding(ASTNode node) {
+		if (node instanceof AbstractTypeDeclaration) {
+			AbstractTypeDeclaration atd = (AbstractTypeDeclaration)node;
+			ITypeBinding tb = atd.resolveBinding();
+			if (tb != null) {
+				IJavaElement tele = tb.getJavaElement();
+				if (tele != null && tele instanceof IType) {
+					return (IType)tele;
+				}
+			}
+		}
+		if (node instanceof AnonymousClassDeclaration) {
+			AnonymousClassDeclaration atd = (AnonymousClassDeclaration)node;
+			ITypeBinding tb = atd.resolveBinding();
+			if (tb != null) {
+				IJavaElement tele = tb.getJavaElement();
+				if (tele != null && tele instanceof IType) {
+					return (IType)tele;
+				}
+			}
+		}
+		return null;
 	}
 
 }

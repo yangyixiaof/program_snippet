@@ -206,7 +206,10 @@ public class IRGeneratorHelper {
 		IRCode irc = irgfob.irc;
 		Map<IJavaElement, Integer> all_count = irgfob.all_count;
 		HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
-		HashMap<IJavaElement, IRForOneInstruction> branch_dependency = irgfob.branchs_var_instr_order.peek();
+		HashMap<IJavaElement, IRForOneInstruction> branch_dependency = null;
+		if (!irgfob.branchs_var_instr_order.isEmpty()) {
+			branch_dependency = irgfob.branchs_var_instr_order.peek();
+		}
 		HashSet<IJavaElement> temp_statement_set = irgfob.temp_statement_environment_set;
 		Set<IJavaElement> concern = new HashSet<IJavaElement>(temp_statement_set);
 		Iterator<IJavaElement> oitr = temp_statement_set.iterator();
