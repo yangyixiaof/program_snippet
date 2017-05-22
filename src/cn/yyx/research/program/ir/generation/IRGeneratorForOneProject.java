@@ -165,7 +165,7 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		Map<IRForOneInstruction, StaticConnection> ins = in_connects.get(target);
 		if (ins == null)
 		{
-			ins = new TreeMap<IRForOneInstruction, StaticConnection>();
+			ins = new HashMap<IRForOneInstruction, StaticConnection>();
 			in_connects.put(target, ins);
 		}
 		StaticConnection origin_conn = ins.get(source);
