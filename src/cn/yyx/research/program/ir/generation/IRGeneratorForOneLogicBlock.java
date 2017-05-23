@@ -1149,10 +1149,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	private void HandleAssign(Expression left, Expression right) {
+		Set<IJavaElement> temp_copy = new HashSet<IJavaElement>(temp_statement_environment_set);
+		temp_statement_environment_set.clear();
 		if (right != null) {
 			right.accept(this);
 		}
 		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment(temp_statement_environment_set);
+		temp_copy.addAll(temp_statement_environment_set);
 		StatementOverHandle();
 
 		left.accept(this);
@@ -1174,7 +1177,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				}
 			}
 		}
-
+		
 		IJavaElement ije = WholeExpressionIsAnElement(right);
 		if (ije != null) {
 			IRForOneInstruction last = irc.GetLastIRTreeNode(ije);
@@ -1182,8 +1185,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			// irc.AddAssignDependency(ije, new
 			// HashSet<IJavaElement>(env.keySet()));
 		}
-
-		StatementOverHandle();
+		
+		temp_statement_environment_set.addAll(temp_copy);
+		// StatementOverHandle();
 	}
 
 	@Override
@@ -1201,6 +1205,12 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// });
 		return false;
 	}
+	
+	@Override
+	public void endVisit(VariableDeclarationFragment node) {
+		// StatementOverHandle();
+		super.endVisit(node);
+	}
 
 	@Override
 	public boolean visit(SingleVariableDeclaration node) {
@@ -1217,7 +1227,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// });
 		return false;
 	}
-
+	
+	@Override
+	public void endVisit(SingleVariableDeclaration node) {
+		// StatementOverHandle();
+		super.endVisit(node);
+	}
+	
 	@Override
 	public boolean visit(TryStatement node) {
 		// no need to do anything.
@@ -1331,6 +1347,12 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// }
 		// });
 		return false;
+	}
+	
+	@Override
+	public void endVisit(Assignment node) {
+		StatementOverHandle();
+		super.endVisit(node);
 	}
 
 	@Override
