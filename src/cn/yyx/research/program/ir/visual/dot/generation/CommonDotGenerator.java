@@ -101,7 +101,6 @@ public class CommonDotGenerator {
 		}
 	}
 	
-	
 	private int GetNodeID(IVNode node) {
 		Integer id = ivn_id.get(node);
 		if (id == null) {

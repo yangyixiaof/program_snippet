@@ -54,7 +54,7 @@ public class IRTreeForOneElement {
 		return last_node;
 	}
 
-	public void SetLastNode(IRForOneInstruction last_node) {
+	private void SetLastNode(IRForOneInstruction last_node) {
 		this.last_node = last_node;
 	}
 
@@ -62,7 +62,7 @@ public class IRTreeForOneElement {
 		return parent_env;
 	}
 
-	public void SetParentEnv(IRCode parent_env) {
+	private void SetParentEnv(IRCode parent_env) {
 		this.parent_env = parent_env;
 	}
 	

@@ -28,6 +28,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeMethodReference;
 
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForIMember;
@@ -59,6 +60,14 @@ public class SearchIMethodVisitor extends ASTVisitor {
 		} else {
 			System.out.println("BreakStatement binding:" + ib);
 		}
+		return super.visit(node);
+	}
+	
+	@Override
+	public boolean visit(TypeDeclaration node) {
+		ITypeBinding it = node.resolveBinding();
+		IJavaElement ije = it.getJavaElement();
+		System.out.println("@!TypeDeclaration:" + node + ";ije:" + ije + ";ije class:" + ije.getClass());
 		return super.visit(node);
 	}
 

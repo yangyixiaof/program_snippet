@@ -106,7 +106,7 @@ public class IRGeneratorHelper {
 				}
 
 				HandleNodeSelfAndBranchDependency(irc, source_method_receiver_element, now, branch_dependency);
-				irc.GoForwardOneIRTreeNode(source_method_receiver_element, now);
+				// irc.GoForwardOneIRTreeNode(source_method_receiver_element, now);
 			}
 			// }
 		}
@@ -195,7 +195,7 @@ public class IRGeneratorHelper {
 				// IRInstrKind ir_kind = IRInstrKind.ComputeKind(1);
 				IRForOneOperation now = new IRForOneOperation(irc, ije, code, DefaultINodeTask.class);
 				ops.add(now);
-				irc.GoForwardOneIRTreeNode(ije, now);
+				// irc.GoForwardOneIRTreeNode(ije, now);
 				HandleNodeSelfAndBranchDependency(irc, ije, now, branch_dependency);
 			}
 		}
@@ -244,7 +244,7 @@ public class IRGeneratorHelper {
 						ops.add(now);
 						HandleNodeSelfAndBranchDependency(irc, im, now, branch_dependency);
 
-						irc.GoForwardOneIRTreeNode(im, now);
+				//		irc.GoForwardOneIRTreeNode(im, now);
 				//	}
 				//		all_count.put(im, count);
 				// 	}
