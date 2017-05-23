@@ -172,8 +172,8 @@ public class CodeOnOneTraceGenerator {
 				// Solved. handle operations first, remember to handle IRForMethodInvocation which is totally different.
 				
 				Set<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory.executed_conns);
-				could_continue = could_continue || ((in_conns != null) && (in_conns.size() > 0));
-				if (in_conns != null && in_conns.size() > 0)
+				could_continue = could_continue || (in_conns != null);
+				if (in_conns != null)
 				{
 					Iterator<StaticConnection> in_itr = in_conns.iterator();
 					while (in_itr.hasNext())
@@ -182,6 +182,8 @@ public class CodeOnOneTraceGenerator {
 						HandleStaticConnectionForTarget(ft, sc.getSource(), sc.getTarget(), sc.GetStaticConnectionInfo(), env_idx);
 						HandleStaticConnectionForSource(ft, sc.getSource(), sc.getTarget(), sc.GetStaticConnectionInfo(), env_idx);
 					}
+					memory.executed_conns.addAll(IRGeneratorForOneProject.GetInstance().GetOutConnections(inode));
+					memory.last_execution.put(ije, inode);
 				}
 			}
 			if (!could_continue)
