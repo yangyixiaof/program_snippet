@@ -204,7 +204,7 @@ public class IRGeneratorHelper {
 
 	public static void GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node, String code) {
 		IRCode irc = irgfob.irc;
-		Map<IJavaElement, Integer> all_count = irgfob.all_count;
+		// Map<IJavaElement, Integer> all_count = irgfob.all_count;
 		HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
 		HashMap<IJavaElement, IRForOneInstruction> branch_dependency = null;
 		if (!irgfob.branchs_var_instr_order.isEmpty()) {
@@ -212,14 +212,14 @@ public class IRGeneratorHelper {
 		}
 		HashSet<IJavaElement> temp_statement_set = irgfob.temp_statement_environment_set;
 		Set<IJavaElement> concern = new HashSet<IJavaElement>(temp_statement_set);
-		Iterator<IJavaElement> oitr = temp_statement_set.iterator();
-		while (oitr.hasNext()) {
-			IJavaElement ije = oitr.next();
-			Set<IJavaElement> dep = irc.GetAssignDependency(ije);
-			if (dep != null) {
-				concern.addAll(dep);
-			}
-		}
+//		Iterator<IJavaElement> oitr = temp_statement_set.iterator();
+//		while (oitr.hasNext()) {
+//			IJavaElement ije = oitr.next();
+//			Set<IJavaElement> dep = irc.GetAssignDependency(ije);
+//			if (dep != null) {
+//				concern.addAll(dep);
+//			}
+//		}
 		Iterator<IJavaElement> titr = concern.iterator();
 		if (!titr.hasNext()) {
 			// ConstantUniqueElement.FetchConstantElement(code);
@@ -231,12 +231,12 @@ public class IRGeneratorHelper {
 			IJavaElement im = titr.next();
 			ASTNode im_node = all_happen.get(im);
 			if (im_node != null && ASTSearch.ASTNodeContainsAnASTNode(node, im_node)) {
-				Integer count = all_count.get(im);
-				if (count != null && count >= 0) {
-					count++;
-					if (count > IRGeneratorForOneLogicBlock.GetMaxLevel()) {
-						count = -1;
-					} else {
+				//	Integer count = all_count.get(im);
+				//	if (count != null && count >= 0) {
+				//		count++;
+				//	if (count > IRGeneratorForOneLogicBlock.GetMaxLevel()) {
+				//		count = -1;
+				//	} else {
 						// int start = exact_node.getStartPosition();
 						// int end = start + exact_node.getLength() - 1;
 						// IRInstrKind ir_kind = IRInstrKind.ComputeKind(count);
@@ -245,9 +245,9 @@ public class IRGeneratorHelper {
 						HandleNodeSelfAndBranchDependency(irc, im, now, branch_dependency);
 
 						irc.GoForwardOneIRTreeNode(im, now);
-					}
-					all_count.put(im, count);
-				}
+				//	}
+				//		all_count.put(im, count);
+				// 	}
 			}
 		}
 		HandleEachElementInSameOperationDependency(ops);

@@ -20,7 +20,7 @@ public abstract class IRCode {
 		public List<IJavaElement> GetParameters() {return null;}
 	};
 
-	protected Map<IJavaElement, Set<IJavaElement>> deps = new HashMap<IJavaElement, Set<IJavaElement>>();
+	// protected Map<IJavaElement, Set<IJavaElement>> deps = new HashMap<IJavaElement, Set<IJavaElement>>();
 	protected Map<IJavaElement, IRTreeForOneElement> irs = new HashMap<IJavaElement, IRTreeForOneElement>();
 	protected Map<IJavaElement, IRForOneInstruction> out_nodes = new HashMap<IJavaElement, IRForOneInstruction>();
 	protected IJavaElement source_method_receiver_element = null;
@@ -156,13 +156,13 @@ public abstract class IRCode {
 //		return null;
 //	}
 
-	public void AddAssignDependency(IJavaElement ije, Set<IJavaElement> assign_depend_set) {
-		deps.put(ije, assign_depend_set);
-	}
-
-	public Set<IJavaElement> GetAssignDependency(IJavaElement ije) {
-		return deps.get(ije);
-	}
+//	public void AddAssignDependency(IJavaElement ije, Set<IJavaElement> assign_depend_set) {
+//		deps.put(ije, assign_depend_set);
+//	}
+//
+//	public Set<IJavaElement> GetAssignDependency(IJavaElement ije) {
+//		return deps.get(ije);
+//	}
 
 	public IMember GetScopeIElement() {
 		return im;

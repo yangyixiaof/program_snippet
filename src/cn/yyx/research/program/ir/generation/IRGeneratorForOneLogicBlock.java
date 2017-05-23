@@ -67,7 +67,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	protected HashMap<ASTNode, Set<IJavaElement>> temp_statement_expression_element_memory = new HashMap<ASTNode, Set<IJavaElement>>();
 	protected HashSet<IJavaElement> temp_statement_expression_environment_set = new HashSet<IJavaElement>();
 	protected HashSet<IJavaElement> temp_statement_environment_set = new HashSet<IJavaElement>();
-	protected HashMap<IJavaElement, Integer> all_count = new HashMap<IJavaElement, Integer>();
+	// protected HashMap<IJavaElement, Integer> all_count = new HashMap<IJavaElement, Integer>();
 	protected HashMap<IJavaElement, ASTNode> all_happen = new HashMap<IJavaElement, ASTNode>();
 
 	// check if all_happen is all right assigned. yes.
@@ -1148,7 +1148,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (ije != null) {
 			IRForOneInstruction last = irc.GetLastIRTreeNode(ije);
 			last.SetRequireType(EdgeBaseType.Self.Value());
-			irc.AddAssignDependency(ije, new HashSet<IJavaElement>(env.keySet()));
+			// irc.AddAssignDependency(ije, new HashSet<IJavaElement>(env.keySet()));
 		}
 
 		StatementOverHandle();
@@ -1369,7 +1369,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// }
 
 		// next isolated tasks.
-		all_count.put(jele, -1);
+		// all_count.put(jele, -1);
 		all_happen.put(jele, happen);
 		temp_statement_environment_set.add(jele);
 		temp_statement_expression_environment_set.add(jele);
@@ -1487,9 +1487,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	@Override
-	public boolean visit(PostfixExpression node) {
+	public void endVisit(PostfixExpression node) {
 		IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.Postfix + node.getOperator().toString());
-		return super.visit(node);
 	}
 
 	@Override
