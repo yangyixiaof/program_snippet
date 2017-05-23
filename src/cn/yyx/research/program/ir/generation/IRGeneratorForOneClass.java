@@ -41,6 +41,7 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 		if (ije instanceof IMethod)
 		{
 			IMethod im = (IMethod)ije;
+			IRGeneratorForOneProject.GetInstance().AddCalleeCaller(im, null);
 			IRForOneMethod imb = null;
 			if (node.isConstructor()) {
 				imb = IRGeneratorForOneProject.GetInstance().FetchIConstructorIR(im, it);

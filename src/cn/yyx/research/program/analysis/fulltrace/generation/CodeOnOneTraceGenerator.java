@@ -92,7 +92,7 @@ public class CodeOnOneTraceGenerator {
 //		List<IRForOneBranchControl> new_list = branch_control_stack.subList(0, last_size);
 		
 		ExecutionMemory memory = new ExecutionMemory();
-		HandleCallerToCallee(irfom, now_instruction, ft, env_idx);
+		HandleCallerToCallee(irfom, now_instruction, ft, env_idx, memory);
 		
 		Stack<BranchControlForOneIRCode> branch_control_stack = branch_control_stack_foreach_ircode.get(irfom);
 		if (branch_control_stack == null) {
@@ -243,7 +243,7 @@ public class CodeOnOneTraceGenerator {
 		return in_conns;
 	}
 	
-	private void HandleCallerToCallee(IRCode irc, IRForOneSourceMethodInvocation wrap_node, FullTrace ft_run, int env_idx)
+	private void HandleCallerToCallee(IRCode irc, IRForOneSourceMethodInvocation wrap_node, FullTrace ft_run, int env_idx, ExecutionMemory memory)
 	{
 		// Solved. need to handle hidden inherit link.
 		// Solved. should handle the before connection to parameters.
@@ -253,13 +253,14 @@ public class CodeOnOneTraceGenerator {
 		// wrap_node is used only for the first phase.
 		// now handle wrap_node for depending on method_parameter_connection.
 		// Set<IIRNode> executed_instrs = new HashSet<IIRNode>();
-		Set<IRForOneInstruction> instr_pc = new HashSet<IRForOneInstruction>();
+	//	Set<IRForOneInstruction> instr_pc = new HashSet<IRForOneInstruction>();
 		Set<IJavaElement> eles = irc.GetAllElements();
 		Iterator<IJavaElement> eitr = eles.iterator();
 		while (eitr.hasNext())
 		{
 			IJavaElement ije = eitr.next();
-			instr_pc.add(irc.GetFirstIRTreeNode(ije));
+			memory.last_execution.put(ije, irc.GetFirstIRTreeNode(ije));
+	//		instr_pc.add(irc.GetFirstIRTreeNode(ije));
 		}
 		
 		if (wrap_node != null) {
