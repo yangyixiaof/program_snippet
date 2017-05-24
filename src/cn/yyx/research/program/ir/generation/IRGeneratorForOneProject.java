@@ -159,6 +159,18 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 			return !EdgeTypeUtil.OnlyHasSpecificType(judge, judged);
 		}, EdgeBaseType.SameOperations.Value());
 	}
+	
+	public Set<StaticConnection> GetOutConnectionsByContainingSpecificType(IRForOneInstruction iirn, int type) {
+		return GetStaticConnectionsByJudgeType(out_connects, iirn, (judge, judged) -> {
+			return EdgeTypeUtil.HasSpecificType(judge, judged);
+		}, type);
+	}
+
+	public Set<StaticConnection> GetInConnectionsByContainingSpecificType(IRForOneInstruction iirn, int type) {
+		return GetStaticConnectionsByJudgeType(in_connects, iirn, (judge, judged) -> {
+			return EdgeTypeUtil.HasSpecificType(judge, judged);
+		}, type);
+	}
 
 	private void OneDirectionRegist(StaticConnection conn, IRForOneInstruction source, IRForOneInstruction target,
 			Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> in_connects) {

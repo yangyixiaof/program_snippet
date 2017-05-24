@@ -15,6 +15,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
+import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
@@ -182,7 +183,7 @@ public class CodeOnOneTraceGenerator {
 				Iterator<IRForOneInstruction> iitr = inodes.iterator();
 				while (iitr.hasNext()) {
 					IRForOneInstruction inode = iitr.next();
-					Set<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory.executed_conns);
+					Set<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory);
 					could_continue = could_continue || (in_conns != null);
 					if (in_conns != null)
 					{
@@ -193,6 +194,7 @@ public class CodeOnOneTraceGenerator {
 							HandleStaticConnectionForTarget(ft, sc.getSource(), sc.getTarget(), sc.GetStaticConnectionInfo(), env_idx);
 							HandleStaticConnectionForSource(ft, sc.getSource(), sc.getTarget(), sc.GetStaticConnectionInfo(), env_idx);
 						}
+						HandleStaticConnectionForTheSameOperation(ft, memory, inode, env_idx);
 						memory.executed_conns.addAll(IRGeneratorForOneProject.GetInstance().GetOutConnections(inode));
 						inodes.remove(inode);
 						memory.executed_nodes.add(inode);
@@ -211,6 +213,27 @@ public class CodeOnOneTraceGenerator {
 			if (!could_continue)
 			{
 				break;
+			}
+		}
+	}
+	
+	private void HandleStaticConnectionForTheSameOperation(FullTrace ft, ExecutionMemory memory, IRForOneInstruction target, int env_idx) {
+		// TODO
+		Set<StaticConnection> in_conns = IRGeneratorForOneProject.GetInstance().GetInConnectionsByContainingSpecificType(target, EdgeBaseType.SameOperations.Value());
+		Iterator<StaticConnection> iitr = in_conns.iterator();
+		while (iitr.hasNext())
+		{
+			StaticConnection iirn = iitr.next();
+			if (!memory.executed_conns.contains(iirn))
+			{
+				IRForOneInstruction source = iirn.getSource();
+				if (memory.executed_nodes.contains(source)) {
+					memory.executed_conns.add(iirn);
+					DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
+					DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
+					ft.AddConnection(new DynamicConnection(source_dn, target_dn, iirn.GetStaticConnectionInfo().getType()));
+					ft.AddConnection(new DynamicConnection(target_dn, source_dn, iirn.GetStaticConnectionInfo().getType()));
+				}
 			}
 		}
 	}
@@ -253,14 +276,14 @@ public class CodeOnOneTraceGenerator {
 		}
 	}
 	
-	private Set<StaticConnection> ObtainExecutionPermission(IRForOneInstruction one_instr_pc, Set<StaticConnection> executed_conns)
+	private Set<StaticConnection> ObtainExecutionPermission(IRForOneInstruction one_instr_pc, ExecutionMemory memory)
 	{
 		Set<StaticConnection> in_conns = IRGeneratorForOneProject.GetInstance().GetInConnections(one_instr_pc);
 		Iterator<StaticConnection> iitr = in_conns.iterator();
 		while (iitr.hasNext())
 		{
 			StaticConnection iirn = iitr.next();
-			if (!executed_conns.contains(iirn))
+			if (!memory.executed_conns.contains(iirn))
 			{
 				return null;
 			}
