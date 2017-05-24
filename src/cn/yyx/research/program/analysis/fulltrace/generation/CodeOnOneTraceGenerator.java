@@ -167,25 +167,47 @@ public class CodeOnOneTraceGenerator {
 			while (exe_itr.hasNext())
 			{
 				IJavaElement ije = exe_itr.next();
-				IRForOneInstruction inode = memory.last_execution.get(ije);
+				List<IRForOneInstruction> inodes = memory.last_execution.get(ije);
+				
+				if (inodes == null) {
+					System.err.println("What!!!!!! inodes is null??????");
+					System.exit(1);
+					
+					inodes = new LinkedList<IRForOneInstruction>();
+					memory.last_execution.put(ije, inodes);
+				}
 				
 				// Solved. handle operations first, remember to handle IRForMethodInvocation which is totally different.
 				
-				Set<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory.executed_conns);
-				could_continue = could_continue || (in_conns != null);
-				if (in_conns != null)
-				{
-					Iterator<StaticConnection> in_itr = in_conns.iterator();
-					while (in_itr.hasNext())
+				Iterator<IRForOneInstruction> iitr = inodes.iterator();
+				while (iitr.hasNext()) {
+					IRForOneInstruction inode = iitr.next();
+					Set<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory.executed_conns);
+					could_continue = could_continue || (in_conns != null);
+					if (in_conns != null)
 					{
-						StaticConnection sc = in_itr.next();
-						HandleStaticConnectionForTarget(ft, sc.getSource(), sc.getTarget(), sc.GetStaticConnectionInfo(), env_idx);
-						HandleStaticConnectionForSource(ft, sc.getSource(), sc.getTarget(), sc.GetStaticConnectionInfo(), env_idx);
+						Iterator<StaticConnection> in_itr = in_conns.iterator();
+						while (in_itr.hasNext())
+						{
+							StaticConnection sc = in_itr.next();
+							HandleStaticConnectionForTarget(ft, sc.getSource(), sc.getTarget(), sc.GetStaticConnectionInfo(), env_idx);
+							HandleStaticConnectionForSource(ft, sc.getSource(), sc.getTarget(), sc.GetStaticConnectionInfo(), env_idx);
+						}
+						memory.executed_conns.addAll(IRGeneratorForOneProject.GetInstance().GetOutConnections(inode));
+						inodes.remove(inode);
+						memory.executed_nodes.add(inode);
+						Set<IRForOneInstruction> outinodes = IRGeneratorForOneProject.GetInstance().GetOutINodesByContainingSpecificType(inode, EdgeBaseType.Self.Value());
+						Iterator<IRForOneInstruction> oitr = outinodes.iterator();
+						while (oitr.hasNext()) {
+							IRForOneInstruction oiri = oitr.next();
+							if (!memory.executed_nodes.contains(oiri)) {
+								inodes.add(oiri);
+							}
+						}
 					}
-					memory.executed_conns.addAll(IRGeneratorForOneProject.GetInstance().GetOutConnections(inode));
-					memory.last_execution.put(ije, inode);
 				}
 			}
+			
 			if (!could_continue)
 			{
 				break;
@@ -261,7 +283,9 @@ public class CodeOnOneTraceGenerator {
 		while (eitr.hasNext())
 		{
 			IJavaElement ije = eitr.next();
-			memory.last_execution.put(ije, irc.GetFirstIRTreeNode(ije));
+			List<IRForOneInstruction> ins = new LinkedList<IRForOneInstruction>();
+			ins.add(irc.GetFirstIRTreeNode(ije));
+			memory.last_execution.put(ije, ins);
 	//		instr_pc.add(irc.GetFirstIRTreeNode(ije));
 		}
 		
