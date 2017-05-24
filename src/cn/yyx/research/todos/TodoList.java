@@ -14,10 +14,9 @@ public class TodoList {
 	// Solved. method declaration remember to check parameter list, add null if.
 	
 	// Solved. variable count and two/three further steps' environment are no longer needed.
+	// TODO SkipSelfTask should add the information of IJavaElement if there are no source connections.
 	
 	// TODO how to recognize the global relationship, eclipse jdt offers? 
 	// TODO how to recognize relationships including code snippet not on the execution path from main root?.
-	
-	// TODO SkipSelfTask should add the information of IJavaElement if there are no source connections.
 	
 }
