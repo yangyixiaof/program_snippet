@@ -39,7 +39,11 @@ public class FullTrace implements IVNodeContainer {
 	}
 	
 	public Collection<DynamicConnection> GetInConnections(DynamicNode node) {
-		return in_conns.get(node).values();
+		Map<DynamicNode, DynamicConnection> ins = in_conns.get(node);
+		if (ins == null) {
+			return new HashSet<DynamicConnection>();
+		}
+		return ins.values();
 	}
 	
 	private void HandleConnection(DynamicNode source, DynamicNode target, DynamicConnection conn, Map<DynamicNode, Map<DynamicNode, DynamicConnection>> conns)
@@ -98,13 +102,15 @@ public class FullTrace implements IVNodeContainer {
 	public Set<IVConnection> GetOutConnection(IVNode source) {
 		Set<IVConnection> result = new HashSet<IVConnection>();
 		Map<DynamicNode, DynamicConnection> out_map = out_conns.get(source);
-		Set<DynamicNode> okeys = out_map.keySet();
-		Iterator<DynamicNode> oitr = okeys.iterator();
-		while (oitr.hasNext()) {
-			DynamicNode irfoi = oitr.next();
-			DynamicConnection sc = out_map.get(irfoi);
-			IVConnection ivc = new IVConnection(source, irfoi, new StaticConnectionInfo(sc.getType()));
-			result.add(ivc);
+		if (out_map != null) {
+			Set<DynamicNode> okeys = out_map.keySet();
+			Iterator<DynamicNode> oitr = okeys.iterator();
+			while (oitr.hasNext()) {
+				DynamicNode irfoi = oitr.next();
+				DynamicConnection sc = out_map.get(irfoi);
+				IVConnection ivc = new IVConnection(source, irfoi, new StaticConnectionInfo(sc.getType()));
+				result.add(ivc);
+			}
 		}
 		return result;
 	}
