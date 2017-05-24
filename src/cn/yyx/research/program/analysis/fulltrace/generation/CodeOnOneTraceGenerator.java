@@ -231,6 +231,7 @@ public class CodeOnOneTraceGenerator {
 	{
 		DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
 		DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
+		ft.NodeCreated(source.getIm(), source_dn);
 		ft.NodeCreated(target.getIm(), target_dn);
 		IIRNodeTask out_task = source.GetOutConnectionMergeTask();
 		if (source instanceof IRForOneSourceMethodInvocation) {

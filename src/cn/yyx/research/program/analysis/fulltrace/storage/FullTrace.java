@@ -80,7 +80,6 @@ public class FullTrace implements IVNodeContainer {
 		if (instr instanceof IRForOneBranchControl) {
 			return;
 		}
-		DynamicNode last_dn = last_pc.get(ije);
 		Set<DynamicNode> nset = ele_nodes.get(ije);
 		if (nset == null) {
 			nset = new HashSet<DynamicNode>();
@@ -88,6 +87,7 @@ public class FullTrace implements IVNodeContainer {
 		}
 		if (!nset.contains(new_dn)) {
 			nset.add(new_dn);
+			DynamicNode last_dn = last_pc.get(ije);
 			last_pc.put(ije, new_dn);
 			if (last_dn != null) {
 				DynamicConnection dc = new DynamicConnection(last_dn, new_dn, EdgeBaseType.Self.Value());
