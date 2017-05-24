@@ -218,7 +218,6 @@ public class CodeOnOneTraceGenerator {
 	}
 	
 	private void HandleStaticConnectionForTheSameOperation(FullTrace ft, ExecutionMemory memory, IRForOneInstruction target, int env_idx) {
-		// TODO
 		Set<StaticConnection> in_conns = IRGeneratorForOneProject.GetInstance().GetInConnectionsByContainingSpecificType(target, EdgeBaseType.SameOperations.Value());
 		Iterator<StaticConnection> iitr = in_conns.iterator();
 		while (iitr.hasNext())
