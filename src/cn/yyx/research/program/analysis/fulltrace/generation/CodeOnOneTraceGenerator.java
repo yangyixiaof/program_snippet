@@ -162,19 +162,19 @@ public class CodeOnOneTraceGenerator {
 		while (true)
 		{
 			boolean could_continue = false;
-			Set<IJavaElement> exe_keys = memory.last_execution.keySet();
+			Set<IJavaElement> exe_keys = memory.last_waiting_execution.keySet();
 			Iterator<IJavaElement> exe_itr = exe_keys.iterator();
 			while (exe_itr.hasNext())
 			{
 				IJavaElement ije = exe_itr.next();
-				List<IRForOneInstruction> inodes = memory.last_execution.get(ije);
+				List<IRForOneInstruction> inodes = memory.last_waiting_execution.get(ije);
 				
 				if (inodes == null) {
 					System.err.println("What!!!!!! inodes is null??????");
 					System.exit(1);
 					
 					inodes = new LinkedList<IRForOneInstruction>();
-					memory.last_execution.put(ije, inodes);
+					memory.last_waiting_execution.put(ije, inodes);
 				}
 				
 				// Solved. handle operations first, remember to handle IRForMethodInvocation which is totally different.
@@ -285,7 +285,7 @@ public class CodeOnOneTraceGenerator {
 			IJavaElement ije = eitr.next();
 			List<IRForOneInstruction> ins = new LinkedList<IRForOneInstruction>();
 			ins.add(irc.GetFirstIRTreeNode(ije));
-			memory.last_execution.put(ije, ins);
+			memory.last_waiting_execution.put(ije, ins);
 	//		instr_pc.add(irc.GetFirstIRTreeNode(ije));
 		}
 		

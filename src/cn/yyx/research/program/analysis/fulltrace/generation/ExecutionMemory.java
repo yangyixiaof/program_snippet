@@ -16,7 +16,7 @@ public class ExecutionMemory {
 	Set<IRForOneInstruction> executed_nodes = new HashSet<IRForOneInstruction>();
 	Set<StaticConnection> executed_conns = new HashSet<StaticConnection>();
 	// Set<IRForOneInstruction> executed_nodes = new HashSet<IRForOneInstruction>();
-	Map<IJavaElement, List<IRForOneInstruction>> last_execution = new HashMap<IJavaElement, List<IRForOneInstruction>>();
+	Map<IJavaElement, List<IRForOneInstruction>> last_waiting_execution = new HashMap<IJavaElement, List<IRForOneInstruction>>();
 	
 	public ExecutionMemory() {
 	}
