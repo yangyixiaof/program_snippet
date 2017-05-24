@@ -31,10 +31,25 @@ public class CommonDotGenerator {
 		this.ivc = ivc;
 	}
 	
-	private void DrawConnections(Set<IVConnection> conns, StringBuffer one_bw, String color, String line_seperator) {
+	private void DrawConnections(Set<IVConnection> conns, StringBuffer one_bw, String line_seperator) {
 		Iterator<IVConnection> conitr = conns.iterator();
 		while (conitr.hasNext()) {
 			IVConnection conn = conitr.next();
+			String color = "black";
+			StaticConnectionInfo info = conn.getInfo();
+			int conn_type = info.getType();
+			if (EdgeTypeUtil.HasSpecificType(conn_type, EdgeBaseType.SameOperations.Value())) {
+				color = "green";
+			}
+			if (EdgeTypeUtil.HasSpecificType(conn_type, EdgeBaseType.Sequential.Value())) {
+				color = "blue";
+			}
+			if (EdgeTypeUtil.HasSpecificType(conn_type, EdgeBaseType.Branch.Value())) {
+				color = "red";
+			}
+			if (EdgeTypeUtil.HasSpecificType(conn_type, EdgeBaseType.Self.Value())) {
+				color = "black";
+			}
 			IVNode source = conn.getSource();
 			IVNode target = conn.getTarget();
 			int source_id = GetNodeID(source);
@@ -71,14 +86,14 @@ public class CommonDotGenerator {
 				cluster_bw.append("color = lightgrey;" + line_seperator);
 				cluster_bw.append(line_seperator);
 				
-				DrawConnections(dc.GetIvnConns(), cluster_bw, "black", line_seperator);
+				DrawConnections(dc.GetIvnConns(), cluster_bw, line_seperator);
 				
 				cluster_bw.append("}" + line_seperator);
 				bw.write(cluster_bw.toString());
 			}
 			
 			StringBuffer share_bw = new StringBuffer();
-			DrawConnections(non_cluster_ivn_conns, share_bw, "red", line_seperator);
+			DrawConnections(non_cluster_ivn_conns, share_bw, line_seperator);
 			bw.write(share_bw.toString());
 			
 			StringBuffer node_bf = new StringBuffer();
