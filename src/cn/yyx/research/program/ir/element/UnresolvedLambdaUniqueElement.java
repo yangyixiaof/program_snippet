@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.JavaModelException;
 
+import cn.yyx.research.program.ir.IRElementMeta;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class UnresolvedLambdaUniqueElement implements IMethod {
@@ -65,7 +66,7 @@ public class UnresolvedLambdaUniqueElement implements IMethod {
 
 	@Override
 	public String getElementName() {
-		return represent;
+		return IRElementMeta.UnresolvedLambdaUniqueElement + "#" + represent;
 	}
 
 	@Override

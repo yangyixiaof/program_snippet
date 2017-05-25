@@ -10,6 +10,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IOpenable;
 import org.eclipse.jdt.core.JavaModelException;
 
+import cn.yyx.research.program.ir.IRElementMeta;
+
 public class UncertainReferenceElement implements IJavaElement {
 	
 	String reference = null;
@@ -45,7 +47,7 @@ public class UncertainReferenceElement implements IJavaElement {
 
 	@Override
 	public String getElementName() {
-		return reference;
+		return IRElementMeta.UncertainReferenceElement + "#" + reference;
 	}
 
 	@Override

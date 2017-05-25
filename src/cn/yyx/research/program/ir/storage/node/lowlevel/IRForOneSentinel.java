@@ -7,6 +7,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 
+import cn.yyx.research.program.ir.IRElementMeta;
 import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
@@ -19,10 +20,10 @@ public class IRForOneSentinel extends IRForOneInstruction {
 	
 	@Override
 	public String ToVisual() {
-		String im_str = null;
+		String im_str = im.getElementName();
 		if (im instanceof ILocalVariable) {
 			ILocalVariable lv = (ILocalVariable)im;
-			im_str = "VD#" + lv.getElementName() + "#" + lv.getTypeSignature();
+			im_str = IRElementMeta.Variable + "#" + lv.getElementName() + "#" + lv.getTypeSignature();
 		} else if (im instanceof IField) {
 			IField ifd = (IField)im;
 			String ts = "Unknown_Type";
@@ -31,7 +32,7 @@ public class IRForOneSentinel extends IRForOneInstruction {
 			} catch (JavaModelException e) {
 				e.printStackTrace();
 			}
-			im_str = "VD#" + ifd.getElementName() + "#" + ts;
+			im_str = IRElementMeta.Variable + "#" + ifd.getElementName() + "#" + ts;
 		} else if (im instanceof IMethod) {
 			IMethod method = (IMethod)im;
 			String sig = "Unknown_Sig";
@@ -40,12 +41,10 @@ public class IRForOneSentinel extends IRForOneInstruction {
 			} catch (JavaModelException e) {
 				e.printStackTrace();
 			}
-			im_str = "MD#" + method.getElementName() + "#" + sig;
+			im_str = IRElementMeta.Method + "#" + method.getElementName() + "#" + sig;
 		} else if (im instanceof IType) {
 			IType it = (IType)im;
-			im_str = "TD#" + it.getElementName();
-		} else {
-			im_str = "NanD#" + im.getElementName();
+			im_str = IRElementMeta.Type + "#" + it.getElementName();
 		}
 		return IRMeta.VirtualSentinel + im_str;
 	}
