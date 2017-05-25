@@ -1149,7 +1149,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return super.visit(node);
 	}
 
-	private void HandleAssign(Expression left, Expression right) {
+	private void HandleAssign(Expression left, Expression right, String operator) {
 		Set<IJavaElement> temp_copy = new HashSet<IJavaElement>(temp_statement_environment_set);
 		temp_statement_environment_set.clear();
 		if (right != null) {
@@ -1157,8 +1157,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment(temp_statement_environment_set);
 		temp_copy.addAll(temp_statement_environment_set);
+		
 		StatementOverHandle();
-
+		
 		left.accept(this);
 
 		Iterator<IJavaElement> itr = temp_statement_environment_set.iterator();
@@ -1194,7 +1195,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(VariableDeclarationFragment node) {
 		// Solved. how to redirect? same as assignment.
-		HandleAssign(node.getName(), node.getInitializer());
+		HandleAssign(node.getName(), node.getInitializer(), "=");
 		// IRGeneratorForOneLogicBlock this_ref = this;
 		// post_visit_task.put(node.getName(), new Runnable() {
 		// @Override
@@ -1216,7 +1217,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(SingleVariableDeclaration node) {
 		// Solved. how to redirect? same as assignment.
-		HandleAssign(node.getName(), node.getInitializer());
+		HandleAssign(node.getName(), node.getInitializer(), "=");
 		// IRGeneratorForOneLogicBlock this_ref = this;
 		// post_visit_task.put(node.getName(), new Runnable() {
 		// @Override
@@ -1308,7 +1309,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// Solved. assign dependency should be extracted as a stand_alone
 		// function because var-declare also will also use it.
 
-		HandleAssign(node.getLeftHandSide(), node.getRightHandSide());
+		HandleAssign(node.getLeftHandSide(), node.getRightHandSide(), node.getOperator().toString());
 
 		// Expression right_val = node.getRightHandSide();
 		// right_val.accept(this);

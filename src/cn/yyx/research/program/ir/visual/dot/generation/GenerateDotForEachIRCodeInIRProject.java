@@ -35,9 +35,9 @@ public class GenerateDotForEachIRCodeInIRProject implements DotGenerator {
 		Iterator<IRCode> iitr = ircodes.iterator();
 		while (iitr.hasNext()) {
 			IRCode irc = iitr.next();
-			if (!irc.IsHasElement()) {
-				continue;
-			}
+//			if (!irc.IsHasElement()) {
+//				continue;
+//			}
 			idx++;
 			IRTreeForOneControlElement control_ir = irc.GetControlLogicHolderElementIR();
 			HashSet<IVNode> pc = new HashSet<IVNode>();
