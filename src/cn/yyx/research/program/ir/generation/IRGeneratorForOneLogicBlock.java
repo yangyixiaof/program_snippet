@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.*;
 
+import cn.yyx.research.program.ir.IRConstantMeta;
 import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.bind.BindingManager;
@@ -1458,37 +1459,41 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(StringLiteral node) {
-		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.StringConstant + "$" + node.getLiteralValue()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(NumberLiteral node) {
-		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.NumberConstant + "$" + node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(NullLiteral node) {
-		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.NullConstant + "$" + node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(CharacterLiteral node) {
-		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.CharConstant + "$" + node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(BooleanLiteral node) {
-		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.BooleanConstant + "$" + node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(TypeLiteral node) {
-		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(node.toString()), node);
+		ITypeBinding itb = node.resolveTypeBinding();
+		boolean source_resolved = HandleBinding(itb, node);
+		if (!source_resolved) {
+			HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.TypeConstant + "$" + node.toString()), node);
+		}
 		return super.visit(node);
 	}
 
