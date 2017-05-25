@@ -2,14 +2,13 @@ package cn.yyx.research.program.ir.orgranization;
 
 import org.eclipse.jdt.core.IJavaElement;
 
-import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.SkipSelfTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSentinel;
 
 public class IRTreeForOneElement {
 	
@@ -22,8 +21,9 @@ public class IRTreeForOneElement {
 	public IRTreeForOneElement(IJavaElement ije, IRCode parent_env) {
 		this.im = ije;
 		SetParentEnv(parent_env);
-		SetRootNode(new IRForOneOperation(parent_env, ije, IRMeta.VirtualSentinel, SkipSelfTask.class));
+		SetRootNode(new IRForOneSentinel(ije, parent_env, SkipSelfTask.class));
 		SetLastNode(GetRootNode());
+		// SetRootNode(new IRForOneOperation(parent_env, ije, IRMeta.VirtualSentinel, SkipSelfTask.class));
 	}
 	
 	public boolean HasElement()

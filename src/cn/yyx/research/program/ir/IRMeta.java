@@ -43,7 +43,7 @@ public class IRMeta {
 	public static final String FieldAccess = "@FieldAccess_";
 	
 	public static final String VirtualMethodReturn = "@VirtualMethodReturn";
-	public static final String VirtualSentinel = "@Sentinel";
+	public static final String VirtualSentinel = "@Sentinel_";
 	
 	public static final String BranchOver = "@BranchOver";
 	

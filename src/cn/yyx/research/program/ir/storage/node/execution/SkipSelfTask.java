@@ -6,11 +6,10 @@ import java.util.Iterator;
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
-import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSentinel;
 
 public class SkipSelfTask extends IIRNodeTask {
 
@@ -25,11 +24,11 @@ public class SkipSelfTask extends IIRNodeTask {
 		Collection<DynamicConnection> in_conns = ft.GetInConnections(source);
 		if (in_conns.isEmpty()) {
 			IRForOneInstruction instr = source.getInstr();
-			if (instr instanceof IRForOneOperation) {
-				IRForOneOperation op = (IRForOneOperation)instr;
-				if (op.getIr().equals(IRMeta.VirtualSentinel)) {
-					ft.AddConnection(new DynamicConnection(source, target, connect_info.getType()));
-				}
+			if (instr instanceof IRForOneSentinel) {
+				// IRForOneOperation op = (IRForOneOperation)instr;
+				// if (op.getIr().equals(IRMeta.VirtualSentinel)) {
+				ft.AddConnection(new DynamicConnection(source, target, connect_info.getType()));
+				// }
 			}
 		} else {
 			Iterator<DynamicConnection> iitr = in_conns.iterator();
