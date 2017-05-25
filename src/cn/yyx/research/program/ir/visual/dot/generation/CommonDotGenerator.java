@@ -127,6 +127,7 @@ public class CommonDotGenerator {
 	
 	Map<IVNode, DotCluster> ivn_cluster = new HashMap<IVNode, DotCluster>();
 	Set<DotCluster> clusters = new HashSet<DotCluster>();
+	Map<DotCluster, Map<DotCluster, Integer>> cluster_conn = new HashMap<DotCluster, Map<DotCluster, Integer>>();
 	
 	public DotCluster GetCluster(IVNode ivn) {
 		DotCluster cluster = ivn_cluster.get(ivn);
@@ -156,6 +157,32 @@ public class CommonDotGenerator {
 			DotCluster source_cluster = GetCluster(source);
 			DotCluster target_cluster = GetCluster(target);
 			if (EdgeTypeUtil.HasSpecificType(info.getType(), EdgeBaseType.Self.Value())) {
+				// Merge clusters.
+				// handle the merge of cluster connections.
+				Map<DotCluster, Integer> merge_conn_cluster = cluster_conn.get(source_cluster);
+				if (merge_conn_cluster == null) {
+					merge_conn_cluster = new HashMap<DotCluster, Integer>();
+					cluster_conn.put(source_cluster, merge_conn_cluster);
+				}
+				Map<DotCluster, Integer> conn_cluster = cluster_conn.remove(target_cluster);
+				if (conn_cluster != null) {
+					Set<DotCluster> conn_keys = conn_cluster.keySet();
+					Iterator<DotCluster> conn_itr = conn_keys.iterator();
+					while (conn_itr.hasNext()) {
+						DotCluster dc = conn_itr.next();
+						if (dc != source_cluster) {
+							int to_merge_num = conn_cluster.get(dc);
+							Integer already_num = merge_conn_cluster.get(dc);
+							if (already_num == null) {
+								already_num = 0;
+							}
+							already_num += to_merge_num;
+							merge_conn_cluster.put(dc, already_num);
+						}
+					}
+				}
+				
+				// handle other merges.
 				clusters.remove(target_cluster);
 				source_cluster.Merge(target_cluster);
 				source_cluster.AddIVConnection(conn);
@@ -167,6 +194,19 @@ public class CommonDotGenerator {
 				}
 			} else {
 				non_cluster_ivn_conns.add(conn);
+				
+				// handle the recording of number of connections.
+				Map<DotCluster, Integer> conn_cluster = cluster_conn.get(source_cluster);
+				if (conn_cluster == null) {
+					conn_cluster = new HashMap<DotCluster, Integer>();
+					cluster_conn.put(source_cluster, conn_cluster);
+				}
+				Integer num = conn_cluster.get(target_cluster);
+				if (num == null) {
+					num = 0;
+				}
+				num++;
+				conn_cluster.put(target_cluster, num);
 			}
 			GenerateDotForOneTempRoot(target, already_visit);
 		}
