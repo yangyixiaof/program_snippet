@@ -34,8 +34,11 @@ public class GenerateDotForEachIRCodeInIRProject implements DotGenerator {
 		List<IRCode> ircodes = IRGeneratorForOneProject.GetInstance().GetAllIRCodes();
 		Iterator<IRCode> iitr = ircodes.iterator();
 		while (iitr.hasNext()) {
-			idx++;
 			IRCode irc = iitr.next();
+			if (!irc.IsHasElement()) {
+				continue;
+			}
+			idx++;
 			IRTreeForOneControlElement control_ir = irc.GetControlLogicHolderElementIR();
 			HashSet<IVNode> pc = new HashSet<IVNode>();
 			pc.add(control_ir.GetRoot());

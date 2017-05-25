@@ -11,6 +11,8 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.internal.corext.callhierarchy.CallHierarchy;
 import org.eclipse.jdt.internal.corext.callhierarchy.MethodWrapper;
 
+import cn.yyx.research.program.ir.util.IMethodDotPermissionHelper;
+
 @SuppressWarnings("restriction")
 public class EclipseSearchForICallGraph {
 	
@@ -42,7 +44,10 @@ public class EclipseSearchForICallGraph {
 		while (kitr.hasNext())
 		{
 			IMethod im = kitr.next();
-			roots.addAll(search.FindRootEntry(im, inverse_call_graph));
+			boolean permit = IMethodDotPermissionHelper.GainPermissionToGenerateDot(im);
+			if (permit) {
+				roots.addAll(search.FindRootEntry(im, inverse_call_graph));
+			}
 		}
 		return roots;
 	}

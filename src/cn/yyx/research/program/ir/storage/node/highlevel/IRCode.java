@@ -29,6 +29,7 @@ public abstract class IRCode {
 	protected IRTreeForOneControlElement control_logic_element_ir = null;
 	
 	private IMember im = null;
+	private boolean has_element = false;
 
 	public IMember getIm() {
 		return im;
@@ -114,6 +115,7 @@ public abstract class IRCode {
 			irs.put(ije, ir_ele);
 		}
 		ir_ele.GoForwardANode(irfou);
+		has_element = has_element || ir_ele.HasElement();
 	}
 
 	public abstract void AddParameter(IJavaElement im);
@@ -215,6 +217,10 @@ public abstract class IRCode {
 	
 	public IRTreeForOneElement GetSourceMethodInvocations() {
 		return irs.get(source_method_receiver_element);
+	}
+
+	public boolean IsHasElement() {
+		return has_element;
 	}
 	
 //	private void AddDependency(IIRNode source, IIRNode target, EdgeConnectionType et) {

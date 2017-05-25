@@ -74,7 +74,7 @@ public class CommonDotGenerator {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(dot_file)));
 			bw.write("digraph {");
 			bw.newLine();
-			bw.write("graph [label=\"" + description + "\"];");
+			bw.write("label=\"" + description + "\";");
 			bw.newLine();
 			
 			String line_seperator = System.getProperty("line.separator");
@@ -88,6 +88,7 @@ public class CommonDotGenerator {
 				cluster_bw.append("node [style = filled,color = white];" + line_seperator);
 				cluster_bw.append("style = filled;" + line_seperator);
 				cluster_bw.append("color = lightgrey;" + line_seperator);
+				cluster_bw.append("label = \"\";" + line_seperator);
 				cluster_bw.append(line_seperator);
 				
 				DrawConnections(dc.GetIvnConns(), cluster_bw, line_seperator);
