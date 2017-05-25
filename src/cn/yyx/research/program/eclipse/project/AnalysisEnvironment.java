@@ -82,7 +82,7 @@ public class AnalysisEnvironment {
 		
 		JavaImportOperation.ImportFileSystem(java_project, dir_files_map);
 		
-		PreProcessHelper.EliminateAllParameterizedType(java_project);
+		PreProcessHelper.EliminateAllParameterizedTypeAndReformAssignment(java_project);
 		return java_project;
 	}
 	

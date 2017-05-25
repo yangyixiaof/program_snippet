@@ -18,6 +18,7 @@ public class PreProcessCompilationUnitHelper {
 		cu.recordModifications();
 		final ASTRewrite rewrite = ASTRewrite.create(cu.getAST());
 		cu.accept(new ParameterizedTypeEliminator(rewrite));
+		cu.accept(new AssignmentTransformer(rewrite));
 		TextEdit edits = rewrite.rewriteAST(doc, null);
 		return edits;
 //		try {
@@ -38,6 +39,7 @@ public class PreProcessCompilationUnitHelper {
 		cu.recordModifications();
 		final ASTRewrite rewrite = ASTRewrite.create(cu.getAST());
 		cu.accept(new ParameterizedTypeEliminator(rewrite));
+		cu.accept(new AssignmentTransformer(rewrite));
 		TextEdit edits = rewrite.rewriteAST(doc, null);
 		return edits;
 	}

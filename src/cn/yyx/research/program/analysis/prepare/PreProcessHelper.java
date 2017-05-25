@@ -11,7 +11,7 @@ import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICompilationUn
 
 public class PreProcessHelper {
 
-	public static void EliminateAllParameterizedType(IJavaProject java_project) throws JavaModelException {
+	public static void EliminateAllParameterizedTypeAndReformAssignment(IJavaProject java_project) throws JavaModelException {
 		List<ICompilationUnit> units = EclipseSearchForICompilationUnits.SearchForAllICompilationUnits(java_project);
 		// System.err.println("unit_size:" + units.size());
 		for (final ICompilationUnit compilation_resource : units) {
