@@ -29,7 +29,7 @@ public class GenerateDotForEachFullTrace implements DotGenerator {
 		while (fitr.hasNext()) {
 			idx++;
 			FullTrace ft = fitr.next();
-			CommonDotGenerator cdg = new CommonDotGenerator(ft.GetRootsForVisual(), ft, dots_dir + "/" + "FullTrace" + idx + ".dot");
+			CommonDotGenerator cdg = new CommonDotGenerator(ft.GetRootsForVisual(), ft, dots_dir + "/" + "FullTrace" + idx + ".dot", ft.GetDescription());
 			cdg.GenerateDot();
 		}
 		DotView dv = new DotView();

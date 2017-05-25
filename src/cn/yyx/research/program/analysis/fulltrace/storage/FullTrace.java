@@ -28,8 +28,14 @@ public class FullTrace implements IVNodeContainer {
 	Map<IJavaElement, DynamicNode> last_pc = new HashMap<IJavaElement, DynamicNode>();
 	Map<IJavaElement, Set<DynamicNode>> ele_nodes = new HashMap<IJavaElement, Set<DynamicNode>>();
 	
-	public FullTrace() {
-		
+	String description = null;
+	
+	public FullTrace(String description) {
+		this.description = description;
+	}
+	
+	public String GetDescription() {
+		return description;
 	}
 	
 	public Set<IVNode> GetRootsForVisual() {

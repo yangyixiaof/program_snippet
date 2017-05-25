@@ -11,6 +11,7 @@ import cn.yyx.research.program.fileutil.FileUtil;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
+import cn.yyx.research.program.ir.util.IMemberDescriptionHelper;
 import cn.yyx.research.program.ir.visual.DotView;
 import cn.yyx.research.program.ir.visual.dot.DotGenerator;
 import cn.yyx.research.program.ir.visual.node.IVNode;
@@ -44,7 +45,7 @@ public class GenerateDotForEachIRCodeInIRProject implements DotGenerator {
 				IJavaElement ije = eitr.next();
 				pc.add(irc.GetFirstIRTreeNode(ije));
 			}
-			CommonDotGenerator cdg = new CommonDotGenerator(pc, IRGeneratorForOneProject.GetInstance(), dot_generation_dir + "/" + "IRCode" + idx + ".dot");
+			CommonDotGenerator cdg = new CommonDotGenerator(pc, IRGeneratorForOneProject.GetInstance(), dot_generation_dir + "/" + "IRCode" + idx + ".dot", IMemberDescriptionHelper.GetDescription(irc.getIm()));
 			cdg.GenerateDot();
 		}
 		DotView dv = new DotView();

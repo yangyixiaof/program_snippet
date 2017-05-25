@@ -24,11 +24,13 @@ public class CommonDotGenerator {
 	IVNodeContainer ivc = null;
 	int idx = 0;
 	Map<IVNode, Integer> ivn_id = new HashMap<IVNode, Integer>();
+	String description = null;
 	
-	public CommonDotGenerator(Set<IVNode> pc, IVNodeContainer ivc, String dot_file) {
+	public CommonDotGenerator(Set<IVNode> pc, IVNodeContainer ivc, String dot_file, String description) {
 		this.dot_file = dot_file;
 		this.pc = pc;
 		this.ivc = ivc;
+		this.description = description;
 	}
 	
 	private void DrawConnections(Set<IVConnection> conns, StringBuffer one_bw, String line_seperator) {
@@ -71,6 +73,8 @@ public class CommonDotGenerator {
 			
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(dot_file)));
 			bw.write("digraph {");
+			bw.newLine();
+			bw.write("graph [label=\"" + description + "\"];");
 			bw.newLine();
 			
 			String line_seperator = System.getProperty("line.separator");
