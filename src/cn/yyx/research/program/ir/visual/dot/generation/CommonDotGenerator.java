@@ -74,13 +74,13 @@ public class CommonDotGenerator {
 			bw.newLine();
 			
 			String line_seperator = System.getProperty("line.separator");
+			int cluster_idx = 0;
 			Iterator<DotCluster> citr = clusters.iterator();
-			int idx = 0;
 			while (citr.hasNext()) {
-				idx++;
+				cluster_idx++;
 				DotCluster dc = citr.next();
 				StringBuffer cluster_bw = new StringBuffer();
-				cluster_bw.append("subgraph cluster" + idx + " {" + line_seperator);
+				cluster_bw.append("subgraph cluster" + cluster_idx + " {" + line_seperator);
 				cluster_bw.append("node [style = filled,color = white];" + line_seperator);
 				cluster_bw.append("style = filled;" + line_seperator);
 				cluster_bw.append("color = lightgrey;" + line_seperator);
@@ -125,11 +125,15 @@ public class CommonDotGenerator {
 		return id;
 	}
 	
+	// Iterate IVGraph to sort each cluster.
+	// Map<Integer, DotCluster> cluster_id = new TreeMap<Integer, DotCluster>();
+	
+	// Generating IVGraph full of IVNodes.
 	Map<IVNode, DotCluster> ivn_cluster = new HashMap<IVNode, DotCluster>();
 	Set<DotCluster> clusters = new HashSet<DotCluster>();
 	Map<DotCluster, Map<DotCluster, Integer>> cluster_conn = new HashMap<DotCluster, Map<DotCluster, Integer>>();
 	
-	public DotCluster GetCluster(IVNode ivn) {
+	private DotCluster GetCluster(IVNode ivn) {
 		DotCluster cluster = ivn_cluster.get(ivn);
 		if (cluster == null) {
 			cluster = new DotCluster(ivn);
