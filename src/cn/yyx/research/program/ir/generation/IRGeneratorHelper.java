@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForIMember;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.search.IRSearchMethodRequestor;
+import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.DefaultINodeTask;
@@ -201,8 +202,12 @@ public class IRGeneratorHelper {
 		}
 		HandleEachElementInSameOperationDependency(ops);
 	}
-
+	
 	public static void GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node, String code) {
+		GenerateGeneralIR(irgfob, node, code, DefaultINodeTask.class);
+	}
+
+	public static void GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node, String code, Class<? extends IIRNodeTask> task_class) {
 		IRCode irc = irgfob.irc;
 		// Map<IJavaElement, Integer> all_count = irgfob.all_count;
 		HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
@@ -240,7 +245,7 @@ public class IRGeneratorHelper {
 						// int start = exact_node.getStartPosition();
 						// int end = start + exact_node.getLength() - 1;
 						// IRInstrKind ir_kind = IRInstrKind.ComputeKind(count);
-						IRForOneOperation now = new IRForOneOperation(irc, im, code, DefaultINodeTask.class);
+						IRForOneOperation now = new IRForOneOperation(irc, im, code, task_class);
 						ops.add(now);
 						HandleNodeSelfAndBranchDependency(irc, im, now, branch_dependency);
 

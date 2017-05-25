@@ -102,11 +102,12 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return result;
 	}
 
-	protected void TempExpressionOverHandle(ASTNode node, boolean remember) {
-		if (remember) {
-			temp_statement_expression_element_memory.put(node,
-					new HashSet<IJavaElement>(temp_statement_expression_environment_set));
-		}
+	// ASTNode node, boolean remember
+	protected void TempExpressionOverHandle() {
+//		if (remember) {
+//			temp_statement_expression_element_memory.put(node,
+//					new HashSet<IJavaElement>(temp_statement_expression_environment_set));
+//		}
 		temp_statement_expression_environment_set.clear();
 	}
 
@@ -358,7 +359,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 						}
 					}
 					method_parameter_element_instr_order.put(expr, new_env);
-					TempExpressionOverHandle(null, false);
+					TempExpressionOverHandle();
 				}
 			});
 		}
@@ -970,7 +971,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 						IRGeneratorHelper.GenerateGeneralIR(this_ref, exp, IRMeta.For_Initial);
 
-						TempExpressionOverHandle(null, false);
+						TempExpressionOverHandle();
 						this_ref.temp_statement_environment_set = temp;
 					}
 				});
@@ -990,7 +991,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 						IRGeneratorHelper.GenerateGeneralIR(this_ref, exp, IRMeta.For_Judge);
 						// PushBranchInstructionOrder(GetBranchInstructions());
 
-						TempExpressionOverHandle(null, false);
+						TempExpressionOverHandle();
 						this_ref.temp_statement_environment_set = temp;
 					}
 				});
@@ -1010,7 +1011,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 						IRGeneratorHelper.GenerateGeneralIR(this_ref, exp, IRMeta.For_Update);
 
-						TempExpressionOverHandle(null, false);
+						TempExpressionOverHandle();
 						this_ref.temp_statement_environment_set = temp;
 					}
 				});
@@ -1150,18 +1151,23 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	private void HandleAssign(Expression left, Expression right) {
+		if (right == null) {
+			return;
+		}
 		Set<IJavaElement> temp_copy = new HashSet<IJavaElement>(temp_statement_environment_set);
 		temp_statement_environment_set.clear();
-		if (right != null) {
-			right.accept(this);
-		}
+		right.accept(this);
 		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment(temp_statement_environment_set);
 		temp_copy.addAll(temp_statement_environment_set);
-		
-		StatementOverHandle();
-		
-		left.accept(this);
 
+		StatementOverHandle();
+
+		left.accept(this);
+		
+		IRGeneratorHelper.GenerateGeneralIR(this, left, IRMeta.LeftHandAssign, SkipSelfTask.class);
+//		System.err.println("============= start =============");
+//		System.err.println(temp_statement_environment_set);
+//		System.err.println("============= over =============");
 		Iterator<IJavaElement> itr = temp_statement_environment_set.iterator();
 		while (itr.hasNext()) {
 			IJavaElement t_ije = itr.next();
@@ -1179,7 +1185,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				}
 			}
 		}
-		
+
 		IJavaElement ije = WholeExpressionIsAnElement(right);
 		if (ije != null) {
 			IRForOneInstruction last = irc.GetLastIRTreeNode(ije);
@@ -1187,7 +1193,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			// irc.AddAssignDependency(ije, new
 			// HashSet<IJavaElement>(env.keySet()));
 		}
-		
+
 		temp_statement_environment_set.addAll(temp_copy);
 		// StatementOverHandle();
 	}
@@ -1207,7 +1213,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// });
 		return false;
 	}
-	
+
 	@Override
 	public void endVisit(VariableDeclarationFragment node) {
 		// StatementOverHandle();
@@ -1229,13 +1235,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// });
 		return false;
 	}
-	
+
 	@Override
 	public void endVisit(SingleVariableDeclaration node) {
 		// StatementOverHandle();
 		super.endVisit(node);
 	}
-	
+
 	@Override
 	public boolean visit(TryStatement node) {
 		// no need to do anything.
@@ -1350,7 +1356,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// });
 		return false;
 	}
-	
+
 	@Override
 	public void endVisit(Assignment node) {
 		StatementOverHandle();
@@ -1460,31 +1466,36 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(StringLiteral node) {
-		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.StringConstant + "$" + node.getLiteralValue()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance()
+				.FetchConstantUniqueElement(IRConstantMeta.StringConstant + "$" + node.getLiteralValue()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(NumberLiteral node) {
-		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.NumberConstant + "$" + node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance()
+				.FetchConstantUniqueElement(IRConstantMeta.NumberConstant + "$" + node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(NullLiteral node) {
-		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.NullConstant + "$" + node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance()
+				.FetchConstantUniqueElement(IRConstantMeta.NullConstant + "$" + node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(CharacterLiteral node) {
-		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.CharConstant + "$" + node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance()
+				.FetchConstantUniqueElement(IRConstantMeta.CharConstant + "$" + node.toString()), node);
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(BooleanLiteral node) {
-		HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.BooleanConstant + "$" + node.toString()), node);
+		HandleIJavaElement(IRGeneratorForOneProject.GetInstance()
+				.FetchConstantUniqueElement(IRConstantMeta.BooleanConstant + "$" + node.toString()), node);
 		return super.visit(node);
 	}
 
@@ -1493,7 +1504,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		ITypeBinding itb = node.resolveTypeBinding();
 		boolean source_resolved = HandleBinding(itb, node);
 		if (!source_resolved) {
-			HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.TypeConstant + "$" + node.toString()), node);
+			HandleIJavaElement(IRGeneratorForOneProject.GetInstance()
+					.FetchConstantUniqueElement(IRConstantMeta.TypeConstant + "$" + node.toString()), node);
 		}
 		return super.visit(node);
 	}
@@ -1633,18 +1645,19 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				public void run() {
 					Set<IJavaElement> all_elements = SearchAndRememberAllElementsInASTNodeInJustEnvironment(expr);
 					PrepareCurrentEnvironmentToMerge(all_elements, merge);
+					TempExpressionOverHandle();
 				}
 			});
 		}
 
-		// IRGeneratorForOneLogicBlock this_ref = this;
-		// post_visit_task.put(node.getLeftOperand(), new Runnable() {
-		// @Override
-		// public void run() {
-		// IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getLeftOperand(),
-		// IRMeta.InfixLeftExpression + node.getOperator().toString());
-		// }
-		// });
+//		IRGeneratorForOneLogicBlock this_ref = this;
+//		post_visit_task.Put(node.getLeftOperand(), new Runnable() {
+//			@Override
+//			public void run() {
+//				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getLeftOperand(),
+//						IRMeta.InfixLeftExpression + node.getOperator().toString());
+//			}
+//		});
 		return super.visit(node);
 	}
 

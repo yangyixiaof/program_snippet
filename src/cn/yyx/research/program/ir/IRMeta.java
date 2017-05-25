@@ -20,8 +20,8 @@ public class IRMeta {
 	public static final String VariabledDeclare = "@VariabledDeclare";
 	public static final String Synchronized = "@Synchronized";
 	public static final String Return = "@Return";
-	public static final String LeftHandAssign = "@LeftHandAssign";
-	public static final String RightHandAssign = "@RightHandAssign";
+	public static final String LeftHandAssign = "@LeftAssign";
+	// public static final String RightHandAssign = "@RightHandAssign";
 	public static final String Switch = "@Switch";
 	public static final String Switch_Case_Default = "@SwitchCaseDefault";
 	public static final String Switch_Case_Cause = "@SwitchCase_";
