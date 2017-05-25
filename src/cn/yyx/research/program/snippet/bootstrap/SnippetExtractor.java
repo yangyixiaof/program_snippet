@@ -83,7 +83,7 @@ public class SnippetExtractor implements IApplication {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		AnalysisEnvironment.DeleteAllAnalysisEnvironment();
+		// AnalysisEnvironment.DeleteAllAnalysisEnvironment();
 		return IApplication.EXIT_OK;
 	}
 	

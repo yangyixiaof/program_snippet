@@ -1149,7 +1149,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return super.visit(node);
 	}
 
-	private void HandleAssign(Expression left, Expression right, String operator) {
+	private void HandleAssign(Expression left, Expression right) {
 		Set<IJavaElement> temp_copy = new HashSet<IJavaElement>(temp_statement_environment_set);
 		temp_statement_environment_set.clear();
 		if (right != null) {
@@ -1195,7 +1195,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(VariableDeclarationFragment node) {
 		// Solved. how to redirect? same as assignment.
-		HandleAssign(node.getName(), node.getInitializer(), "=");
+		HandleAssign(node.getName(), node.getInitializer());
 		// IRGeneratorForOneLogicBlock this_ref = this;
 		// post_visit_task.put(node.getName(), new Runnable() {
 		// @Override
@@ -1217,7 +1217,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(SingleVariableDeclaration node) {
 		// Solved. how to redirect? same as assignment.
-		HandleAssign(node.getName(), node.getInitializer(), "=");
+		HandleAssign(node.getName(), node.getInitializer());
 		// IRGeneratorForOneLogicBlock this_ref = this;
 		// post_visit_task.put(node.getName(), new Runnable() {
 		// @Override
@@ -1309,7 +1309,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// Solved. assign dependency should be extracted as a stand_alone
 		// function because var-declare also will also use it.
 
-		HandleAssign(node.getLeftHandSide(), node.getRightHandSide(), node.getOperator().toString());
+		HandleAssign(node.getLeftHandSide(), node.getRightHandSide());
 
 		// Expression right_val = node.getRightHandSide();
 		// right_val.accept(this);
@@ -1608,6 +1608,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 		List<Expression> expr_list = new LinkedList<Expression>();
 		expr_list.add(node.getLeftOperand());
+		expr_list.add(node.getRightOperand());
 		@SuppressWarnings("unchecked")
 		List<Expression> exprs = (List<Expression>) node.extendedOperands();
 		expr_list.addAll(exprs);
@@ -1644,7 +1645,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// IRMeta.InfixLeftExpression + node.getOperator().toString());
 		// }
 		// });
-		return false;
+		return super.visit(node);
 	}
 
 	private void MergeListParallelToOne(List<IRForOneInstruction> list, IJavaElement ije, IRForOneOperation irfop) {
