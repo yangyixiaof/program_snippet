@@ -3,7 +3,6 @@ package cn.yyx.research.program.ir.storage.node.lowlevel;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ILocalVariable;
-import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -20,28 +19,33 @@ public class IRForOneSentinel extends IRForOneInstruction {
 	
 	@Override
 	public String ToVisual() {
-		String im_str = im.getElementName();
+		String im_str = null;
 		if (im instanceof ILocalVariable) {
 			ILocalVariable lv = (ILocalVariable)im;
-			IMember member = lv.getDeclaringMember();
-			im_str = member.getDeclaringType().getFullyQualifiedName();
+			im_str = "VD#" + lv.getElementName() + "#" + lv.getTypeSignature();
 		} else if (im instanceof IField) {
 			IField ifd = (IField)im;
-			im_str = ifd.getDeclaringType().getFullyQualifiedName();
+			String ts = "Unknown_Type";
+			try {
+				ts = ifd.getTypeSignature();
+			} catch (JavaModelException e) {
+				e.printStackTrace();
+			}
+			im_str = "VD#" + ifd.getElementName() + "#" + ts;
 		} else if (im instanceof IMethod) {
 			IMethod method = (IMethod)im;
-			String sig = "()V";
+			String sig = "Unknown_Sig";
 			try {
 				sig = method.getSignature();
 			} catch (JavaModelException e) {
 				e.printStackTrace();
 			}
-			im_str = method.getElementName() + sig;
+			im_str = "MD#" + method.getElementName() + "#" + sig;
 		} else if (im instanceof IType) {
 			IType it = (IType)im;
-			im_str = it.getFullyQualifiedName();
+			im_str = "TD#" + it.getElementName();
 		} else {
-			im_str = "Unknown Kind:" + im.getClass();
+			im_str = "NanD#" + im.getElementName();
 		}
 		return IRMeta.VirtualSentinel + im_str;
 	}
