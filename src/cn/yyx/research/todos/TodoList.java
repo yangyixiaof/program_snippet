@@ -15,7 +15,7 @@ public class TodoList {
 	
 	// Solved. variable count and two/three further steps' environment are no longer needed.
 	// Solved. SkipSelfTask should add the information of IJavaElement if there are no source connections.
-	// TODO wrong when handling inter-procedure and constructors in full traces.
+	// TODO wrong when handling invoking constructors in full traces.
 	// Solved. do not traverse from root methods (exclude constructors) which contains no statements.
 	
 	// TODO how to recognize the global relationship, eclipse jdt offers? 
