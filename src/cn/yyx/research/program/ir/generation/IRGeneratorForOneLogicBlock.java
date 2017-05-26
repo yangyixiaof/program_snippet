@@ -303,7 +303,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	protected HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>> method_parameter_element_instr_order = new HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>>();
-	protected HashMap<ASTNode, Map<IJavaElement, Boolean>> method_parameter_element_instr_is_self = new HashMap<ASTNode, Map<IJavaElement, Boolean>>();
+	// protected HashMap<ASTNode, Map<IJavaElement, Boolean>> method_parameter_element_instr_is_self = new HashMap<ASTNode, Map<IJavaElement, Boolean>>();
 
 	// private void RecordASTNodePreEnvironment(ASTNode node)
 	// {
@@ -352,7 +352,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				public void run() {
 					IJavaElement w_ije = WholeExpressionIsAnElement(expr);
 					Map<IJavaElement, Boolean> new_is_self_env = new HashMap<IJavaElement, Boolean>();
-					method_parameter_element_instr_is_self.put(expr, new_is_self_env);
+					// method_parameter_element_instr_is_self.put(expr, new_is_self_env);
 					Map<IJavaElement, IRForOneInstruction> new_env = new HashMap<IJavaElement, IRForOneInstruction>();
 					Iterator<IJavaElement> titr = SearchAndRememberAllElementsInASTNodeInJustEnvironment(expr).iterator();
 					// temp_statement_expression_environment_set.iterator()
@@ -382,24 +382,37 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (dec_class != null) {
 			from_source = true;
 		}
+		IRForOneSourceMethodInvocation now = null;
 		IJavaElement jele = imb.getJavaElement();
 		if (imb != null && dec_class != null && from_source && jele != null && jele instanceof IMethod) {
 			// source method invocation.
 			IMethod im = (IMethod) jele;
-			IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, im, expr, identifier, node);
+			now = IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, im, expr, identifier, node);
 			IRForOneSourceMethodInvocation irfomi = (IRForOneSourceMethodInvocation) irc
 					.GetLastIRTreeNode(source_method_virtual_holder_element);
+			// handle return type and its corresponding reference.
 			ITypeBinding itb = imb.getReturnType();
 			if (itb != null && itb.isPrimitive() && !itb.getQualifiedName().equals("void")) {
 				UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
 				HandleIJavaElement(ure, node);
 				IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, irfomi);
 			}
-		} else {
-			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.MethodInvocation + identifier);
 		}
-		method_parameter_element_instr_order.clear();
-		method_parameter_element_instr_is_self.clear();
+		
+		// add sequential edge.
+		List<IRForOneOperation> ops = IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.MethodInvocation + identifier, SkipSelfTask.class);
+		Iterator<IRForOneOperation> opitr = ops.iterator();
+		while (opitr.hasNext()) {
+			IRForOneOperation irfop = opitr.next();
+			IRGeneratorForOneProject.GetInstance()
+				.RegistConnection(new StaticConnection(now, irfop, EdgeBaseType.Sequential.Value()));
+		}
+		
+		Iterator<Expression> nitr = nlist.iterator();
+		while (nitr.hasNext()) {
+			method_parameter_element_instr_order.remove(nitr.next());
+		}
+		// method_parameter_element_instr_is_self.clear();
 	}
 
 	@Override
