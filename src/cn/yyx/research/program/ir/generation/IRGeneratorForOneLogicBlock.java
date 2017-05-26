@@ -382,20 +382,18 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (dec_class != null) {
 			from_source = true;
 		}
-		if (imb != null && dec_class != null && from_source) {
+		IJavaElement jele = imb.getJavaElement();
+		if (imb != null && dec_class != null && from_source && jele != null && jele instanceof IMethod) {
 			// source method invocation.
+			IMethod im = (IMethod) jele;
+			IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, im, expr, identifier, node);
+			IRForOneSourceMethodInvocation irfomi = (IRForOneSourceMethodInvocation) irc
+					.GetLastIRTreeNode(source_method_virtual_holder_element);
 			ITypeBinding itb = imb.getReturnType();
-			if (itb.isPrimitive() && !itb.getQualifiedName().equals("void")) {
-				IJavaElement jele = imb.getJavaElement();
-				if (jele != null && jele instanceof IMethod) {
-					IMethod im = (IMethod) jele;
-					IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, im, expr, identifier, node);
-					IRForOneSourceMethodInvocation irfomi = (IRForOneSourceMethodInvocation) irc
-							.GetLastIRTreeNode(source_method_virtual_holder_element);
-					UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
-					HandleIJavaElement(ure, node);
-					IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, irfomi);
-				}
+			if (itb != null && itb.isPrimitive() && !itb.getQualifiedName().equals("void")) {
+				UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
+				HandleIJavaElement(ure, node);
+				IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, irfomi);
 			}
 		} else {
 			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.MethodInvocation + identifier);

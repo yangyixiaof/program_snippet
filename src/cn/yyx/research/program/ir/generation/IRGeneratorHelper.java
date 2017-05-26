@@ -111,58 +111,6 @@ public class IRGeneratorHelper {
 			}
 			// }
 		}
-
-		// // initialize parameters of the node.
-		// Map<IBinding, Integer> invoke_parameter_order = new HashMap<IBinding,
-		// Integer>();
-		// // @SuppressWarnings("unchecked")
-		// // List<Expression> nlist = node.arguments();
-		// Iterator<Expression> itr = nlist.iterator();
-		// int idx = 0;
-		// while (itr.hasNext()) {
-		// idx++;
-		// Expression e = itr.next();
-		// if (e instanceof Name) {
-		// Name n = (Name) e;
-		// IBinding nbind = n.resolveBinding();
-		// if (nbind != null && nbind instanceof ITypeBinding && nbind
-		// instanceof IVariableBinding) {
-		// invoke_parameter_order.put(nbind, idx);
-		// }
-		// }
-		// }
-		//
-		// IBinding ib = null;
-		// // IMethodBinding imb = node.resolveMethodBinding();
-		// // Expression expr = node.getExpression();
-		// String code = identifier.toString();
-		// if (expr == null) {
-		// // set to meta--invoke other user defined function.
-		// code = IRMeta.User_Defined_Function;
-		// } else {
-		// // set data_dependency in IRForOneMethod.
-		// if (expr instanceof Name) {
-		// Name n = (Name) expr;
-		// ib = n.resolveBinding();
-		// if (ib instanceof ITypeBinding || ib instanceof IVariableBinding) {
-		// irc.AddDataDependency(ib, invoke_parameter_order.keySet());
-		// }
-		// }
-		// }
-		//
-		// if (imb == null || !imb.getDeclaringClass().isFromSource()) {
-		// // null or is from binary.
-		//
-		// } else {
-		// // is from source.
-		// // need to be handled specifically.
-		// if (ib != null) {
-		// code = IRMeta.User_Defined_Function;
-		// IRGeneratorHelper.GenerateSourceMethodInvocationIR(ib, imb, node,
-		// node, irc, invoke_parameter_order,
-		// IRMeta.MethodInvocation + code);
-		// }
-		// }
 	}
 
 	// public static void GenerateSwitchCaseIR(ASTNode node, ASTNode sc, IRCode
