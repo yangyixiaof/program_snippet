@@ -91,13 +91,21 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		result.addAll(temp_statement_expression_environment_set);
 		Set<ASTNode> tkeys = temp_statement_expression_element_memory.keySet();
 		Iterator<ASTNode> titr = tkeys.iterator();
+		List<ASTNode> remove_nodes = new LinkedList<ASTNode>();
 		while (titr.hasNext()) {
 			ASTNode astnode = titr.next();
 			if (ASTSearch.ASTNodeContainsAnASTNode(expr, astnode)) {
-				Set<IJavaElement> set = temp_statement_expression_element_memory.remove(astnode);
+				remove_nodes.add(astnode);
+				Set<IJavaElement> set = temp_statement_expression_element_memory.get(astnode);
 				result.addAll(set);
 			}
 		}
+		Iterator<ASTNode> rnitr = remove_nodes.iterator();
+		while (rnitr.hasNext()) {
+			ASTNode an = rnitr.next();
+			temp_statement_expression_element_memory.remove(an);
+		}
+		remove_nodes.clear();
 		temp_statement_expression_element_memory.put(expr, result);
 		return result;
 	}
@@ -369,7 +377,12 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	private void PostMethodInvocation(IMethod parent_im, IMethodBinding imb, List<Expression> nlist, Expression expr,
 			String identifier, ASTNode node) {
-		if (imb != null && imb.getDeclaringClass() != null && imb.getDeclaringClass().isFromSource()) {
+		ITypeBinding dec_class = imb.getDeclaringClass();
+		boolean from_source = false;
+		if (dec_class != null) {
+			from_source = true;
+		}
+		if (imb != null && dec_class != null && from_source) {
 			// source method invocation.
 			ITypeBinding itb = imb.getReturnType();
 			if (itb.isPrimitive() && !itb.getQualifiedName().equals("void")) {
@@ -1072,8 +1085,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// branches & loops statements end.
 
-	// Solved. missed to consider the label and will be considered in the
-	// future.
+	// Solved. missed to consider the label and will be considered in the future.
 
 	private void HandleBreakContinueStatement(ASTNode node, SimpleName label, String code) {
 		ASTNode n = ASTSearch.FindMostCloseLoopNode(node);
