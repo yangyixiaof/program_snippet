@@ -18,7 +18,7 @@ public class TodoList {
 	// TODO wrong when handling invoking constructors and super-methods in full traces.
 	// Solved. do not traverse from root methods (exclude constructors) which contains no statements.
 	
-	// TODO how to recognize the global relationship, eclipse jdt offers? 
+	// TODO how to recognize the global relationship, eclipse jdt offers?
 	// TODO how to recognize relationships including code snippet not on the execution path from main root?.
 	
 }
