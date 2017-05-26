@@ -178,9 +178,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		this.irc = irc;
 		this.parent_im = im;
 		this.source_method_virtual_holder_element = new UncertainReferenceElement(
-				irc.GetScopeIElement().toString() + "_mholder");
+				irc.GetScopeIElement().getElementName().toString() + "_mholder");
 		this.control_logic_holder_element = new UncertainReferenceElement(
-				irc.GetScopeIElement().toString() + "_clogic");
+				irc.GetScopeIElement().getElementName().toString() + "_clogic");
 		this.irc.SetSourceMethodElement(this.source_method_virtual_holder_element);
 		this.irc.SetControlLogicHolderElement(this.control_logic_holder_element);
 
