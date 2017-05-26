@@ -21,7 +21,7 @@ public class IRForOneBranchControl extends IRForOneInstruction {
 
 	@Override
 	public String ToVisual() {
-		return "Branch:" + branch_type.name() + "#" + hashCode();
+		return "Branch:" + branch_type.name();
 	}
 	
 }

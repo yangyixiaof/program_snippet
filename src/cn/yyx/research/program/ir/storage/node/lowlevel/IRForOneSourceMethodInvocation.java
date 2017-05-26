@@ -55,7 +55,7 @@ public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 
 	@Override
 	public String ToVisual() {
-		return "Method:" + method_name + "#" + hashCode();
+		return "Method:" + method_name;
 	}
 
 //	public void AddVariableParameterOrderInstructionIndexs(Map<IRForOneInstruction, List<Integer>> para_order_instr_index_map) {

@@ -4,7 +4,7 @@ public class EdgeTypeUtil {
 	
 	public static boolean OnlyHasSpecificType(int type, int ebt)
 	{
-		if ((type & ebt) > 0 && (type & (~ebt)) == 0)
+		if ((type & ebt) == ebt && (type & (~ebt)) == 0)
 		{
 			return true;
 		}
@@ -13,7 +13,7 @@ public class EdgeTypeUtil {
 	
 	public static boolean HasSpecificType(int type, int ebt)
 	{
-		if ((type & ebt) > 0)
+		if ((type & ebt) == ebt)
 		{
 			return true;
 		}

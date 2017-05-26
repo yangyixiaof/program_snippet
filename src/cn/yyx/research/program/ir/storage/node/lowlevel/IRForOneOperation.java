@@ -24,7 +24,7 @@ public class IRForOneOperation extends IRForOneInstruction {
 
 	@Override
 	public String ToVisual() {
-		return "Op:" + ir + "#" + hashCode();
+		return "Op:" + ir;
 	}
 
 //	@Override
