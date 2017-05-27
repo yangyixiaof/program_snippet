@@ -295,7 +295,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		while (titr.hasNext()) {
 			IJavaElement ije = titr.next();
 			ASTNode happen = all_happen.get(ije);
-			if (happen == expr) {
+			if (expr.equals(happen)) {
 				return ije;
 			}
 		}

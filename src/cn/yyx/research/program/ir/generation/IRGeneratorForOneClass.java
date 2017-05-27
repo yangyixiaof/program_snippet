@@ -61,7 +61,7 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 		if (node instanceof AbstractTypeDeclaration || node instanceof AnonymousClassDeclaration)
 		{
 			IType resolved_type = NodeBinding(node);
-			boolean type_equals = resolved_type == it;
+			boolean type_equals = resolved_type.equals(it);
 			boolean has_element = irc.IsHasElement();
 			if (type_equals && has_element) {
 				this.initial_node.accept(this);
