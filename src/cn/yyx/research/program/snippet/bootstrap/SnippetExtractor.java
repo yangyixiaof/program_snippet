@@ -23,6 +23,7 @@ import cn.yyx.research.program.ir.IRControlMeta;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.visual.dot.generation.GenerateDotForEachFullTrace;
 import cn.yyx.research.program.ir.visual.dot.generation.GenerateDotForEachIRCodeInIRProject;
+import cn.yyx.research.program.ir.visual.meta.DotMeta;
 import cn.yyx.research.program.systemutil.SystemUtil;
 import cn.yyx.research.test.TestJavaSearch;
 
@@ -54,7 +55,7 @@ public class SnippetExtractor implements IApplication {
 			} else {
 				IRGeneratorForOneProject.GenerateForAllICompilationUnits(java_project);
 				// generate each local method.
-				GenerateDotForEachIRCodeInIRProject irproj_local_generation = new GenerateDotForEachIRCodeInIRProject("IRProjectLocalMethodDots", "IRProjectLocalMethodDotsPics");
+				GenerateDotForEachIRCodeInIRProject irproj_local_generation = new GenerateDotForEachIRCodeInIRProject(DotMeta.DebugDotDir, DotMeta.DebugPicDir);
 				irproj_local_generation.GenerateDots();
 				
 				// generate for each full trace.
@@ -76,7 +77,7 @@ public class SnippetExtractor implements IApplication {
 					FullTrace ft = cootg.GetFullTrace();
 					ft_traces.add(ft);
 				}
-				GenerateDotForEachFullTrace full_trace_generator = new GenerateDotForEachFullTrace("FullTraceDots", "FullTracePics", ft_traces);
+				GenerateDotForEachFullTrace full_trace_generator = new GenerateDotForEachFullTrace(DotMeta.FullTraceDotDir, DotMeta.FullTracePicDir, ft_traces);
 				full_trace_generator.GenerateDots();
 			}
 			SystemUtil.Delay(1000);
