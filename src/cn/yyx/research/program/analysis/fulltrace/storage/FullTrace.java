@@ -1,6 +1,5 @@
 package cn.yyx.research.program.analysis.fulltrace.storage;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -44,12 +43,12 @@ public class FullTrace implements IVNodeContainer {
 		return result;
 	}
 	
-	public Collection<DynamicConnection> GetInConnections(DynamicNode node) {
+	public Set<DynamicConnection> GetInConnections(DynamicNode node) {
 		Map<DynamicNode, DynamicConnection> ins = in_conns.get(node);
 		if (ins == null) {
 			return new HashSet<DynamicConnection>();
 		}
-		return ins.values();
+		return new HashSet<DynamicConnection>(ins.values());
 	}
 	
 	private void HandleAddConnection(DynamicNode source, DynamicNode target, DynamicConnection conn, Map<DynamicNode, Map<DynamicNode, DynamicConnection>> conns)

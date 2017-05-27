@@ -1,7 +1,7 @@
 package cn.yyx.research.program.ir.storage.node.execution;
 
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
@@ -21,7 +21,7 @@ public class SkipSelfTask extends IIRNodeTask {
 	public void HandleOutConnection(DynamicNode source, DynamicNode target, StaticConnectionInfo connect_info,
 			FullTrace ft) {
 		int final_type = TaskExecutionHelper.ComputeFinalType(source, target, connect_info);
-		Collection<DynamicConnection> in_conns = ft.GetInConnections(source);
+		Set<DynamicConnection> in_conns = ft.GetInConnections(source);
 		if (in_conns.isEmpty()) {
 			IRForOneInstruction instr = source.getInstr();
 			if (instr instanceof IRForOneSentinel) {
