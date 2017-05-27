@@ -90,7 +90,7 @@ public class CodeOnOneTraceGenerator {
 		IRTreeForOneControlElement control_ir = irfom.GetControlLogicHolderElementIR();
 		IRForOneBranchControl control_root = control_ir.GetRoot();
 		
-		HashMap<IRCode, Stack<BranchControlForOneIRCode>> copy_env = new HashMap<IRCode, Stack<BranchControlForOneIRCode>>(branch_control_stack_foreach_ircode);
+//		HashMap<IRCode, Stack<BranchControlForOneIRCode>> copy_env = new HashMap<IRCode, Stack<BranchControlForOneIRCode>>(branch_control_stack_foreach_ircode);
 //		int last_size = branch_control_stack.size();
 //		List<IRForOneBranchControl> new_list = branch_control_stack.subList(0, last_size);
 		
@@ -102,18 +102,19 @@ public class CodeOnOneTraceGenerator {
 			branch_control_stack = new Stack<BranchControlForOneIRCode>();
 			branch_control_stack_foreach_ircode.put(irfom, branch_control_stack);
 		}
+		
 		Stack<BranchControlForOneIRCode> branch_control_stack_copy = new Stack<BranchControlForOneIRCode>();
 		branch_control_stack_copy.addAll(branch_control_stack);
 		BranchControlForOneIRCode branch_control = new BranchControlForOneIRCode(irfom);
 		branch_control_stack.push(branch_control);
 		DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, control_root, irfom, memory, env_idx);
-		branch_control_stack.pop();
 		
+		branch_control_stack.pop();
 		method_id.get(irfom).pop();
 //		branch_control_stack.clear();
 //		branch_control_stack.addAll(new_list);
-		branch_control_stack_foreach_ircode.clear();
-		branch_control_stack_foreach_ircode.putAll(copy_env);
+//		branch_control_stack_foreach_ircode.clear();
+//		branch_control_stack_foreach_ircode.putAll(copy_env);
 	}
 	
 	private void DepthFirstToVisitControlLogic(FullTrace ft, Stack<BranchControlForOneIRCode> branch_control_stack_copy, BranchControlForOneIRCode branch_control, IRForOneBranchControl now_control_root, IRCode irfom, ExecutionMemory execution_memory, int env_idx)
