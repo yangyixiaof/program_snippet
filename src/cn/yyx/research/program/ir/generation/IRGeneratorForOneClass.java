@@ -61,7 +61,9 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 		if (node instanceof AbstractTypeDeclaration || node instanceof AnonymousClassDeclaration)
 		{
 			IType resolved_type = NodeBinding(node);
-			if (resolved_type == it && irc.IsHasElement()) {
+			boolean type_equals = resolved_type == it;
+			boolean has_element = irc.IsHasElement();
+			if (type_equals && has_element) {
 				this.initial_node.accept(this);
 				IRGeneratorForOneProject.GetInstance().FetchITypeIR((it)).SetFieldLevel((IRForOneField)irc);
 			}
