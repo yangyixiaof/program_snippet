@@ -49,13 +49,5 @@ public class IRGeneratorForClassesInICompilationUnit extends ASTVisitor {
 		}
 		return null;
 	}
-
-//	public List<IRForOneClass> getClasses() {
-//		return classes;
-//	}
-//
-//	private void setClasses(List<IRForOneClass> classes) {
-//		this.classes = classes;
-//	}
 	
 }
