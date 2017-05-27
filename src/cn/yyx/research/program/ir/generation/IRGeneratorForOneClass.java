@@ -64,7 +64,9 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 			boolean type_equals = resolved_type.equals(it);
 			boolean has_element = irc.IsHasElement();
 			if (type_equals && has_element) {
-				this.initial_node.accept(this);
+				if (this.initial_node != null) {
+					this.initial_node.accept(this);
+				}
 				IRGeneratorForOneProject.GetInstance().FetchITypeIR((it)).SetFieldLevel((IRForOneField)irc);
 			}
 		}
