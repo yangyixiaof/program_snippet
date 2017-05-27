@@ -22,6 +22,8 @@ import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
+import cn.yyx.research.program.ir.element.ControlLogicHolderElement;
+import cn.yyx.research.program.ir.element.SourceMethodHolderElement;
 import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
@@ -177,10 +179,10 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public IRGeneratorForOneLogicBlock(IMethod im, IRCode irc) {
 		this.irc = irc;
 		this.parent_im = im;
-		this.source_method_virtual_holder_element = new UncertainReferenceElement(
-				irc.GetScopeIElement().getElementName().toString() + "_mholder");
-		this.control_logic_holder_element = new UncertainReferenceElement(
-				irc.GetScopeIElement().getElementName().toString() + "_clogic");
+		this.source_method_virtual_holder_element = new SourceMethodHolderElement(
+				irc.GetScopeIElement().getElementName().toString() + "&mholder");
+		this.control_logic_holder_element = new ControlLogicHolderElement(
+				irc.GetScopeIElement().getElementName().toString() + "&clogic");
 		this.irc.SetSourceMethodElement(this.source_method_virtual_holder_element);
 		this.irc.SetControlLogicHolderElement(this.control_logic_holder_element);
 
