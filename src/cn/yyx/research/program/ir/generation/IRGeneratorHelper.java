@@ -240,7 +240,7 @@ public class IRGeneratorHelper {
 			Boolean has_set = element_has_set_source_method_barrier.get(ije);
 			if (has_set == null) {
 				IRGeneratorForOneProject.GetInstance().RegistConnection(
-						new StaticConnection(source_method_barrier, now, EdgeBaseType.Sequential.Value()));
+						new StaticConnection(source_method_barrier, now, EdgeBaseType.Barrier.Value()));
 				element_has_set_source_method_barrier.put(ije, true);
 			}
 		}
