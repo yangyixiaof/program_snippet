@@ -21,6 +21,7 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 	
 	public IRGeneratorForOneClass(IType it) {
 		super(null, new IRForOneField(it));
+		this.it = it;
 	}
 		
 	@Override
