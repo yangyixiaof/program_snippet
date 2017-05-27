@@ -55,7 +55,7 @@ public class SnippetExtractor implements IApplication {
 			} else {
 				IRGeneratorForOneProject.GenerateForAllICompilationUnits(java_project);
 				// generate each local method.
-				GenerateDotForEachIRCodeInIRProject irproj_local_generation = new GenerateDotForEachIRCodeInIRProject(DotMeta.DebugDotDir, DotMeta.DebugPicDir);
+				GenerateDotForEachIRCodeInIRProject irproj_local_generation = new GenerateDotForEachIRCodeInIRProject(DotMeta.ProjectEachMethodDotDir, DotMeta.ProjectEachMethodPicDir);
 				irproj_local_generation.GenerateDots();
 				
 				// generate for each full trace.
