@@ -9,7 +9,7 @@ import cn.yyx.research.program.ir.visual.meta.DotMeta;
 public class DebugShowDotPic {
 	
 	public static void ShowPicForTrace(FullTrace ft) {
-		if (IRControlMeta.debug) {
+		if (IRControlMeta.deep_debug) {
 			CommonDotGenerator cdg = new CommonDotGenerator(ft.GetRootsForVisual(), ft, DotMeta.DebugDotDir + "/" + "Debug" + ".dot", ft.GetDescription());
 			cdg.GenerateDot();
 			DotView.HandleAllDotsInDirectory(DotMeta.DebugDotDir, DotMeta.DebugPicDir);
