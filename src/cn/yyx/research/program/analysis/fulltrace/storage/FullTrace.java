@@ -52,7 +52,7 @@ public class FullTrace implements IVNodeContainer {
 		return ins.values();
 	}
 	
-	private void HandleConnection(DynamicNode source, DynamicNode target, DynamicConnection conn, Map<DynamicNode, Map<DynamicNode, DynamicConnection>> conns)
+	private void HandleAddConnection(DynamicNode source, DynamicNode target, DynamicConnection conn, Map<DynamicNode, Map<DynamicNode, DynamicConnection>> conns)
 	{
 		Map<DynamicNode, DynamicConnection> source_map = conns.get(source);
 		if (source_map == null) {
@@ -65,6 +65,21 @@ public class FullTrace implements IVNodeContainer {
 		} else {
 			source_map.put(target, conn);
 		}
+	}
+	
+	public void HandleRemoveConnection(DynamicNode source, DynamicNode target, Map<DynamicNode, Map<DynamicNode, DynamicConnection>> conns) {
+		Map<DynamicNode, DynamicConnection> source_map = conns.get(source);
+		source_map.remove(target);
+		if (source_map.isEmpty()) {
+			IJavaElement ije = source.getInstr().getIm();
+			Set<DynamicNode> created_nodes = ele_nodes.get(ije);
+			created_nodes.remove(source);
+		}
+	}
+	
+	public void RemoveConnection(DynamicConnection conn) {
+		HandleRemoveConnection(conn.GetTarget(), conn.GetSource(), in_conns);
+		HandleRemoveConnection(conn.GetSource(), conn.GetTarget(), out_conns);
 	}
 	
 	public void AddConnection(DynamicConnection conn)
@@ -82,8 +97,8 @@ public class FullTrace implements IVNodeContainer {
 		if (instr instanceof IRForOneBranchControl || !created_nodes.contains(source_dn)) {
 			return;
 		}
-		HandleConnection(conn.GetTarget(), conn.GetSource(), conn, in_conns);
-		HandleConnection(conn.GetSource(), conn.GetTarget(), conn, out_conns);
+		HandleAddConnection(conn.GetTarget(), conn.GetSource(), conn, in_conns);
+		HandleAddConnection(conn.GetSource(), conn.GetTarget(), conn, out_conns);
 	}
 	
 	public void NodeCreated(IJavaElement ije, DynamicNode new_dn)

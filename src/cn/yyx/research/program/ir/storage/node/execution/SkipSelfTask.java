@@ -32,8 +32,9 @@ public class SkipSelfTask extends IIRNodeTask {
 			Iterator<DynamicConnection> iitr = in_conns.iterator();
 			while (iitr.hasNext()) {
 				DynamicConnection dc = iitr.next();
-				dc.setTarget(target);
-				dc.setType(dc.getType() | final_type);
+				ft.RemoveConnection(dc);
+				DynamicConnection new_dc = new DynamicConnection(source, target, dc.getType() & final_type);
+				ft.AddConnection(new_dc);
 			}
 		}
 	}
