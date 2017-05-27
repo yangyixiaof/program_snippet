@@ -51,8 +51,7 @@ public class GenerateDotForEachIRCodeInIRProject implements DotGenerator {
 			CommonDotGenerator cdg = new CommonDotGenerator(pc, IRGeneratorForOneProject.GetInstance(), dot_generation_dir + "/" + "IRCode" + idx + ".dot", IMemberDescriptionHelper.GetDescription(irc.getIm()));
 			cdg.GenerateDot();
 		}
-		DotView dv = new DotView();
-		dv.HandleAllDotsInDirectory(dot_generation_dir, dot_pic_dir);
+		DotView.HandleAllDotsInDirectory(dot_generation_dir, dot_pic_dir);
 	}
 	
 }

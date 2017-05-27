@@ -25,12 +25,10 @@ public class SkipSelfTask extends IIRNodeTask {
 		if (in_conns.isEmpty()) {
 			IRForOneInstruction instr = source.getInstr();
 			if (instr instanceof IRForOneSentinel) {
-				// IRForOneOperation op = (IRForOneOperation)instr;
-				// if (op.getIr().equals(IRMeta.VirtualSentinel)) {
 				ft.AddConnection(new DynamicConnection(source, target, connect_info.getType()));
-				// }
 			}
 		} else {
+			System.err.println("====== Real skip task is running!");
 			Iterator<DynamicConnection> iitr = in_conns.iterator();
 			while (iitr.hasNext()) {
 				DynamicConnection dc = iitr.next();

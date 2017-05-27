@@ -32,6 +32,7 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 import cn.yyx.research.program.ir.util.IMemberDescriptionHelper;
+import cn.yyx.research.program.ir.visual.dot.debug.DebugShowDotPic;
 
 public class CodeOnOneTraceGenerator {
 
@@ -285,6 +286,9 @@ public class CodeOnOneTraceGenerator {
 		} else {
 			out_task.HandleOutConnection(source_dn, target_dn, sc_info, ft);
 		}
+		
+		DebugShowDotPic.ShowPicForTrace(ft);
+		System.err.println("One debug step.");
 	}
 
 	private Set<StaticConnection> ObtainExecutionPermission(IRForOneInstruction one_instr_pc, ExecutionMemory memory) {

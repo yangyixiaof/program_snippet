@@ -32,8 +32,7 @@ public class GenerateDotForEachFullTrace implements DotGenerator {
 			CommonDotGenerator cdg = new CommonDotGenerator(ft.GetRootsForVisual(), ft, dots_dir + "/" + "FullTrace" + idx + ".dot", ft.GetDescription());
 			cdg.GenerateDot();
 		}
-		DotView dv = new DotView();
-		dv.HandleAllDotsInDirectory(dots_dir, pics_dir);
+		DotView.HandleAllDotsInDirectory(dots_dir, pics_dir);
 	}
 	
 }

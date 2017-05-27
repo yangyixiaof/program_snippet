@@ -9,12 +9,12 @@ import cn.yyx.research.program.ir.IRVisualMeta;
 
 public class DotView {
 	
-	public void HandleAllDotsInDirectory()
+	public static void HandleAllDotsInDirectory()
 	{
 		HandleAllDotsInDirectory(IRVisualMeta.dot_directory, IRVisualMeta.dot_pics_directory);
 	}
 	
-	public void HandleAllDotsInDirectory(String dot_directory, String pic_directory)
+	public static void HandleAllDotsInDirectory(String dot_directory, String pic_directory)
 	{
 		FileIterator fi = new FileIterator(dot_directory, ".*\\.dot$");
 		Iterator<File> fitr = fi.EachFileIterator();
@@ -39,8 +39,7 @@ public class DotView {
 	}
 	
 	public static void main(String[] args) {
-		DotView dv = new DotView();
-		dv.HandleAllDotsInDirectory();
+		DotView.HandleAllDotsInDirectory();
 	}
 	
 }
