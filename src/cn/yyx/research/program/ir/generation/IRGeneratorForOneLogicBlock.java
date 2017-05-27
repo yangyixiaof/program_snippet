@@ -1725,8 +1725,10 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		while (mitr.hasNext()) {
 			IJavaElement ije = mitr.next();
 			List<IRForOneInstruction> list = merge.get(ije);
+			// this is the only place which generates meaningful codes but not through IRGeneratorHelper.
 			IRForOneOperation irfop = new IRForOneOperation(irc, ije, node.getOperator().toString(),
 					DefaultINodeTask.class);
+			IRGeneratorHelper.HandleNodeSelfAndSourceMethodAndBranchDependency(irc, ije, irfop, branch_var_instr_order.empty() ? null : branch_var_instr_order.peek(), source_invocation_barrier.peek(), element_has_set_branch, element_has_set_source_method_barrier);
 			new_creation.add(irfop);
 			MergeListParallelToOne(list, ije, irfop);
 		}

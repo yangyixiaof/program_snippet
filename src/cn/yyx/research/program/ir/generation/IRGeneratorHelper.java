@@ -215,7 +215,7 @@ public class IRGeneratorHelper {
 		return ops;
 	}
 
-	private static void HandleNodeSelfAndSourceMethodAndBranchDependency(IRCode irc, IJavaElement ije,
+	public static void HandleNodeSelfAndSourceMethodAndBranchDependency(IRCode irc, IJavaElement ije,
 			IRForOneInstruction now, HashMap<IJavaElement, IRForOneInstruction> branch_dependency,
 			IRForOneSourceMethodInvocation source_method_barrier, HashMap<IJavaElement, Boolean> element_has_set_branch,
 			HashMap<IJavaElement, Boolean> element_has_set_source_method_barrier) {
