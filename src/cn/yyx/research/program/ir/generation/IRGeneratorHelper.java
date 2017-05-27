@@ -103,12 +103,18 @@ public class IRGeneratorHelper {
 						
 						IRGeneratorForOneProject.GetInstance()
 							.RegistConnection(new StaticConnection(source, now, EdgeBaseType.Sequential.Value()));
-//						boolean is_self = jele_is_self.get(ije);
-//						if (is_self) {
-//							StaticConnection conn = new StaticConnection(source, now, EdgeBaseType.Self.Value());
-//							IRGeneratorForOneProject.GetInstance().RegistConnection(conn);
-//						}
 					}
+				}
+				
+				// add every connection to now method for each IJavaElement in current environment.
+				Map<IJavaElement, IRForOneInstruction> curr_env = irc.CopyEnvironment();
+				Set<IJavaElement> curr_keys = curr_env.keySet();
+				Iterator<IJavaElement> curr_itr = curr_keys.iterator();
+				while (curr_itr.hasNext()) {
+					IJavaElement cije = curr_itr.next();
+					IRForOneInstruction cirfoi = curr_env.get(cije);
+					IRGeneratorForOneProject.GetInstance()
+						.RegistConnection(new StaticConnection(cirfoi, now, EdgeBaseType.Sequential.Value()));
 				}
 
 				HandleNodeSelfAndBranchDependency(irc, source_method_receiver_element, now, branch_dependency);

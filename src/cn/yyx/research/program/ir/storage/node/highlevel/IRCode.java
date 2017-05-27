@@ -23,6 +23,7 @@ public abstract class IRCode {
 	// protected Map<IJavaElement, Set<IJavaElement>> deps = new HashMap<IJavaElement, Set<IJavaElement>>();
 	protected Map<IJavaElement, IRTreeForOneElement> irs = new HashMap<IJavaElement, IRTreeForOneElement>();
 	protected Map<IJavaElement, IRForOneInstruction> out_nodes = new HashMap<IJavaElement, IRForOneInstruction>();
+	
 	protected IJavaElement source_method_receiver_element = null;
 	
 	protected IJavaElement control_logic_holder_element = null;
