@@ -271,26 +271,6 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		GetInstance().HandleToAddAllChildrenSetForAllControl();
 	}
 
-	// private void SelfAddToMethodIR(IMethod it, IRForOneMethod irfocbu)
-	// {
-	// method_irs.put(it, irfocbu);
-	// }
-	//
-	// private void SelfAddToClassIR(IType im, IRForOneClass irfoc)
-	// {
-	// class_irs.put(im, irfoc);
-	// }
-	//
-	// public static void AddToMethodIR(IMethod it, IRForOneMethod irfocbu)
-	// {
-	// irgfop.SelfAddToMethodIR(it, irfocbu);
-	// }
-	//
-	// public static void AddToClassIR(IType im, IRForOneClass irfoc)
-	// {
-	// irgfop.SelfAddToClassIR(im, irfoc);
-	// }
-
 	public IRForOneClass FetchITypeIR(IType it) {
 		IRForOneClass irclass = class_irs.get(it);
 		if (irclass == null) {
