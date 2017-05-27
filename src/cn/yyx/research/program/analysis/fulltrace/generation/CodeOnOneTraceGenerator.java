@@ -306,6 +306,7 @@ public class CodeOnOneTraceGenerator {
 
 	private void HandleCallerToCallee(IRCode irc, IRForOneSourceMethodInvocation wrap_node, FullTrace ft_run,
 			int env_idx, ExecutionMemory memory) {
+		// TODO every node connection level exact IJavaElement matching is not considered.
 		// Solved. need to handle hidden inherit link.
 		// Solved. should handle the before connection to parameters.
 

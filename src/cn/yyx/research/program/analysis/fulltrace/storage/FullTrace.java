@@ -68,7 +68,10 @@ public class FullTrace implements IVNodeContainer {
 	
 	public void HandleRemoveConnection(DynamicNode source, DynamicNode target, Map<DynamicNode, Map<DynamicNode, DynamicConnection>> conns) {
 		Map<DynamicNode, DynamicConnection> source_map = conns.get(source);
-		source_map.remove(target);
+		DynamicConnection dc = source_map.remove(target);
+		if (dc == null) {
+			System.err.println("Strange! removed objects are null?");
+		}
 		if (source_map.isEmpty()) {
 			IJavaElement ije = source.getInstr().getIm();
 			Set<DynamicNode> created_nodes = ele_nodes.get(ije);
@@ -139,6 +142,15 @@ public class FullTrace implements IVNodeContainer {
 			}
 		}
 		return result;
+	}
+	
+	public DynamicConnection GetSpecifiedConnection(DynamicNode source, DynamicNode target) {
+		Map<DynamicNode, DynamicConnection> ocnnts = out_conns.get(source);
+		if (ocnnts == null) {
+			return null;
+		}
+		DynamicConnection conn = ocnnts.get(target);
+		return conn;
 	}
 	
 }

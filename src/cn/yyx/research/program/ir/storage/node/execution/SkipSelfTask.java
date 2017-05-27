@@ -7,6 +7,7 @@ import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
+import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSentinel;
@@ -33,9 +34,17 @@ public class SkipSelfTask extends IIRNodeTask {
 			while (iitr.hasNext()) {
 				DynamicConnection dc = iitr.next();
 				ft.RemoveConnection(dc);
-				DynamicConnection new_dc = new DynamicConnection(source, target, dc.getType() & final_type);
+				DynamicNode nsource = dc.GetSource();
+				DynamicNode ntarget = target;
+				int addition = ntarget.getInstr().getIm().equals(nsource.getInstr().getIm()) ? EdgeBaseType.Self.Value() : 0;
+				DynamicConnection new_dc = new DynamicConnection(nsource, ntarget, dc.getType() & final_type | addition);
 				ft.AddConnection(new_dc);
 			}
+			DynamicConnection conn = ft.GetSpecifiedConnection(source, target);
+			if (conn == null) {
+				System.err.println("Strange! specified connection is null!");
+			}
+			ft.RemoveConnection(conn);
 		}
 	}
 	
