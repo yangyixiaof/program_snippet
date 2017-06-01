@@ -131,22 +131,22 @@ public class CodeOnOneTraceGenerator {
 			BranchControlForOneIRCode branch_control, IRForOneBranchControl now_control_root, IRCode irfom,
 			ExecutionMemory execution_memory, int env_idx) {
 		Set<IRForOneBranchControl> already_visited = new HashSet<IRForOneBranchControl>();
-		branch_control.already_branch_path.push(now_control_root);
+		branch_control.Push(now_control_root);
 		Iterator<BranchControlForOneIRCode> bitr = branch_control_stack_copy.iterator();
 		while (bitr.hasNext()) {
 			BranchControlForOneIRCode bcfoi = bitr.next();
 			if (bcfoi.IsStartWithTheParameterSpecified(branch_control)) {
 				Set<IRForOneBranchControl> children = IRGeneratorForOneProject.GetInstance()
-						.GetChildrenOfControl(bcfoi.already_branch_path.lastElement());
-				children.addAll(bcfoi.already_branch_path);
+						.GetChildrenOfControl(bcfoi.Peek());
+				children.addAll(bcfoi.GetAllBranchControls());
 				already_visited.addAll(children);
 			}
 		}
 		Set<IRForOneBranchControl> curr_visited = new HashSet<IRForOneBranchControl>();
-		curr_visited.addAll(branch_control.already_branch_path);
+		curr_visited.addAll(branch_control.GetAllBranchControls());
 		curr_visited.addAll(IRGeneratorForOneProject.GetInstance().GetChildrenOfControl(now_control_root));
 		if (already_visited.containsAll(curr_visited)) {
-			branch_control.already_branch_path.pop();
+			branch_control.Pop();
 			return;
 		}
 		Set<StaticConnection> out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(now_control_root);
@@ -168,7 +168,7 @@ public class CodeOnOneTraceGenerator {
 			DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, ir_control, irfom,
 					execution_memory, env_idx);
 		}
-		branch_control.already_branch_path.pop();
+		branch_control.Pop();
 	}
 
 	private void BreadthFirstToVisitIR(FullTrace ft, ExecutionMemory memory, int env_idx) {

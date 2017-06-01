@@ -11,6 +11,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.node.connection.EdgeTypeUtil;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
@@ -24,7 +25,8 @@ public class FullTrace implements IVNodeContainer {
 	Map<DynamicNode, Map<DynamicNode, DynamicConnection>> out_conns = new HashMap<DynamicNode, Map<DynamicNode, DynamicConnection>>();
 	
 	Map<IJavaElement, Set<DynamicNode>> root_pc = new HashMap<IJavaElement, Set<DynamicNode>>();
-	Map<IJavaElement, Set<DynamicNode>> last_pc = new HashMap<IJavaElement, Set<DynamicNode>>();
+	Map<DynamicNode, Set<DynamicNode>> waiting_replace_root_pc = new HashMap<DynamicNode, Set<DynamicNode>>();
+	// Map<IJavaElement, Set<DynamicNode>> last_pc = new HashMap<IJavaElement, Set<DynamicNode>>();
 	Map<IJavaElement, Set<DynamicNode>> ele_nodes = new HashMap<IJavaElement, Set<DynamicNode>>();
 	
 	String description = null;
@@ -75,59 +77,65 @@ public class FullTrace implements IVNodeContainer {
 		if (dc == null) {
 			System.err.println("Strange! removed objects are null?");
 		}
+	}
+	
+	public void HandleRootsBeforeRemovingConnection(DynamicConnection conn) {
+		if (EdgeTypeUtil.HasSpecificType(conn.getType(), EdgeBaseType.Self.Value())) {
+			DynamicNode source = conn.GetSource();
+			DynamicNode target = conn.GetTarget();
+			Set<DynamicNode> roots = root_pc.get(source.getInstr().getIm());
+			if (roots.contains(source)) {
+				Set<DynamicNode> replace_nodes = waiting_replace_root_pc.get(source);
+				if (replace_nodes == null) {
+					replace_nodes = new HashSet<DynamicNode>();
+					waiting_replace_root_pc.put(source, replace_nodes);
+				}
+				replace_nodes.add(target);
+			}
+		}
+	}
+	
+	public void HandleRootsAfterRemovingConnection(DynamicConnection conn) {
+		DynamicNode source = conn.GetSource();
+		Map<DynamicNode, DynamicConnection> source_map = out_conns.get(source);
 		if (source_map.isEmpty()) {
 			IJavaElement ije = source.getInstr().getIm();
 			Set<DynamicNode> created_nodes = ele_nodes.get(ije);
 			created_nodes.remove(source);
+			Set<DynamicNode> roots = root_pc.get(source.getInstr().getIm());
+			if (waiting_replace_root_pc.containsKey(source)) {
+				roots.remove(source);
+				roots.addAll(waiting_replace_root_pc.remove(source));
+			}
 		}
 	}
 	
 	public void RemoveConnection(DynamicConnection conn) {
+		HandleRootsBeforeRemovingConnection(conn);
+		
 		HandleRemoveConnection(conn.GetTarget(), conn.GetSource(), in_conns);
 		HandleRemoveConnection(conn.GetSource(), conn.GetTarget(), out_conns);
+		
+		HandleRootsAfterRemovingConnection(conn);
 	}
 	
 	public void AddConnection(DynamicConnection conn)
 	{
+		// debugging info print.
 		DynamicNode source_dn = conn.GetSource();
 		IRForOneInstruction instr = source_dn.getInstr();
 		IJavaElement ije = instr.getIm();
 		Set<DynamicNode> created_nodes = ele_nodes.get(ije);
-		
-		// debugging.
 		if (created_nodes == null) {
 			System.err.println("Strange! created_nodes is null? ije:" + ije);
 		}
-		
 		if (instr instanceof IRForOneBranchControl || !created_nodes.contains(source_dn)) {
 			return;
 		}
+		
+		// real logics.
 		HandleAddConnection(conn.GetTarget(), conn.GetSource(), conn, in_conns);
 		HandleAddConnection(conn.GetSource(), conn.GetTarget(), conn, out_conns);
-	}
-	
-	public void NodeCreated(IJavaElement ije, DynamicNode new_dn)
-	{
-		IRForOneInstruction instr = new_dn.getInstr();
-		if (instr instanceof IRForOneBranchControl) {
-			return;
-		}
-		Set<DynamicNode> nset = ele_nodes.get(ije);
-		if (nset == null) {
-			nset = new HashSet<DynamicNode>();
-			ele_nodes.put(ije, nset);
-		}
-		if (!nset.contains(new_dn)) {
-			nset.add(new_dn);
-			DynamicNode last_dn = last_pc.get(ije);
-			last_pc.put(ije, new_dn);
-			if (last_dn != null) {
-				DynamicConnection dc = new DynamicConnection(last_dn, new_dn, EdgeBaseType.Self.Value());
-				AddConnection(dc);
-			} else {
-				root_pc.put(ije, new_dn);
-			}
-		}
 	}
 
 	@Override
@@ -154,6 +162,30 @@ public class FullTrace implements IVNodeContainer {
 		}
 		DynamicConnection conn = ocnnts.get(target);
 		return conn;
+	}
+	
+	public void NodeCreated(IJavaElement ije, DynamicNode new_dn)
+	{
+		IRForOneInstruction instr = new_dn.getInstr();
+		if (instr instanceof IRForOneBranchControl) {
+			return;
+		}
+		Set<DynamicNode> nset = ele_nodes.get(ije);
+		if (nset == null) {
+			nset = new HashSet<DynamicNode>();
+			ele_nodes.put(ije, nset);
+		}
+		if (!nset.contains(new_dn)) {
+			nset.add(new_dn);
+			DynamicNode last_dn = last_pc.get(ije);
+			last_pc.put(ije, new_dn);
+			if (last_dn != null) {
+				DynamicConnection dc = new DynamicConnection(last_dn, new_dn, EdgeBaseType.Self.Value());
+				AddConnection(dc);
+			} else {
+				root_pc.put(ije, new_dn);
+			}
+		}
 	}
 	
 }
