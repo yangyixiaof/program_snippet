@@ -137,7 +137,7 @@ public class CodeOnOneTraceGenerator {
 			BranchControlForOneIRCode bcfoi = bitr.next();
 			if (bcfoi.IsStartWithTheParameterSpecified(branch_control)) {
 				Set<IRForOneBranchControl> children = IRGeneratorForOneProject.GetInstance()
-						.GetChildrenOfControl(bcfoi.Peek());
+						.GetChildrenOfControl(bcfoi.LastBranchControl());
 				children.addAll(bcfoi.GetAllBranchControls());
 				already_visited.addAll(children);
 			}
@@ -265,8 +265,8 @@ public class CodeOnOneTraceGenerator {
 			StaticConnectionInfo sc_info, int env_idx) {
 		DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
 		DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
-		ft.NodeCreated(source.getIm(), source_dn);
-		ft.NodeCreated(target.getIm(), target_dn);
+		ft.NodeCreated(source.getIm(), source_dn, branch_control_stack_foreach_ircode.get(source.getParentEnv()).peek());
+		ft.NodeCreated(target.getIm(), target_dn, branch_control_stack_foreach_ircode.get(target.getParentEnv()).peek());
 		IIRNodeTask out_task = source.GetOutConnectionMergeTask();
 		if (source instanceof IRForOneSourceMethodInvocation) {
 			IRForOneSourceMethodInvocation irmethod_source = (IRForOneSourceMethodInvocation) source;
@@ -356,7 +356,7 @@ public class CodeOnOneTraceGenerator {
 			while (aitr.hasNext()) {
 				IJavaElement ije = aitr.next();
 				IRForOneInstruction irpara = irc.GetFirstIRTreeNode(ije);
-				ft_run.NodeCreated(ije, new DynamicNode(irpara, irc, env_idx));
+				ft_run.NodeCreated(ije, new DynamicNode(irpara, irc, env_idx), );
 			}
 		} else {
 			if (irc instanceof IRForOneMethod) {

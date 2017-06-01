@@ -42,8 +42,18 @@ public class BranchControlForOneIRCode {
 		last_instrs.pop();
 	}
 	
-	public IRForOneBranchControl Peek() {
+	public IRForOneBranchControl LastBranchControl() {
+		if (already_branch_path.isEmpty()) {
+			return null;
+		}
 		return already_branch_path.peek();
+	}
+	
+	public Map<IJavaElement, Set<IRForOneInstruction>> LastLastInstructions() {
+		if (last_instrs.isEmpty()) {
+			return null;
+		}
+		return last_instrs.peek();
 	}
 	
 	public boolean IsStartWithTheParameterSpecified(BranchControlForOneIRCode bcfoi) {

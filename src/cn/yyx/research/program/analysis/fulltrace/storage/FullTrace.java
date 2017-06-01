@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
 
+import cn.yyx.research.program.analysis.fulltrace.generation.BranchControlForOneIRCode;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
@@ -164,7 +165,7 @@ public class FullTrace implements IVNodeContainer {
 		return conn;
 	}
 	
-	public void NodeCreated(IJavaElement ije, DynamicNode new_dn)
+	public void NodeCreated(IJavaElement ije, DynamicNode new_dn, BranchControlForOneIRCode bcfir)
 	{
 		IRForOneInstruction instr = new_dn.getInstr();
 		if (instr instanceof IRForOneBranchControl) {
