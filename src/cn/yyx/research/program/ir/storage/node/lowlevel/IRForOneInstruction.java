@@ -17,7 +17,7 @@ public abstract class IRForOneInstruction implements IIREnergyNode, IVNode {
 	protected int accept_type = 0;
 	protected int require_type = 0;
 	
-	protected IRForOneInstruction group = null;
+	protected IRForOneInstruction group = this;
 	
 	// private int start = -1;
 	// private int end = -1;
