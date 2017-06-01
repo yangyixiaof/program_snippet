@@ -15,6 +15,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 
 import cn.yyx.research.logger.DebugLogger;
+import cn.yyx.research.program.analysis.fulltrace.storage.BranchControlForOneIRCode;
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
@@ -40,8 +41,7 @@ public class CodeOnOneTraceGenerator {
 	private MethodSelection method_selection = null;
 	private FullTrace full_trace = null;
 	private Map<IRCode, Stack<BranchControlForOneIRCode>> branch_control_stack_foreach_ircode = new HashMap<IRCode, Stack<BranchControlForOneIRCode>>();
-	// private Stack<BranchControlForOneIRCode> branch_control_stack = new
-	// Stack<BranchControlForOneIRCode>();
+	private Stack<BranchControlForOneIRCode> branch_control_stack_total = new Stack<BranchControlForOneIRCode>();
 	private Map<IRCode, Integer> method_max_id = new HashMap<IRCode, Integer>();
 	private Map<IRCode, Stack<Map<IRForOneSourceMethodInvocation, Integer>>> method_id = new HashMap<IRCode, Stack<Map<IRForOneSourceMethodInvocation, Integer>>>();
 
@@ -116,9 +116,15 @@ public class CodeOnOneTraceGenerator {
 		branch_control_stack_copy.addAll(branch_control_stack);
 		BranchControlForOneIRCode branch_control = new BranchControlForOneIRCode(irfom);
 		branch_control_stack.push(branch_control);
+		branch_control_stack_total.push(branch_control);
+		
 		DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, control_root, irfom, memory,
 				env_idx);
 
+		BranchControlForOneIRCode pop = branch_control_stack_total.pop();
+		if (!branch_control_stack_total.isEmpty()) {
+			branch_control_stack_total.peek().InheritFromExecutedIRCode(pop);
+		}
 		branch_control_stack.pop();
 		method_id.get(irfom).pop();
 		// branch_control_stack.clear();
@@ -265,8 +271,8 @@ public class CodeOnOneTraceGenerator {
 			StaticConnectionInfo sc_info, int env_idx) {
 		DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
 		DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
-		ft.NodeCreated(source.getIm(), source_dn, branch_control_stack_foreach_ircode.get(source.getParentEnv()).peek());
-		ft.NodeCreated(target.getIm(), target_dn, branch_control_stack_foreach_ircode.get(target.getParentEnv()).peek());
+		ft.NodeCreated(source.getIm(), null, source_dn, branch_control_stack_total.peek());
+		ft.NodeCreated(target.getIm(), source_dn, target_dn, branch_control_stack_total.peek());
 		IIRNodeTask out_task = source.GetOutConnectionMergeTask();
 		if (source instanceof IRForOneSourceMethodInvocation) {
 			IRForOneSourceMethodInvocation irmethod_source = (IRForOneSourceMethodInvocation) source;
@@ -356,7 +362,7 @@ public class CodeOnOneTraceGenerator {
 			while (aitr.hasNext()) {
 				IJavaElement ije = aitr.next();
 				IRForOneInstruction irpara = irc.GetFirstIRTreeNode(ije);
-				ft_run.NodeCreated(ije, new DynamicNode(irpara, irc, env_idx), );
+				ft_run.NodeCreated(ije, null, new DynamicNode(irpara, irc, env_idx), branch_control_stack_total.peek());
 			}
 		} else {
 			if (irc instanceof IRForOneMethod) {

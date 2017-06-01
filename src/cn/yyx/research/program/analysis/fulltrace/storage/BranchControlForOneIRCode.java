@@ -1,7 +1,8 @@
-package cn.yyx.research.program.analysis.fulltrace.generation;
+package cn.yyx.research.program.analysis.fulltrace.storage;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +11,10 @@ import java.util.Stack;
 import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.jdkutil.ListCompare;
+import cn.yyx.research.program.analysis.fulltrace.storage.helper.MapSetUtil;
+import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
+import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
+import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
@@ -18,7 +23,8 @@ public class BranchControlForOneIRCode {
 	
 	private IRCode parent_env = null;
 	private Stack<IRForOneBranchControl> already_branch_path = new Stack<IRForOneBranchControl>();
-	private Stack<Map<IJavaElement, Set<IRForOneInstruction>>> last_instrs = new Stack<Map<IJavaElement, Set<IRForOneInstruction>>>();
+	private Stack<Map<IJavaElement, Set<DynamicNode>>> last_instrs = new Stack<Map<IJavaElement, Set<DynamicNode>>>();
+	private Map<IJavaElement, Set<DynamicNode>> out_last_instrs = new HashMap<IJavaElement, Set<DynamicNode>>();
 	
 	public BranchControlForOneIRCode(IRCode parent_env) {
 		this.SetParentEnv(parent_env);
@@ -26,7 +32,7 @@ public class BranchControlForOneIRCode {
 	
 	public void Push(IRForOneBranchControl bc) {
 		already_branch_path.push(bc);
-		HashMap<IJavaElement, Set<IRForOneInstruction>> one_last_instrs = new HashMap<IJavaElement, Set<IRForOneInstruction>>();
+		HashMap<IJavaElement, Set<DynamicNode>> one_last_instrs = new HashMap<IJavaElement, Set<DynamicNode>>();
 		if (!last_instrs.isEmpty()) {
 			one_last_instrs.putAll(last_instrs.peek());
 		}
@@ -38,8 +44,12 @@ public class BranchControlForOneIRCode {
 	}
 	
 	public void Pop() {
-		already_branch_path.pop();
-		last_instrs.pop();
+		IRForOneBranchControl bc = already_branch_path.pop();
+		Set<IRForOneInstruction> out_conns = IRGeneratorForOneProject.GetInstance().GetOutINodesByContainingSpecificType(bc, EdgeBaseType.BranchControl.Value());
+		Map<IJavaElement, Set<DynamicNode>> pop_cnt = last_instrs.pop();
+		if (out_conns == null || out_conns.isEmpty()) {
+			MapSetUtil.HandleTwoMapSet(out_last_instrs, pop_cnt);
+		}
 	}
 	
 	public IRForOneBranchControl LastBranchControl() {
@@ -49,7 +59,16 @@ public class BranchControlForOneIRCode {
 		return already_branch_path.peek();
 	}
 	
-	public Map<IJavaElement, Set<IRForOneInstruction>> LastLastInstructions() {
+	public Set<DynamicNode> LastLastInstructions(IJavaElement ije) {
+		Set<DynamicNode> ir_set = last_instrs.peek().get(ije);
+		if (ir_set == null) {
+			ir_set = new HashSet<DynamicNode>();
+			last_instrs.peek().put(ije, ir_set);
+		}
+		return ir_set;
+	}
+	
+	public Map<IJavaElement, Set<DynamicNode>> LastLastInstructions() {
 		if (last_instrs.isEmpty()) {
 			return null;
 		}
@@ -72,6 +91,10 @@ public class BranchControlForOneIRCode {
 	
 	public void SetParentEnv(IRCode parent_env) {
 		this.parent_env = parent_env;
+	}
+	
+	public void InheritFromExecutedIRCode(BranchControlForOneIRCode executed) {
+		MapSetUtil.HandleTwoMapSet(last_instrs.peek(), executed.out_last_instrs);
 	}
 	
 }

@@ -65,5 +65,12 @@ public class DynamicNode implements IVNode {
 	public String ToVisual() {
 		return instr.ToVisual() + "#" + idx;
 	}
+	
+	public boolean IsSameGroup(DynamicNode dn) {
+		if (instr.GetGroup().equals(dn.getInstr().GetGroup()) && idx == dn.idx) {
+			return true;
+		}
+		return false;
+	}
 
 }

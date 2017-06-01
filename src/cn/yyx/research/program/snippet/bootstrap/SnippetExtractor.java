@@ -58,28 +58,27 @@ public class SnippetExtractor implements IApplication {
 				GenerateDotForEachIRCodeInIRProject irproj_local_generation = new GenerateDotForEachIRCodeInIRProject(DotMeta.ProjectEachMethodDotDir, DotMeta.ProjectEachMethodPicDir);
 				irproj_local_generation.GenerateDots();
 				
-				
 				// generate for each full trace.
-//				IRGeneratorForOneProject irinstance = IRGeneratorForOneProject.GetInstance();
-//				Set<IMethod> roots = EclipseSearchForICallGraph.GetRootCallEntries(irinstance.GetInverseCallGraph());
-//				
-//				// debugging.
-//				DebugLogger.Log("root size:" + roots.size());
-//				DebugLogger.Log("root imethods:" + roots);
-//				
-//				InvokeMethodSelector ims = new InvokeMethodSelector();
-//				ims.SelectOneMethod(null, roots, true);
-//				List<MethodSelection> method_selects = ims.GetMethodSelections();
-//				List<FullTrace> ft_traces = new LinkedList<FullTrace>();
-//				Iterator<MethodSelection> mitr = method_selects.iterator();
-//				while (mitr.hasNext()) {
-//					MethodSelection ms = mitr.next();
-//					CodeOnOneTraceGenerator cootg = new CodeOnOneTraceGenerator(ms);
-//					FullTrace ft = cootg.GetFullTrace();
-//					ft_traces.add(ft);
-//				}
-//				GenerateDotForEachFullTrace full_trace_generator = new GenerateDotForEachFullTrace(DotMeta.FullTraceDotDir, DotMeta.FullTracePicDir, ft_traces);
-//				full_trace_generator.GenerateDots();
+				IRGeneratorForOneProject irinstance = IRGeneratorForOneProject.GetInstance();
+				Set<IMethod> roots = EclipseSearchForICallGraph.GetRootCallEntries(irinstance.GetInverseCallGraph());
+				
+				// debugging.
+				DebugLogger.Log("root size:" + roots.size());
+				DebugLogger.Log("root imethods:" + roots);
+				
+				InvokeMethodSelector ims = new InvokeMethodSelector();
+				ims.SelectOneMethod(null, roots, true);
+				List<MethodSelection> method_selects = ims.GetMethodSelections();
+				List<FullTrace> ft_traces = new LinkedList<FullTrace>();
+				Iterator<MethodSelection> mitr = method_selects.iterator();
+				while (mitr.hasNext()) {
+					MethodSelection ms = mitr.next();
+					CodeOnOneTraceGenerator cootg = new CodeOnOneTraceGenerator(ms);
+					FullTrace ft = cootg.GetFullTrace();
+					ft_traces.add(ft);
+				}
+				GenerateDotForEachFullTrace full_trace_generator = new GenerateDotForEachFullTrace(DotMeta.FullTraceDotDir, DotMeta.FullTracePicDir, ft_traces);
+				full_trace_generator.GenerateDots();
 			}
 			SystemUtil.Delay(1000);
 		} catch (Exception e) {

@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
 
-import cn.yyx.research.program.analysis.fulltrace.generation.BranchControlForOneIRCode;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
@@ -165,7 +164,7 @@ public class FullTrace implements IVNodeContainer {
 		return conn;
 	}
 	
-	public void NodeCreated(IJavaElement ije, DynamicNode new_dn, BranchControlForOneIRCode bcfir)
+	public void NodeCreated(IJavaElement ije, DynamicNode source_dn, DynamicNode new_dn, BranchControlForOneIRCode bcfir)
 	{
 		IRForOneInstruction instr = new_dn.getInstr();
 		if (instr instanceof IRForOneBranchControl) {
@@ -178,13 +177,28 @@ public class FullTrace implements IVNodeContainer {
 		}
 		if (!nset.contains(new_dn)) {
 			nset.add(new_dn);
-			DynamicNode last_dn = last_pc.get(ije);
-			last_pc.put(ije, new_dn);
-			if (last_dn != null) {
-				DynamicConnection dc = new DynamicConnection(last_dn, new_dn, EdgeBaseType.Self.Value());
-				AddConnection(dc);
+			Set<DynamicNode> last_dns = bcfir.LastLastInstructions(ije);
+			if (last_dns != null) {
+				Set<DynamicNode> remove = new HashSet<DynamicNode>();
+				Set<DynamicNode> last_ins = bcfir.LastLastInstructions(ije);
+				Iterator<DynamicNode> litr = last_ins.iterator();
+				while (litr.hasNext()) {
+					DynamicNode last_dn = litr.next();
+					if (!last_dn.IsSameGroup(new_dn)) {
+						AddConnection(new DynamicConnection(last_dn, new_dn, EdgeBaseType.Self.Value()));
+						remove.add(last_dn);
+					} else {
+						if (last_dn.equals(source_dn)) {
+							remove.add(last_dn);
+						}
+					}
+				}
+				last_ins.add(new_dn);
+				last_ins.removeAll(remove);
 			} else {
-				root_pc.put(ije, new_dn);
+				last_dns = new HashSet<DynamicNode>();
+				last_dns.add(new_dn);
+				root_pc.put(ije, last_dns);
 			}
 		}
 	}
