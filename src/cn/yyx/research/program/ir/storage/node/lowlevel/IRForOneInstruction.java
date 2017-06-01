@@ -17,6 +17,8 @@ public abstract class IRForOneInstruction implements IIREnergyNode, IVNode {
 	protected int accept_type = 0;
 	protected int require_type = 0;
 	
+	protected IRForOneInstruction group = null;
+	
 	// private int start = -1;
 	// private int end = -1;
 	// private IRInstrKind ir_kind = IRInstrKind.Weak;
@@ -61,41 +63,6 @@ public abstract class IRForOneInstruction implements IIREnergyNode, IVNode {
 		this.iirtask = iirtask;
 	}
 	
-//	public void AddParent(IRForOneJavaInstruction parent)
-//	{
-//		parents.add(parent);
-//		parent.AddChild(this);
-//	}
-//	
-//	private void AddChild(IRForOneJavaInstruction child)
-//	{
-//		children.add(child);
-//	}
-
-//	public int getStart() {
-//		return start;
-//	}
-//
-//	public void setStart(int start) {
-//		this.start = start;
-//	}
-//
-//	public int getEnd() {
-//		return end;
-//	}
-//
-//	public void setEnd(int end) {
-//		this.end = end;
-//	}
-//
-//	public IRInstrKind getIr_kind() {
-//		return ir_kind;
-//	}
-//
-//	public void setIr_kind(IRInstrKind ir_kind) {
-//		this.ir_kind = ir_kind;
-//	}
-	
 	@Override
 	public void SetRequireType(int require_type) {
 		this.require_type = require_type;
@@ -114,6 +81,14 @@ public abstract class IRForOneInstruction implements IIREnergyNode, IVNode {
 	@Override
 	public int GetAcceptType() {
 		return accept_type;
+	}
+
+	public IRForOneInstruction GetGroup() {
+		return group;
+	}
+
+	public void SetGroup(IRForOneInstruction group) {
+		this.group = group;
 	}
 	
 }

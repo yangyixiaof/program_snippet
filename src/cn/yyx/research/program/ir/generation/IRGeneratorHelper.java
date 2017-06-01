@@ -27,6 +27,7 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSentinel;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
+import cn.yyx.research.program.systemutil.ReflectionInvoke;
 
 public class IRGeneratorHelper {
 	// necessary. remember to add virtual node to each parameter.
@@ -37,6 +38,25 @@ public class IRGeneratorHelper {
 	// needs
 	// to add a distinct node.
 	// can only be invoked in end_visit_method_invocation.
+	private static void HandleInstructionsUnderParentInfix(IRGeneratorForOneLogicBlock irgfob,
+			IRForOneInstruction now) {
+		if (irgfob.most_parent_infix != null) {
+			// source_method_receiver_element
+			Set<IRForOneInstruction> instrs = irgfob.instrs_under_most_parent_infix.get(now.getIm());
+			if (instrs == null) {
+				instrs = new HashSet<IRForOneInstruction>();
+				irgfob.instrs_under_most_parent_infix.put(now.getIm(), instrs);
+			}
+			instrs.add(now);
+		}
+	}
+
+	public static Object CreateIRInstruction(IRGeneratorForOneLogicBlock irgfob, Class<?> cls, Object[] objs) {
+		IRForOneInstruction now = (IRForOneInstruction) ReflectionInvoke.InvokeConstructor(cls, objs);
+		HandleInstructionsUnderParentInfix(irgfob, now);
+		return now;
+	}
+
 	public static IRForOneSourceMethodInvocation GenerateMethodInvocationIR(IRGeneratorForOneLogicBlock irgfob,
 			List<Expression> nlist, IMethod parent_im, IMethod im, Expression expr, String identifier, ASTNode node) {
 		IRForOneSourceMethodInvocation now = null;
@@ -75,8 +95,11 @@ public class IRGeneratorHelper {
 					}
 				}
 				Map<IRForOneInstruction, List<Integer>> para_order_instr_index_map = new HashMap<IRForOneInstruction, List<Integer>>();
-				now = new IRForOneSourceMethodInvocation(im.getElementName(), irc, source_method_receiver_element,
-						methods, DefaultINodeTask.class, para_order_instr_index_map);
+
+				now = (IRForOneSourceMethodInvocation) CreateIRInstruction(irgfob, IRForOneSourceMethodInvocation.class,
+						new Object[] { im.getElementName(), irc, source_method_receiver_element, methods,
+								DefaultINodeTask.class, para_order_instr_index_map });
+
 				Iterator<Expression> nitr = nlist.iterator();
 				int idx = -1;
 				while (nitr.hasNext()) {
@@ -144,7 +167,7 @@ public class IRGeneratorHelper {
 				// int start = exact_node.getStartPosition();
 				// int end = start + exact_node.getLength() - 1;
 				// IRInstrKind ir_kind = IRInstrKind.ComputeKind(1);
-				IRForOneOperation now = new IRForOneOperation(irc, ije, code, DefaultINodeTask.class);
+				IRForOneOperation now = (IRForOneOperation) CreateIRInstruction(irgfob, IRForOneOperation.class, new Object[]{irc, ije, code, DefaultINodeTask.class});
 				ops.add(now);
 				// irc.GoForwardOneIRTreeNode(ije, now);
 				HandleNodeSelfAndSourceMethodAndBranchDependency(irc, ije, now, branch_dependency,
@@ -199,7 +222,8 @@ public class IRGeneratorHelper {
 				// int start = exact_node.getStartPosition();
 				// int end = start + exact_node.getLength() - 1;
 				// IRInstrKind ir_kind = IRInstrKind.ComputeKind(count);
-				IRForOneOperation now = new IRForOneOperation(irc, im, code, task_class);
+				IRForOneOperation now = (IRForOneOperation) CreateIRInstruction(irgfob, IRForOneOperation.class,
+						new Object[] { irc, im, code, task_class });
 				ops.add(now);
 				HandleNodeSelfAndSourceMethodAndBranchDependency(irc, im, now, branch_dependency,
 						irgfob.source_invocation_barrier.peek(), irgfob.element_has_set_branch,

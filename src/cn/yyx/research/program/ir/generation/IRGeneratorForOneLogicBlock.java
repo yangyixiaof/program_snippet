@@ -73,7 +73,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// protected HashMap<IJavaElement, Integer> all_count = new
 	// HashMap<IJavaElement, Integer>();
 	protected HashMap<IJavaElement, ASTNode> all_happen = new HashMap<IJavaElement, ASTNode>();
-
+	
+	protected InfixExpression most_parent_infix = null;
+	protected Map<IJavaElement, Set<IRForOneInstruction>> instrs_under_most_parent_infix = new HashMap<IJavaElement, Set<IRForOneInstruction>>();
 	// check if all_happen is all right assigned. yes.
 
 	// these two variables are all be handled when encountering source method
@@ -545,6 +547,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	private void SwitchAndPrepareMergeInBranch(ASTNode all_in_control, ASTNode branch_first_stat,
 			ASTNode branch_last_stat, boolean clear, boolean just_one_branch) {
+		final IRGeneratorForOneLogicBlock this_ref = this;
 		if (branch_first_stat != null) {
 			pre_visit_task.Put(branch_first_stat, new Runnable() {
 				@Override
@@ -571,7 +574,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 						Iterator<IJavaElement> eleitr = eles.iterator();
 						while (eleitr.hasNext()) {
 							IJavaElement eije = eleitr.next();
-							IRForOneOperation irfop = new IRForOneOperation(irc, eije, "nothing.", SkipSelfTask.class);
+							IRForOneOperation irfop = (IRForOneOperation) IRGeneratorHelper.CreateIRInstruction(this_ref, IRForOneOperation.class, new Object[]{irc, eije, "nothing.", SkipSelfTask.class});
 							IRTreeForOneElement itree = irc.GetIRTreeForOneElement(eije);
 							itree.GoForwardANode(irfop);
 						}
@@ -617,7 +620,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		Iterator<IJavaElement> itr = merge.keySet().iterator();
 		while (itr.hasNext()) {
 			IJavaElement ije = itr.next();
-			IRForOneOperation irfop = new IRForOneOperation(irc, ije, IRMeta.BranchOver, DefaultINodeTask.class);
+			IRForOneOperation irfop = (IRForOneOperation) IRGeneratorHelper.CreateIRInstruction(this, IRForOneOperation.class, new Object[]{irc, ije, IRMeta.BranchOver, DefaultINodeTask.class});
 			ops.add(irfop);
 			List<IRForOneInstruction> merge_list = merge.get(ije);
 			MergeListParallelToOne(merge_list, ije, irfop);
@@ -1653,9 +1656,16 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			list.add(irc.GetLastIRTreeNode(ije));
 		}
 	}
-
+	
+	// TODO
+	
 	@Override
 	public boolean visit(InfixExpression node) {
+		if (most_parent_infix == null) {
+			most_parent_infix = node;
+			instrs_under_most_parent_infix.clear();
+		}
+		
 		HashMap<IJavaElement, List<IRForOneInstruction>> merge = new HashMap<IJavaElement, List<IRForOneInstruction>>();
 		node_to_merge.put(node, merge);
 
@@ -1726,8 +1736,16 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			IJavaElement ije = mitr.next();
 			List<IRForOneInstruction> list = merge.get(ije);
 			// this is the only place which generates meaningful codes but not through IRGeneratorHelper.
-			IRForOneOperation irfop = new IRForOneOperation(irc, ije, node.getOperator().toString(),
-					DefaultINodeTask.class);
+			IRForOneOperation irfop = (IRForOneOperation) IRGeneratorHelper.CreateIRInstruction(this, IRForOneOperation.class, new Object[]{irc, ije, node.getOperator().toString(),
+					DefaultINodeTask.class});
+			if (node.equals(most_parent_infix)) {
+				Set<IRForOneInstruction> instrs = instrs_under_most_parent_infix.get(ije);
+				Iterator<IRForOneInstruction> initr = instrs.iterator();
+				while (initr.hasNext()) {
+					IRForOneInstruction iroi = initr.next();
+					iroi.SetGroup(irfop);
+				}
+			}
 			IRGeneratorHelper.HandleNodeSelfAndSourceMethodAndBranchDependency(irc, ije, irfop, branch_var_instr_order.empty() ? null : branch_var_instr_order.peek(), source_invocation_barrier.peek(), element_has_set_branch, element_has_set_source_method_barrier);
 			new_creation.add(irfop);
 			MergeListParallelToOne(list, ije, irfop);
@@ -1735,6 +1753,10 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		IRGeneratorHelper.HandleEachElementInSameOperationDependency(new_creation);
 		node_to_merge.get(node).clear();
 		node_to_merge.remove(node);
+		if (node.equals(most_parent_infix)) {
+			most_parent_infix = null;
+			instrs_under_most_parent_infix.clear();
+		}
 		super.endVisit(node);
 	}
 

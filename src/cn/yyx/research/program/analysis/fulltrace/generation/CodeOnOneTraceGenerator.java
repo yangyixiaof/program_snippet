@@ -149,12 +149,11 @@ public class CodeOnOneTraceGenerator {
 			branch_control.already_branch_path.pop();
 			return;
 		}
-
 		Set<StaticConnection> out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(now_control_root);
 		execution_memory.executed_conns.addAll(out_conns);
-
+		
 		BreadthFirstToVisitIR(ft, execution_memory, env_idx);
-
+		
 		IRGeneratorForOneProject irproj = IRGeneratorForOneProject.GetInstance();
 		Set<IRForOneInstruction> control_outs = irproj.GetOutINodesByContainingSpecificType(now_control_root,
 				EdgeBaseType.BranchControl.Value());
@@ -169,7 +168,6 @@ public class CodeOnOneTraceGenerator {
 			DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, ir_control, irfom,
 					execution_memory, env_idx);
 		}
-
 		branch_control.already_branch_path.pop();
 	}
 
@@ -351,6 +349,7 @@ public class CodeOnOneTraceGenerator {
 					}
 				}
 			}
+			
 			Set<IJavaElement> all_eles = new HashSet<IJavaElement>(irfom.GetAllElements());
 			all_eles.removeAll(non_null_params);
 			Iterator<IJavaElement> aitr = all_eles.iterator();

@@ -23,8 +23,8 @@ public class FullTrace implements IVNodeContainer {
 	Map<DynamicNode, Map<DynamicNode, DynamicConnection>> in_conns = new HashMap<DynamicNode, Map<DynamicNode, DynamicConnection>>();
 	Map<DynamicNode, Map<DynamicNode, DynamicConnection>> out_conns = new HashMap<DynamicNode, Map<DynamicNode, DynamicConnection>>();
 	
-	Map<IJavaElement, DynamicNode> root_pc = new HashMap<IJavaElement, DynamicNode>();
-	Map<IJavaElement, DynamicNode> last_pc = new HashMap<IJavaElement, DynamicNode>();
+	Map<IJavaElement, Set<DynamicNode>> root_pc = new HashMap<IJavaElement, Set<DynamicNode>>();
+	Map<IJavaElement, Set<DynamicNode>> last_pc = new HashMap<IJavaElement, Set<DynamicNode>>();
 	Map<IJavaElement, Set<DynamicNode>> ele_nodes = new HashMap<IJavaElement, Set<DynamicNode>>();
 	
 	String description = null;
@@ -39,7 +39,10 @@ public class FullTrace implements IVNodeContainer {
 	
 	public Set<IVNode> GetRootsForVisual() {
 		Set<IVNode> result = new HashSet<IVNode>();
-		result.addAll(root_pc.values());
+		Iterator<Set<DynamicNode>> ritr = root_pc.values().iterator();
+		while (ritr.hasNext()) {
+			result.addAll(ritr.next());
+		}
 		return result;
 	}
 	
