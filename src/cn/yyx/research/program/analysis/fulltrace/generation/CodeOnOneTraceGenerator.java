@@ -14,7 +14,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 
-import cn.yyx.research.logger.DebugLogger;
 import cn.yyx.research.program.analysis.fulltrace.storage.BranchControlForOneIRCode;
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
@@ -301,7 +300,7 @@ public class CodeOnOneTraceGenerator {
 		}
 		
 		DebugShowDotPic.ShowPicForTrace(ft);
-		DebugLogger.Log("");
+		System.currentTimeMillis();
 	}
 
 	private Set<StaticConnection> ObtainExecutionPermission(IRForOneInstruction one_instr_pc, ExecutionMemory memory) {

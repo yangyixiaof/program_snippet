@@ -84,7 +84,7 @@ public class FullTrace implements IVNodeContainer {
 			DynamicNode source = conn.GetSource();
 			DynamicNode target = conn.GetTarget();
 			Set<DynamicNode> roots = root_pc.get(source.getInstr().getIm());
-			if (roots.contains(source)) {
+			if (roots != null && roots.contains(source)) {
 				Set<DynamicNode> replace_nodes = waiting_replace_root_pc.get(source);
 				if (replace_nodes == null) {
 					replace_nodes = new HashSet<DynamicNode>();
