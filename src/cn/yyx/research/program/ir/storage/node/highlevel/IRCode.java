@@ -219,6 +219,10 @@ public abstract class IRCode {
 	public IRTreeForOneElement GetSourceMethodInvocations() {
 		return irs.get(source_method_receiver_element);
 	}
+	
+	public IJavaElement GetSourceMethodReceiverElement() {
+		return source_method_receiver_element;
+	}
 
 	public boolean IsHasElement() {
 		return has_element;

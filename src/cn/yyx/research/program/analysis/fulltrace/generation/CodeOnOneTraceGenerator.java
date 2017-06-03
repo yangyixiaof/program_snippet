@@ -158,7 +158,7 @@ public class CodeOnOneTraceGenerator {
 		Set<StaticConnection> out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(now_control_root);
 		execution_memory.executed_conns.addAll(out_conns);
 		
-		BreadthFirstToVisitIR(ft, execution_memory, env_idx);
+		BreadthFirstToVisitIR(ft, execution_memory, env_idx, irfom);
 		
 		IRGeneratorForOneProject irproj = IRGeneratorForOneProject.GetInstance();
 		Set<IRForOneInstruction> control_outs = irproj.GetOutINodesByContainingSpecificType(now_control_root,
@@ -177,15 +177,23 @@ public class CodeOnOneTraceGenerator {
 		branch_control.Pop();
 	}
 
-	private void BreadthFirstToVisitIR(FullTrace ft, ExecutionMemory memory, int env_idx) {
+	private void BreadthFirstToVisitIR(FullTrace ft, ExecutionMemory memory, int env_idx, IRCode irfom) {
 		while (true) {
 			boolean could_continue = false;
-			Set<IJavaElement> exe_keys = memory.last_waiting_execution.keySet();
-			Iterator<IJavaElement> exe_itr = exe_keys.iterator();
+			IJavaElement source_mi = irfom.GetSourceMethodReceiverElement();
+			List<IJavaElement> exe_key_list = new LinkedList<IJavaElement>();
+			Set<IJavaElement> exe_keys = new HashSet<IJavaElement>(memory.last_waiting_execution.keySet());
+			if (memory.last_waiting_execution.containsKey(source_mi)) {
+				exe_key_list.add(source_mi);
+				exe_keys.remove(source_mi);
+			}
+			exe_key_list.addAll(exe_keys);
+			Iterator<IJavaElement> exe_itr = exe_key_list.iterator();
 			while (exe_itr.hasNext()) {
 				IJavaElement ije = exe_itr.next();
 				List<IRForOneInstruction> inodes = memory.last_waiting_execution.get(ije);
-
+				
+				// debugging code.
 				if (inodes == null) {
 					System.err.println("What!!!!!! inodes is null??????");
 					System.exit(1);
@@ -310,7 +318,7 @@ public class CodeOnOneTraceGenerator {
 
 	private void HandleCallerToCallee(IRCode irc, IRForOneSourceMethodInvocation wrap_node, FullTrace ft_run,
 			int env_idx, ExecutionMemory memory) {
-		// TODO every node connection level exact IJavaElement matching is not considered.
+		// Solved. every node connection level exact IJavaElement matching is not considered.
 		// Solved. need to handle hidden inherit link.
 		// Solved. should handle the before connection to parameters.
 
