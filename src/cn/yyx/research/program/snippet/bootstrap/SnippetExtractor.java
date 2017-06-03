@@ -80,11 +80,12 @@ public class SnippetExtractor implements IApplication {
 				GenerateDotForEachFullTrace full_trace_generator = new GenerateDotForEachFullTrace(DotMeta.FullTraceDotDir, DotMeta.FullTracePicDir, ft_traces);
 				full_trace_generator.GenerateDots();
 			}
-			SystemUtil.Delay(1000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		// AnalysisEnvironment.DeleteAllAnalysisEnvironment();
+		SystemUtil.Delay(1000);
+		SystemUtil.Flush();
 		return IApplication.EXIT_OK;
 	}
 	

@@ -42,7 +42,7 @@ public class SkipSelfTask extends IIRNodeTask {
 			}
 			DynamicConnection conn = ft.GetSpecifiedConnection(source, target);
 			if (conn == null) {
-				System.err.println("Strange! specified connection is null!");
+				System.err.println("Strange! specified connection is null!" + ";Source:" + source + ";Target:" + target);
 			}
 			ft.RemoveConnection(conn);
 		}

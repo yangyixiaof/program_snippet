@@ -12,4 +12,9 @@ public class SystemUtil {
 		}
 	}
 	
+	public static void Flush() {
+		System.out.flush();
+		System.err.flush();
+	}
+	
 }
