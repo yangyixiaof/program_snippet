@@ -40,11 +40,11 @@ public class SkipSelfTask extends IIRNodeTask {
 				DynamicConnection new_dc = new DynamicConnection(nsource, ntarget, dc.getType() & final_type | addition);
 				ft.AddConnection(new_dc);
 			}
-			DynamicConnection conn = ft.GetSpecifiedConnection(source, target);
-			if (conn == null) {
-				System.err.println("Strange! specified connection is null!" + ";Source:" + source + ";Target:" + target);
-			}
-			ft.RemoveConnection(conn);
+//			DynamicConnection conn = ft.GetSpecifiedConnection(source, target);
+//			if (conn == null) {
+//				System.err.println("Strange! specified connection is null!" + ";Source:" + source + ";Target:" + target);
+//			}
+//			ft.RemoveConnection(conn);
 		}
 	}
 	

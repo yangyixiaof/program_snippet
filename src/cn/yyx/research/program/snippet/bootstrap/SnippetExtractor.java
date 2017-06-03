@@ -84,8 +84,8 @@ public class SnippetExtractor implements IApplication {
 			e.printStackTrace();
 		}
 		// AnalysisEnvironment.DeleteAllAnalysisEnvironment();
-		SystemUtil.Delay(1000);
 		SystemUtil.Flush();
+		SystemUtil.Delay(1000);
 		return IApplication.EXIT_OK;
 	}
 	
