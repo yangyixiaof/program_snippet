@@ -198,7 +198,7 @@ public class FullTrace implements IVNodeContainer {
 			} else {
 				// last_dns = new HashSet<DynamicNode>();
 				last_dns.add(new_dn);
-				// root_pc.put(ije, last_dns);
+				root_pc.put(ije, new HashSet<DynamicNode>(last_dns));
 			}
 		}
 	}
