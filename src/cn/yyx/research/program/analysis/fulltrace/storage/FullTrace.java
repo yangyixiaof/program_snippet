@@ -178,7 +178,7 @@ public class FullTrace implements IVNodeContainer {
 		if (!nset.contains(new_dn)) {
 			nset.add(new_dn);
 			Set<DynamicNode> last_dns = bcfir.LastLastInstructions(ije);
-			if (last_dns != null && !last_dns.isEmpty()) {
+			if (!last_dns.isEmpty()) {
 				Set<DynamicNode> remove = new HashSet<DynamicNode>();
 				// Set<DynamicNode> last_ins = bcfir.LastLastInstructions(ije);
 				Iterator<DynamicNode> litr = last_dns.iterator();
@@ -196,9 +196,9 @@ public class FullTrace implements IVNodeContainer {
 				last_dns.add(new_dn);
 				last_dns.removeAll(remove);
 			} else {
-				last_dns = new HashSet<DynamicNode>();
+				// last_dns = new HashSet<DynamicNode>();
 				last_dns.add(new_dn);
-				root_pc.put(ije, last_dns);
+				// root_pc.put(ije, last_dns);
 			}
 		}
 	}
