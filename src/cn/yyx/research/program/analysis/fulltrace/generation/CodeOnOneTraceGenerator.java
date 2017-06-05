@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 
+import cn.yyx.research.logger.DebugLogger;
 import cn.yyx.research.program.analysis.fulltrace.storage.BranchControlForOneIRCode;
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
@@ -49,7 +50,7 @@ public class CodeOnOneTraceGenerator {
 		full_trace = new FullTrace(IMemberDescriptionHelper.GetDescription(ms.GetRoot()));
 		IRForOneMethod root_code = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(ms.GetRoot());
 		int env_idx = GetID(root_code);
-		GenerateFullTrace(root_code, null, env_idx, full_trace);
+		GenerateFullTrace(root_code, null, env_idx, full_trace, true);
 	}
 
 	public FullTrace GetFullTrace() {
@@ -67,9 +68,9 @@ public class CodeOnOneTraceGenerator {
 	}
 
 	private void GenerateFullTrace(IRCode irfom, IRForOneSourceMethodInvocation now_instruction, int env_idx,
-			FullTrace ft) {
+			FullTrace ft, boolean is_root) {
 		// Debugging.
-		System.err.println("irfom:" + irfom.getIm().getElementName() + ";now_instruction:" + now_instruction
+		DebugLogger.Error("FullTrace Generation, is_root:" + is_root + ";irfom:" + irfom.getIm().getElementName() + ";is_field_code:" + (!is_root && now_instruction == null)
 				+ ";env_idx:" + env_idx);
 
 		// Solved. handle constructor here.
@@ -80,7 +81,7 @@ public class CodeOnOneTraceGenerator {
 			if (irfot != null) {
 				IRForOneField field_level = irfot.GetFieldLevel();
 				if (field_level != null) {
-					GenerateFullTrace(field_level, null, GetID(field_level), ft);
+					GenerateFullTrace(field_level, null, GetID(field_level), ft, false);
 				}
 			}
 		}
@@ -271,7 +272,7 @@ public class CodeOnOneTraceGenerator {
 		IRForOneMethod select_method_ir = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(select_method);
 		int id = GetID(select_method_ir);
 		method_id.get(irfosm.getParentEnv()).peek().put(irfosm, id);
-		GenerateFullTrace(select_method_ir, irfosm, id, ft);
+		GenerateFullTrace(select_method_ir, irfosm, id, ft, false);
 	}
 
 	private void HandleStaticConnectionForSource(FullTrace ft, IRForOneInstruction source, IRForOneInstruction target,

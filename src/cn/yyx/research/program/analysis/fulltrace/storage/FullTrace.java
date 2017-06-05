@@ -178,10 +178,10 @@ public class FullTrace implements IVNodeContainer {
 		if (!nset.contains(new_dn)) {
 			nset.add(new_dn);
 			Set<DynamicNode> last_dns = bcfir.LastLastInstructions(ije);
-			if (last_dns != null) {
+			if (last_dns != null && !last_dns.isEmpty()) {
 				Set<DynamicNode> remove = new HashSet<DynamicNode>();
-				Set<DynamicNode> last_ins = bcfir.LastLastInstructions(ije);
-				Iterator<DynamicNode> litr = last_ins.iterator();
+				// Set<DynamicNode> last_ins = bcfir.LastLastInstructions(ije);
+				Iterator<DynamicNode> litr = last_dns.iterator();
 				while (litr.hasNext()) {
 					DynamicNode last_dn = litr.next();
 					if (!last_dn.IsSameGroup(new_dn)) {
@@ -193,8 +193,8 @@ public class FullTrace implements IVNodeContainer {
 						}
 					}
 				}
-				last_ins.add(new_dn);
-				last_ins.removeAll(remove);
+				last_dns.add(new_dn);
+				last_dns.removeAll(remove);
 			} else {
 				last_dns = new HashSet<DynamicNode>();
 				last_dns.add(new_dn);

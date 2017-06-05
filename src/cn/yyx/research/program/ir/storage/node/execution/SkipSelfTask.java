@@ -61,13 +61,13 @@ public class SkipSelfTask extends IIRNodeTask {
 			} else {
 				ft.AddConnection(new DynamicConnection(source, target, connect_info.getType()));
 			}
-			System.currentTimeMillis();
 //			DynamicConnection conn = ft.GetSpecifiedConnection(source, target);
 //			if (conn == null) {
 //				System.err.println("Strange! specified connection is null!" + ";Source:" + source + ";Target:" + target);
 //			}
 //			ft.RemoveConnection(conn);
 		}
+		System.currentTimeMillis();
 	}
 	
 }
