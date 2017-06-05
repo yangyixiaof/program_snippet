@@ -17,7 +17,7 @@ public class DebugShowDotPic {
 		if (IRControlMeta.deep_debug) {
 			CommonDotGenerator cdg = new CommonDotGenerator(ft.GetRootsForVisual(), ft, DotMeta.DebugDotDir + "/" + "Debug" + (++debug_idx) + ".dot", ft.GetDescription());
 			cdg.GenerateDot();
-			DotView.HandleAllDotsInDirectory(DotMeta.DebugDotDir, DotMeta.DebugPicDir);
+			DotView.HandleLatestDotInDirectory(DotMeta.DebugDotDir, DotMeta.DebugPicDir);
 		}
 	}
 	

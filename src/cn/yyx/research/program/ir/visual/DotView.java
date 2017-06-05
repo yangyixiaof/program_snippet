@@ -22,24 +22,62 @@ public class DotView {
 		{
 			File f = fitr.next();
 			System.out.print("Handling " + f.getName() + " ......");
-			String fname = f.getName();
-			String dotname = fname.substring(0, fname.lastIndexOf(".dot"));
-			String cmd = IRVisualMeta.DOT_EXE + " -Tjpg " + f.getAbsolutePath() + " -o " + pic_directory + "/" + dotname + ".jpg";
-			try {
-				ProcessBuilder pb = new ProcessBuilder(cmd.split(" "));
-				pb.redirectError(Redirect.INHERIT);
-				pb.redirectOutput(Redirect.INHERIT);
-				Process process = pb.start();
-				process.waitFor();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			HandleOneDot(f, pic_directory);
 			System.out.println("One file: " + f.getAbsolutePath() + " has been hanlded over.");
+		}
+	}
+	
+	private static void HandleOneDot(File f, String pic_directory) {
+		String fname = f.getName();
+		String dotname = fname.substring(0, fname.lastIndexOf(".dot"));
+		String cmd = IRVisualMeta.DOT_EXE + " -Tjpg " + f.getAbsolutePath() + " -o " + pic_directory + "/" + dotname + ".jpg";
+		try {
+			ProcessBuilder pb = new ProcessBuilder(cmd.split(" "));
+			pb.redirectError(Redirect.INHERIT);
+			pb.redirectOutput(Redirect.INHERIT);
+			Process process = pb.start();
+			process.waitFor();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	
 	public static void main(String[] args) {
 		DotView.HandleAllDotsInDirectory();
+	}
+
+	public static void HandleLatestDotInDirectory(String debugdotdir, String debugpicdir) {
+		File latest = null;
+		FileIterator fi = new FileIterator(debugdotdir, ".*\\.dot$");
+		Iterator<File> fitr = fi.EachFileIterator();
+		int max = -1;
+		while (fitr.hasNext())
+		{
+			File f = fitr.next();
+			String fname = f.getName();
+			fname = fname.substring(0, fname.lastIndexOf(".dot"));
+			int flen = fname.length()-1;
+			String num = "";
+			while (flen >= 0) {
+				char c = fname.charAt(flen);
+				if (!Character.isDigit(c)) {
+					break;
+				}
+				num = c + num;
+				flen--;
+			}
+			if (num.equals("")) {
+				num = "0";
+			}
+			int n = Integer.parseInt(num);
+			if (max < n) {
+				max = n;
+				latest = f;
+			}
+		}
+		if (latest != null) {
+			HandleOneDot(latest, debugpicdir);
+		}
 	}
 	
 }
