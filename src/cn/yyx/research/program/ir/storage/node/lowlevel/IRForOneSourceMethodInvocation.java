@@ -57,7 +57,12 @@ public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 	public String ToVisual() {
 		return "Method:" + method_name;
 	}
-
+	
+	@Override
+	public String toString() {
+		return ToVisual();
+	}
+	
 //	public void AddVariableParameterOrderInstructionIndexs(Map<IRForOneInstruction, List<Integer>> para_order_instr_index_map) {
 //		this.para_order_instr_index_map.putAll(para_order_instr_index_map);
 //	}

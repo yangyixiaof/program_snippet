@@ -48,5 +48,10 @@ public class IRForOneSentinel extends IRForOneInstruction {
 		}
 		return IRMeta.VirtualSentinel + im_str;
 	}
-
+	
+	@Override
+	public String toString() {
+		return ToVisual();
+	}
+	
 }

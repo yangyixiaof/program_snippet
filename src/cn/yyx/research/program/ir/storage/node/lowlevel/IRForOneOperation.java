@@ -27,18 +27,9 @@ public class IRForOneOperation extends IRForOneInstruction {
 		return "Op:" + ir;
 	}
 
-//	@Override
-//	public Map<IIRNode, Set<StaticConnection>> PrepareOutNodes() {
-//		Map<IIRNode, Set<StaticConnection>> irmap = new HashMap<IIRNode, Set<StaticConnection>>();
-//		irmap.put(this, IRGeneratorForOneProject.GetInstance().GetOutConnection(this));
-//		return irmap;
-//	}
-//
-//	@Override
-//	public Map<IIRNode, Set<StaticConnection>> PrepareInNodes() {
-//		Map<IIRNode, Set<StaticConnection>> irmap = new HashMap<IIRNode, Set<StaticConnection>>();
-//		irmap.put(this, IRGeneratorForOneProject.GetInstance().GetInConnection(this));
-//		return irmap;
-//	}
+	@Override
+	public String toString() {
+		return ToVisual();
+	}
 	
 }

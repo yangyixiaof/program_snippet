@@ -24,4 +24,9 @@ public class IRForOneBranchControl extends IRForOneInstruction {
 		return "Branch:" + branch_type.name();
 	}
 	
+	@Override
+	public String toString() {
+		return ToVisual();
+	}
+	
 }
