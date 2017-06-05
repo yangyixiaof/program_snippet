@@ -373,19 +373,7 @@ public class CodeOnOneTraceGenerator {
 				IRForOneInstruction irpara = irc.GetFirstIRTreeNode(ije);
 				ft_run.NodeCreated(ije, null, new DynamicNode(irpara, irc, env_idx), branch_control_stack_total.peek());
 			}
-		} else {
-			if (irc instanceof IRForOneMethod) {
-				// root
-				// IRForOneMethod irfom = (IRForOneMethod) irc;
-				// do nothing.
-			} else {
-				// field code.
-				// IRForOneField irfom = (IRForOneField) irc;
-				// do nothing.
-			}
 		}
-
-		
 	}
 
 }
