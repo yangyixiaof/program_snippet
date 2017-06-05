@@ -72,6 +72,7 @@ public class CodeOnOneTraceGenerator {
 		// Debugging.
 		DebugLogger.Error("FullTrace Generation, is_root:" + is_root + ";irfom:" + irfom.getIm().getElementName() + ";is_field_code:" + (!is_root && now_instruction == null)
 				+ ";env_idx:" + env_idx);
+		System.currentTimeMillis();
 
 		// Solved. handle constructor here.
 		if (irfom instanceof IRForOneConstructor) {
@@ -384,38 +385,7 @@ public class CodeOnOneTraceGenerator {
 			}
 		}
 
-		// while (param_depend_itr.hasNext())
-		// {
-		// IRForOneInstruction irfoi = param_depend_itr.next();
-		// Integer index = wrap_node.ParameterIndexNodeDependsTo(irfoi);
-		// IJavaElement param = params.get(index);
-		// List<IRForOneInstruction> depd = inverse_depend.get(param);
-		// if (depd == null)
-		// {
-		// depd = new LinkedList<IRForOneInstruction>();
-		// inverse_depend.put(param, depd);
-		// }
-		// depd.add(irfoi);
-		// }
-		// Set<IJavaElement> ikeys = inverse_depend.keySet();
-		// Iterator<IJavaElement> iitr = ikeys.iterator();
-		// while (iitr.hasNext())
-		// {
-		// IJavaElement ije = iitr.next();
-		// IRForOneInstruction first_instr = irc.GetFirstIRTreeNode(ije);
-		// List<IRForOneInstruction> depds = inverse_depend.get(ije);
-		// Iterator<IRForOneInstruction> ditr = depds.iterator();
-		// while (ditr.hasNext())
-		// {
-		// IRForOneInstruction irfoi = ditr.next();
-		// HandleChildNodeExtendFromParentNode(irfoi, first_instr,
-		// IRGeneratorForOneProject.GetInstance().GetSpecifiedConnection(irfoi,
-		// wrap_node));
-		// }
-		// executed_instrs.add(first_instr);
-		// instr_pc.remove(first_instr);
-		// instr_pc.addAll(IRGeneratorForOneProject.GetInstance().GetOutINodes(first_instr));
-		// }
+		
 	}
 
 }

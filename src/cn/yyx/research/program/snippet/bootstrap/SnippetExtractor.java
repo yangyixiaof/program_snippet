@@ -24,6 +24,7 @@ import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.visual.dot.generation.GenerateDotForEachFullTrace;
 import cn.yyx.research.program.ir.visual.dot.generation.GenerateDotForEachIRCodeInIRProject;
 import cn.yyx.research.program.ir.visual.meta.DotMeta;
+import cn.yyx.research.program.systemutil.EnvironmentUtil;
 import cn.yyx.research.program.systemutil.SystemUtil;
 import cn.yyx.research.test.TestJavaSearch;
 
@@ -45,6 +46,7 @@ public class SnippetExtractor implements IApplication {
 	
 	@Override
 	public Object start(IApplicationContext context) throws Exception {
+		EnvironmentUtil.Clear();
 		IJavaProject java_project = LoadProjectAccordingToArgs((String[])context.getArguments().get(IApplicationContext.APPLICATION_ARGS));
 		try {
 			// DebugLogger.Log("Start is invoked!");

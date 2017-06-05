@@ -11,14 +11,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class FileUtil {
-	
+
 	public static void EnsureDirectoryExist(String dir) {
 		File d = new File(dir);
 		if (!d.exists()) {
 			d.mkdirs();
 		}
 	}
-	
+
 	public static String ReadFromFile(File f) {
 		BufferedReader reader = null;
 		try {
@@ -102,6 +102,19 @@ public class FileUtil {
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public static void DeleteFile(File file) {
+		if (file.exists()) {
+			if (file.isDirectory()) {
+				File[] files = file.listFiles();
+				for (File f : files) {
+					DeleteFile(f);
+				}
+			} else {
+				file.delete();
+			}
 		}
 	}
 
