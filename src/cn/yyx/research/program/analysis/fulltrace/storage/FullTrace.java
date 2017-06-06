@@ -126,10 +126,12 @@ public class FullTrace implements IVNodeContainer {
 		IRForOneInstruction instr = source_dn.getInstr();
 		IJavaElement ije = instr.getIm();
 		Set<DynamicNode> created_nodes = ele_nodes.get(ije);
-		if (created_nodes == null) {
+		if (created_nodes == null || !created_nodes.contains(source_dn)) {
 			System.err.println("Strange! created_nodes is null? ije:" + ije);
+			System.err.println("Strange! created_nodes do not contain source_dn:" + source_dn);
+			System.exit(1);
 		}
-		if (instr instanceof IRForOneBranchControl || !created_nodes.contains(source_dn)) {
+		if (instr instanceof IRForOneBranchControl) {
 			return;
 		}
 		
