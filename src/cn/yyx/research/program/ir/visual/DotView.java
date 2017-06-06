@@ -21,9 +21,7 @@ public class DotView {
 		while (fitr.hasNext())
 		{
 			File f = fitr.next();
-			System.out.print("Handling " + f.getName() + " ......");
 			HandleOneDot(f, pic_directory);
-			System.out.println("One file: " + f.getAbsolutePath() + " has been hanlded over.");
 		}
 	}
 	
@@ -40,6 +38,7 @@ public class DotView {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("One file: " + f.getAbsolutePath() + " has been hanlded over.");
 	}
 	
 	public static void main(String[] args) {
