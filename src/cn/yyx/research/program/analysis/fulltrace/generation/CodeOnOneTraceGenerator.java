@@ -341,7 +341,8 @@ public class CodeOnOneTraceGenerator {
 			memory.last_waiting_execution.put(ije, ins);
 			// instr_pc.add(irc.GetFirstIRTreeNode(ije));
 		}
-
+		
+		Set<IJavaElement> all_eles = new HashSet<IJavaElement>(irc.GetAllElements());
 		if (wrap_node != null) {
 			// irc must be of type IRForOneMethod.
 			IRForOneMethod irfom = (IRForOneMethod) irc;
@@ -365,14 +366,13 @@ public class CodeOnOneTraceGenerator {
 				}
 			}
 			
-			Set<IJavaElement> all_eles = new HashSet<IJavaElement>(irfom.GetAllElements());
 			all_eles.removeAll(non_null_params);
-			Iterator<IJavaElement> aitr = all_eles.iterator();
-			while (aitr.hasNext()) {
-				IJavaElement ije = aitr.next();
-				IRForOneInstruction irpara = irc.GetFirstIRTreeNode(ije);
-				ft_run.NodeCreated(ije, null, new DynamicNode(irpara, irc, env_idx), branch_control_stack_total.peek());
-			}
+		}
+		Iterator<IJavaElement> aitr = all_eles.iterator();
+		while (aitr.hasNext()) {
+			IJavaElement ije = aitr.next();
+			IRForOneInstruction irpara = irc.GetFirstIRTreeNode(ije);
+			ft_run.NodeCreated(ije, null, new DynamicNode(irpara, irc, env_idx), branch_control_stack_total.peek());
 		}
 	}
 
