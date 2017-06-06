@@ -26,7 +26,7 @@ public class DynamicConnection {
 		return target;
 	}
 
-	public void setTarget(DynamicNode target) {
+	private void setTarget(DynamicNode target) {
 		this.target = target;
 	}
 
@@ -39,6 +39,10 @@ public class DynamicConnection {
 	}
 	
 	public DynamicConnection Merge(DynamicConnection dnn) {
+		if (!source.equals(dnn.source) || !target.equals(dnn.target)) {
+			System.err.println("source is not source or target is not target.");
+			System.exit(1);
+		}
 		return new DynamicConnection(source, target, type | dnn.getType());
 	}
 	

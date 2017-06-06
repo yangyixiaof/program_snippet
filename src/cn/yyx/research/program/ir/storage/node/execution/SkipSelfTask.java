@@ -25,10 +25,7 @@ public class SkipSelfTask extends IIRNodeTask {
 		int final_type = TaskExecutionHelper.ComputeFinalType(source, target, connect_info);
 		Set<DynamicConnection> in_conns = ft.GetInConnections(source);
 		if (in_conns.isEmpty()) {
-			// IRForOneInstruction instr = source.getInstr();
-			// if (instr instanceof IRForOneSentinel) {
 			ft.AddConnection(new DynamicConnection(source, target, connect_info.getType()));
-			// }
 		} else {
 			// System.err.println("====== Real skip task is running!");
 			boolean skip = true;
