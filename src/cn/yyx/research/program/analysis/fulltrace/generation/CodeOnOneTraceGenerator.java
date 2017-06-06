@@ -103,10 +103,7 @@ public class CodeOnOneTraceGenerator {
 		// int last_size = branch_control_stack.size();
 		// List<IRForOneBranchControl> new_list =
 		// branch_control_stack.subList(0, last_size);
-
-		ExecutionMemory memory = new ExecutionMemory();
-		HandleCallerToCallee(irfom, now_instruction, ft, env_idx, memory);
-
+		
 		Stack<BranchControlForOneIRCode> branch_control_stack = branch_control_stack_foreach_ircode.get(irfom);
 		if (branch_control_stack == null) {
 			branch_control_stack = new Stack<BranchControlForOneIRCode>();
@@ -119,6 +116,9 @@ public class CodeOnOneTraceGenerator {
 		branch_control_stack.push(branch_control);
 		branch_control_stack_total.push(branch_control);
 		
+		ExecutionMemory memory = new ExecutionMemory();
+		HandleCallerToCallee(irfom, now_instruction, ft, env_idx, memory);
+		
 		DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, control_root, irfom, memory,
 				env_idx);
 
@@ -128,10 +128,6 @@ public class CodeOnOneTraceGenerator {
 		}
 		branch_control_stack.pop();
 		method_id.get(irfom).pop();
-		// branch_control_stack.clear();
-		// branch_control_stack.addAll(new_list);
-		// branch_control_stack_foreach_ircode.clear();
-		// branch_control_stack_foreach_ircode.putAll(copy_env);
 	}
 
 	private void DepthFirstToVisitControlLogic(FullTrace ft, Stack<BranchControlForOneIRCode> branch_control_stack_copy,
