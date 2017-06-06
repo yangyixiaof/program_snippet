@@ -74,19 +74,6 @@ public class CodeOnOneTraceGenerator {
 				+ ";env_idx:" + env_idx);
 		System.currentTimeMillis();
 
-		// Solved. handle constructor here.
-		if (irfom instanceof IRForOneConstructor) {
-			IRForOneConstructor irfoc = (IRForOneConstructor) irfom;
-			IType it = irfoc.getWrap_class();
-			IRForOneClass irfot = IRGeneratorForOneProject.GetInstance().GetClassIR(it);
-			if (irfot != null) {
-				IRForOneField field_level = irfot.GetFieldLevel();
-				if (field_level != null) {
-					GenerateFullTrace(field_level, null, GetID(field_level), ft, false);
-				}
-			}
-		}
-
 		Stack<Map<IRForOneSourceMethodInvocation, Integer>> id_stack = method_id.get(irfom);
 		if (id_stack == null) {
 			id_stack = new Stack<Map<IRForOneSourceMethodInvocation, Integer>>();
@@ -157,6 +144,18 @@ public class CodeOnOneTraceGenerator {
 		execution_memory.executed_conns.addAll(out_conns);
 		
 		if (first_level) {
+			// Solved. handle constructor here.
+			if (irfom instanceof IRForOneConstructor) {
+				IRForOneConstructor irfoc = (IRForOneConstructor) irfom;
+				IType it = irfoc.getWrap_class();
+				IRForOneClass irfot = IRGeneratorForOneProject.GetInstance().GetClassIR(it);
+				if (irfot != null) {
+					IRForOneField field_level = irfot.GetFieldLevel();
+					if (field_level != null) {
+						GenerateFullTrace(field_level, null, GetID(field_level), ft, false);
+					}
+				}
+			}
 			HandleCallerToCallee(irfom, now_instruction, ft, env_idx, execution_memory);
 		}
 		
