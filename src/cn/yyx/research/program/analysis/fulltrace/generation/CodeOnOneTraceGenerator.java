@@ -117,10 +117,9 @@ public class CodeOnOneTraceGenerator {
 		branch_control_stack_total.push(branch_control);
 		
 		ExecutionMemory memory = new ExecutionMemory();
-		HandleCallerToCallee(irfom, now_instruction, ft, env_idx, memory);
 		
 		DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, control_root, irfom, memory,
-				env_idx);
+				env_idx, true, now_instruction);
 
 		BranchControlForOneIRCode pop = branch_control_stack_total.pop();
 		if (!branch_control_stack_total.isEmpty()) {
@@ -132,9 +131,11 @@ public class CodeOnOneTraceGenerator {
 
 	private void DepthFirstToVisitControlLogic(FullTrace ft, Stack<BranchControlForOneIRCode> branch_control_stack_copy,
 			BranchControlForOneIRCode branch_control, IRForOneBranchControl now_control_root, IRCode irfom,
-			ExecutionMemory execution_memory, int env_idx) {
+			ExecutionMemory execution_memory, int env_idx, boolean first_level, IRForOneSourceMethodInvocation now_instruction) {
 		Set<IRForOneBranchControl> already_visited = new HashSet<IRForOneBranchControl>();
 		branch_control.Push(now_control_root);
+		
+		// judge whether we should continue, mainly for recursive functions.
 		Iterator<BranchControlForOneIRCode> bitr = branch_control_stack_copy.iterator();
 		while (bitr.hasNext()) {
 			BranchControlForOneIRCode bcfoi = bitr.next();
@@ -155,6 +156,10 @@ public class CodeOnOneTraceGenerator {
 		Set<StaticConnection> out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(now_control_root);
 		execution_memory.executed_conns.addAll(out_conns);
 		
+		if (first_level) {
+			HandleCallerToCallee(irfom, now_instruction, ft, env_idx, execution_memory);
+		}
+		
 		BreadthFirstToVisitIR(ft, execution_memory, env_idx, irfom);
 		
 		IRGeneratorForOneProject irproj = IRGeneratorForOneProject.GetInstance();
@@ -169,7 +174,7 @@ public class CodeOnOneTraceGenerator {
 			}
 			IRForOneBranchControl ir_control = (IRForOneBranchControl) irfoi;
 			DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, ir_control, irfom,
-					execution_memory, env_idx);
+					execution_memory, env_idx, false, null);
 		}
 		branch_control.Pop();
 	}
