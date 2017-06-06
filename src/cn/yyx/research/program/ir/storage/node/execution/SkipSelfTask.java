@@ -55,6 +55,7 @@ public class SkipSelfTask extends IIRNodeTask {
 					DynamicConnection new_dc = new DynamicConnection(nsource, ntarget, dc.getType() & final_type | addition);
 					ft.AddConnection(new_dc);
 				}
+				ft.HandleRootsAfterRemovingAllConnections(in_conns);
 			} else {
 				ft.AddConnection(new DynamicConnection(source, target, connect_info.getType()));
 			}

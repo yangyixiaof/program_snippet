@@ -79,7 +79,8 @@ public class FullTrace implements IVNodeContainer {
 		}
 	}
 	
-	public void HandleRootsBeforeRemovingConnection(DynamicConnection conn) {
+	private void HandleRootsBeforeRemovingConnection(DynamicConnection conn) {
+		// just handle waiting_replace_root_pc.
 		if (EdgeTypeUtil.HasSpecificType(conn.getType(), EdgeBaseType.Self.Value())) {
 			DynamicNode source = conn.GetSource();
 			DynamicNode target = conn.GetTarget();
@@ -95,17 +96,21 @@ public class FullTrace implements IVNodeContainer {
 		}
 	}
 	
-	public void HandleRootsAfterRemovingConnection(DynamicConnection conn) {
-		DynamicNode source = conn.GetSource();
-		Map<DynamicNode, DynamicConnection> source_map = out_conns.get(source);
-		if (source_map.isEmpty()) {
-			IJavaElement ije = source.getInstr().getIm();
-			Set<DynamicNode> created_nodes = ele_nodes.get(ije);
-			created_nodes.remove(source);
-			Set<DynamicNode> roots = root_pc.get(source.getInstr().getIm());
-			if (waiting_replace_root_pc.containsKey(source)) {
-				roots.remove(source);
-				roots.addAll(waiting_replace_root_pc.remove(source));
+	public void HandleRootsAfterRemovingAllConnections(Set<DynamicConnection> conns) {
+		Iterator<DynamicConnection> citr = conns.iterator();
+		while (citr.hasNext()) {
+			DynamicConnection conn = citr.next();
+			DynamicNode source = conn.GetSource();
+			Map<DynamicNode, DynamicConnection> source_map = out_conns.get(source);
+			if (source_map.isEmpty()) {
+				IJavaElement ije = source.getInstr().getIm();
+				Set<DynamicNode> created_nodes = ele_nodes.get(ije);
+				created_nodes.remove(source);
+				Set<DynamicNode> roots = root_pc.get(source.getInstr().getIm());
+				if (waiting_replace_root_pc.containsKey(source)) {
+					roots.remove(source);
+					roots.addAll(waiting_replace_root_pc.remove(source));
+				}
 			}
 		}
 	}
@@ -115,8 +120,6 @@ public class FullTrace implements IVNodeContainer {
 		
 		HandleRemoveConnection(conn.GetTarget(), conn.GetSource(), in_conns);
 		HandleRemoveConnection(conn.GetSource(), conn.GetTarget(), out_conns);
-		
-		HandleRootsAfterRemovingConnection(conn);
 	}
 	
 	public void AddConnection(DynamicConnection conn)
