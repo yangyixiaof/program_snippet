@@ -32,6 +32,7 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneField;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodBarrier;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 import cn.yyx.research.program.ir.util.IMemberDescriptionHelper;
 import cn.yyx.research.program.ir.visual.dot.debug.DebugShowDotPic;
@@ -252,16 +253,18 @@ public class CodeOnOneTraceGenerator {
 		Iterator<StaticConnection> iitr = in_conns.iterator();
 		while (iitr.hasNext()) {
 			StaticConnection iirn = iitr.next();
-			if (!memory.executed_conns.contains(iirn)) {
-				IRForOneInstruction source = iirn.getSource();
-				if (memory.executed_nodes.contains(source)) {
-					memory.executed_conns.add(iirn);
-					DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
-					DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
-					ft.AddConnection(
-							new DynamicConnection(source_dn, target_dn, iirn.GetStaticConnectionInfo().getType()));
-					ft.AddConnection(
-							new DynamicConnection(target_dn, source_dn, iirn.GetStaticConnectionInfo().getType()));
+			if (!(iirn.getSource() instanceof IRForOneMethodBarrier && iirn.getTarget() instanceof IRForOneMethodBarrier)) {
+				if (!memory.executed_conns.contains(iirn)) {
+					IRForOneInstruction source = iirn.getSource();
+					if (memory.executed_nodes.contains(source)) {
+						memory.executed_conns.add(iirn);
+						DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
+						DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
+						ft.AddConnection(
+								new DynamicConnection(source_dn, target_dn, iirn.GetStaticConnectionInfo().getType()));
+						ft.AddConnection(
+								new DynamicConnection(target_dn, source_dn, iirn.GetStaticConnectionInfo().getType()));
+					}
 				}
 			}
 		}

@@ -27,6 +27,12 @@ public class DebugLogger {
 			System.err.println(info);
 		}
 	}
+	
+	public static void Debug(String info) {
+		if (IRControlMeta.debug) {
+			System.err.println(info);
+		}
+	}
 
 	public static void Log(String info) {
 		if (IRControlMeta.debug) {
