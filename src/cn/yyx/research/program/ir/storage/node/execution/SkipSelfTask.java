@@ -11,7 +11,6 @@ import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConn
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
 import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeTypeUtil;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodBarrier;
@@ -25,7 +24,11 @@ public class SkipSelfTask extends IIRNodeTask {
 	@Override
 	public void HandleOutConnection(DynamicNode source, DynamicNode target, StaticConnectionInfo connect_info,
 			FullTrace ft) {
-		// need to handle IRForOneRawMethodBarrier.
+		// Solved. need to handle IRForOneRawMethodBarrier.
+		if (source.getInstr() instanceof IRForOneMethodBarrier && target.getInstr() instanceof IRForOneMethodBarrier) {
+			return;
+		}
+		
 		int final_type = TaskExecutionHelper.ComputeFinalType(source, target, connect_info);
 		
 		Set<DynamicConnection> in_conns = new HashSet<DynamicConnection>();
@@ -33,9 +36,10 @@ public class SkipSelfTask extends IIRNodeTask {
 		Iterator<DynamicConnection> ritr = raw_in_conns.iterator();
 		while (ritr.hasNext()) {
 			DynamicConnection dc = ritr.next();
-			if (!(source.getInstr() instanceof IRForOneMethodBarrier && EdgeTypeUtil.HasSpecificType(dc.getType(), EdgeBaseType.SameOperations.Value()))) {
-				in_conns.add(dc);
+			if (dc.GetSource().getInstr() instanceof IRForOneMethodBarrier && dc.GetTarget().getInstr() instanceof IRForOneMethodBarrier) {
+				continue;
 			}
+			in_conns.add(dc);
 		}
 		
 		if (in_conns.isEmpty()) {
