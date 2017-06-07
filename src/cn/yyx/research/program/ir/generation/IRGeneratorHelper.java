@@ -159,7 +159,7 @@ public class IRGeneratorHelper {
 		Set<IJavaElement> temp_bindings = member_set;
 		Iterator<IJavaElement> titr = temp_bindings.iterator();
 
-		List<IRForOneOperation> ops = new LinkedList<IRForOneOperation>();
+		List<IRForOneInstruction> ops = new LinkedList<IRForOneInstruction>();
 		while (titr.hasNext()) {
 			IJavaElement ije = titr.next();
 			ASTNode im_node = all_happen.get(ije);
@@ -167,7 +167,7 @@ public class IRGeneratorHelper {
 				// int start = exact_node.getStartPosition();
 				// int end = start + exact_node.getLength() - 1;
 				// IRInstrKind ir_kind = IRInstrKind.ComputeKind(1);
-				IRForOneOperation now = (IRForOneOperation) CreateIRInstruction(irgfob, IRForOneOperation.class, new Object[]{irc, ije, code, DefaultINodeTask.class});
+				IRForOneInstruction now = (IRForOneInstruction) CreateIRInstruction(irgfob, IRForOneOperation.class, new Object[]{irc, ije, code, DefaultINodeTask.class});
 				ops.add(now);
 				// irc.GoForwardOneIRTreeNode(ije, now);
 				HandleNodeSelfAndSourceMethodAndBranchDependency(irc, ije, now, branch_dependency,
@@ -178,13 +178,18 @@ public class IRGeneratorHelper {
 		HandleEachElementInSameOperationDependency(ops);
 	}
 
-	public static List<IRForOneOperation> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
 			String code) {
 		return GenerateGeneralIR(irgfob, node, code, DefaultINodeTask.class);
 	}
-
-	public static List<IRForOneOperation> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
+	
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
 			String code, Class<? extends IIRNodeTask> task_class) {
+		return GenerateGeneralIR(irgfob, node, code, task_class, IRForOneOperation.class);
+	}
+
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
+			String code, Class<? extends IIRNodeTask> task_class, Class<? extends IRForOneInstruction> operation_class) {
 		IRCode irc = irgfob.irc;
 		// Map<IJavaElement, Integer> all_count = irgfob.all_count;
 		HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
@@ -208,31 +213,17 @@ public class IRGeneratorHelper {
 			// do nothing.
 		}
 
-		List<IRForOneOperation> ops = new LinkedList<IRForOneOperation>();
+		List<IRForOneInstruction> ops = new LinkedList<IRForOneInstruction>();
 		while (titr.hasNext()) {
 			IJavaElement im = titr.next();
 			ASTNode im_node = all_happen.get(im);
 			if (im_node != null && ASTSearch.ASTNodeContainsAnASTNode(node, im_node)) {
-				// Integer count = all_count.get(im);
-				// if (count != null && count >= 0) {
-				// count++;
-				// if (count > IRGeneratorForOneLogicBlock.GetMaxLevel()) {
-				// count = -1;
-				// } else {
-				// int start = exact_node.getStartPosition();
-				// int end = start + exact_node.getLength() - 1;
-				// IRInstrKind ir_kind = IRInstrKind.ComputeKind(count);
-				IRForOneOperation now = (IRForOneOperation) CreateIRInstruction(irgfob, IRForOneOperation.class,
+				IRForOneInstruction now = (IRForOneInstruction) CreateIRInstruction(irgfob, operation_class,
 						new Object[] { irc, im, code, task_class });
 				ops.add(now);
 				HandleNodeSelfAndSourceMethodAndBranchDependency(irc, im, now, branch_dependency,
 						irgfob.source_invocation_barrier.peek(), irgfob.element_has_set_branch,
 						irgfob.element_has_set_source_method_barrier);
-
-				// irc.GoForwardOneIRTreeNode(im, now);
-				// }
-				// all_count.put(im, count);
-				// }
 			}
 		}
 		HandleEachElementInSameOperationDependency(ops);
@@ -315,13 +306,13 @@ public class IRGeneratorHelper {
 	// }
 	// }
 
-	public static void HandleEachElementInSameOperationDependency(List<IRForOneOperation> ops) {
-		Iterator<IRForOneOperation> oitr = ops.iterator();
+	public static void HandleEachElementInSameOperationDependency(List<IRForOneInstruction> ops) {
+		Iterator<IRForOneInstruction> oitr = ops.iterator();
 		while (oitr.hasNext()) {
-			IRForOneOperation irfop = oitr.next();
-			Iterator<IRForOneOperation> oitr_inner = ops.iterator();
+			IRForOneInstruction irfop = oitr.next();
+			Iterator<IRForOneInstruction> oitr_inner = ops.iterator();
 			while (oitr_inner.hasNext()) {
-				IRForOneOperation irfop_inner = oitr_inner.next();
+				IRForOneInstruction irfop_inner = oitr_inner.next();
 				if (irfop == irfop_inner) {
 					break;
 				}

@@ -39,6 +39,7 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodBarrier;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 
@@ -409,11 +410,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 
 		// add sequential edge.
-		List<IRForOneOperation> ops = IRGeneratorHelper.GenerateGeneralIR(this, node,
-				IRMeta.MethodInvocation + identifier, SkipSelfTask.class);
-		Iterator<IRForOneOperation> opitr = ops.iterator();
+		List<IRForOneInstruction> ops = IRGeneratorHelper.GenerateGeneralIR(this, node,
+				IRMeta.MethodInvocation + identifier, SkipSelfTask.class, IRForOneMethodBarrier.class);
+		Iterator<IRForOneInstruction> opitr = ops.iterator();
 		while (opitr.hasNext()) {
-			IRForOneOperation irfop = opitr.next();
+			IRForOneInstruction irfop = opitr.next();
 			IRGeneratorForOneProject.GetInstance()
 					.RegistConnection(new StaticConnection(now, irfop, EdgeBaseType.Sequential.Value()));
 		}
@@ -615,12 +616,12 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	private void HandleMerge(ASTNode all_in_control) {
-		List<IRForOneOperation> ops = new LinkedList<IRForOneOperation>();
+		List<IRForOneInstruction> ops = new LinkedList<IRForOneInstruction>();
 		Map<IJavaElement, List<IRForOneInstruction>> merge = node_to_merge.remove(all_in_control);
 		Iterator<IJavaElement> itr = merge.keySet().iterator();
 		while (itr.hasNext()) {
 			IJavaElement ije = itr.next();
-			IRForOneOperation irfop = (IRForOneOperation) IRGeneratorHelper.CreateIRInstruction(this, IRForOneOperation.class, new Object[]{irc, ije, IRMeta.BranchOver, DefaultINodeTask.class});
+			IRForOneInstruction irfop = (IRForOneInstruction) IRGeneratorHelper.CreateIRInstruction(this, IRForOneOperation.class, new Object[]{irc, ije, IRMeta.BranchOver, DefaultINodeTask.class});
 			ops.add(irfop);
 			List<IRForOneInstruction> merge_list = merge.get(ije);
 			MergeListParallelToOne(merge_list, ije, irfop);
@@ -1714,7 +1715,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return super.visit(node);
 	}
 
-	private void MergeListParallelToOne(List<IRForOneInstruction> list, IJavaElement ije, IRForOneOperation irfop) {
+	private void MergeListParallelToOne(List<IRForOneInstruction> list, IJavaElement ije, IRForOneInstruction irfop) {
 		Iterator<IRForOneInstruction> litr = list.iterator();
 		while (litr.hasNext()) {
 			IRForOneInstruction tn = litr.next();
@@ -1731,12 +1732,12 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		Map<IJavaElement, List<IRForOneInstruction>> merge = node_to_merge.get(node);
 		Set<IJavaElement> mkeys = merge.keySet();
 		Iterator<IJavaElement> mitr = mkeys.iterator();
-		List<IRForOneOperation> new_creation = new LinkedList<IRForOneOperation>();
+		List<IRForOneInstruction> new_creation = new LinkedList<IRForOneInstruction>();
 		while (mitr.hasNext()) {
 			IJavaElement ije = mitr.next();
 			List<IRForOneInstruction> list = merge.get(ije);
 			// this is the only place which generates meaningful codes but not through IRGeneratorHelper.
-			IRForOneOperation irfop = (IRForOneOperation) IRGeneratorHelper.CreateIRInstruction(this, IRForOneOperation.class, new Object[]{irc, ije, node.getOperator().toString(),
+			IRForOneInstruction irfop = (IRForOneInstruction) IRGeneratorHelper.CreateIRInstruction(this, IRForOneOperation.class, new Object[]{irc, ije, node.getOperator().toString(),
 					DefaultINodeTask.class});
 			if (node.equals(most_parent_infix)) {
 				Set<IRForOneInstruction> instrs = instrs_under_most_parent_infix.get(ije);
