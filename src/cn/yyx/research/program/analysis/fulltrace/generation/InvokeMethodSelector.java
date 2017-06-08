@@ -45,9 +45,6 @@ public class InvokeMethodSelector {
 	private void SelectAllMethods() {
 		while (!im_stack.isEmpty()) {
 			MethodHolder mh = im_stack.pop();
-			if (im_stack.isEmpty()) {
-				last_pop = mh;
-			}
 			SelectOneMethod(mh);
 		}
 	}
@@ -72,8 +69,12 @@ public class InvokeMethodSelector {
 			if (mh.irfomi == null) {
 				root = im;
 				method_invocation.clear();
+				last_pop = null;
 			} else {
 				method_invocation.put(mh.irfomi, im);
+			}
+			if (im_stack.isEmpty()) {
+				last_pop = mh;
 			}
 			IRForOneMethod irfom = IRGeneratorForOneProject.GetInstance().GetMethodIR(im);
 			if (irfom == null) {
