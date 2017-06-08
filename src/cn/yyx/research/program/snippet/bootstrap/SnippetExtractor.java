@@ -68,8 +68,8 @@ public class SnippetExtractor implements IApplication {
 				DebugLogger.Log("root size:" + roots.size());
 				DebugLogger.Log("root imethods:" + roots);
 				
-				InvokeMethodSelector ims = new InvokeMethodSelector();
-				ims.SelectOneMethod(null, roots, true);
+				InvokeMethodSelector ims = new InvokeMethodSelector(roots);
+				ims.StartSelectMethodsProcess();
 				List<MethodSelection> method_selects = ims.GetMethodSelections();
 				List<FullTrace> ft_traces = new LinkedList<FullTrace>();
 				Iterator<MethodSelection> mitr = method_selects.iterator();

@@ -268,6 +268,7 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 			IRGeneratorForClassesInICompilationUnit irgfcicu = new IRGeneratorForClassesInICompilationUnit();
 			cu.accept(irgfcicu);
 		}
+		GetInstance().HandleToRemoveNoIRsElementForAllIRCode();
 		GetInstance().HandleToAddAllChildrenSetForAllControl();
 	}
 
@@ -330,6 +331,15 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 			IRTreeForOneControlElement control_ir = irc.GetControlLogicHolderElementIR();
 			IRForOneBranchControl control_root = control_ir.GetRoot();
 			GetAllChildrenOfControl(control_root);
+		}
+	}
+	
+	public void HandleToRemoveNoIRsElementForAllIRCode() {
+		List<IRCode> ircs = GetAllIRCodes();
+		Iterator<IRCode> iitr = ircs.iterator();
+		while (iitr.hasNext()) {
+			IRCode irc = iitr.next();
+			irc.RemoveNoIRsElement();
 		}
 	}
 

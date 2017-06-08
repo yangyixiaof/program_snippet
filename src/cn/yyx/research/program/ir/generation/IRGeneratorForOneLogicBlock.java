@@ -1658,7 +1658,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 	}
 	
-	// TODO
+	// Solved. Add group to each IRForOneInstruction.
 	
 	@Override
 	public boolean visit(InfixExpression node) {

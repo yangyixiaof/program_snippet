@@ -1,6 +1,7 @@
 package cn.yyx.research.program.ir.storage.node.highlevel;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -226,6 +227,24 @@ public abstract class IRCode {
 
 	public boolean IsHasElement() {
 		return has_element;
+	}
+	
+	public void RemoveNoIRsElement() {
+		Set<IJavaElement> removed_ijes = new HashSet<IJavaElement>();
+		Set<IJavaElement> keys = irs.keySet();
+		Iterator<IJavaElement> kitr = keys.iterator();
+		while (kitr.hasNext()) {
+			IJavaElement ije = kitr.next();
+			IRTreeForOneElement irtree = irs.get(ije);
+			if (!irtree.HasElement()) {
+				removed_ijes.add(ije);
+			}
+		}
+		Iterator<IJavaElement> ritr = removed_ijes.iterator();
+		while (ritr.hasNext()) {
+			IJavaElement ije = ritr.next();
+			irs.remove(ije);
+		}
 	}
 	
 //	private void AddDependency(IIRNode source, IIRNode target, EdgeConnectionType et) {
