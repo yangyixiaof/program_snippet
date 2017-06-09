@@ -31,6 +31,7 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneField;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneEmptyConstructorInvocation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodBarrier;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
@@ -273,10 +274,18 @@ public class CodeOnOneTraceGenerator {
 	private void HandleStaticConnectionForTarget(FullTrace ft, IRForOneSourceMethodInvocation irfosm) {
 		// && (source.getIm() instanceof SourceMethodHolderElement)
 		IMethod select_method = method_selection.GetMethodSelection(irfosm);
-		IRForOneMethod select_method_ir = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(select_method);
-		int id = GetID(select_method_ir);
-		method_id.get(irfosm.getParentEnv()).peek().put(irfosm, id);
-		GenerateFullTrace(select_method_ir, irfosm, id, ft, false);
+		if (select_method != null) {
+			IRForOneMethod select_method_ir = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(select_method);
+			if (select_method_ir != null) {
+				int id = GetID(select_method_ir);
+				method_id.get(irfosm.getParentEnv()).peek().put(irfosm, id);
+				GenerateFullTrace(select_method_ir, irfosm, id, ft, false);
+			}
+		} else {
+			if (irfosm instanceof IRForOneEmptyConstructorInvocation) {
+				
+			}
+		}
 	}
 
 	private void HandleStaticConnectionForSource(FullTrace ft, IRForOneInstruction source, IRForOneInstruction target,

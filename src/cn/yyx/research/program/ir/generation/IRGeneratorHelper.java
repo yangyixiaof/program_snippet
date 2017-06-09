@@ -12,6 +12,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 
@@ -23,6 +24,7 @@ import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.DefaultINodeTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneEmptyConstructorInvocation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSentinel;
@@ -57,7 +59,7 @@ public class IRGeneratorHelper {
 		return now;
 	}
 
-	public static IRForOneSourceMethodInvocation GenerateMethodInvocationIR(IRGeneratorForOneLogicBlock irgfob,
+	public static IRForOneInstruction GenerateMethodInvocationIR(IRGeneratorForOneLogicBlock irgfob,
 			List<Expression> nlist, IMethod parent_im, IMethod im, Expression expr, String identifier, ASTNode node) {
 		IRForOneSourceMethodInvocation now = null;
 		IRCode irc = irgfob.irc;
@@ -100,6 +102,7 @@ public class IRGeneratorHelper {
 						new Object[] { im.getElementName(), irc, source_method_receiver_element, methods,
 								DefaultINodeTask.class, para_order_instr_index_map });
 
+				// handle para_order_instr_index_map.
 				Iterator<Expression> nitr = nlist.iterator();
 				int idx = -1;
 				while (nitr.hasNext()) {
@@ -124,7 +127,19 @@ public class IRGeneratorHelper {
 								.RegistConnection(new StaticConnection(source, now, EdgeBaseType.Sequential.Value()));
 					}
 				}
+			} else {
+				try {
+					if (im.isConstructor()) {
+						now = (IRForOneSourceMethodInvocation) CreateIRInstruction(irgfob,
+								IRForOneEmptyConstructorInvocation.class, new Object[] { im.getElementName(), irc,
+										source_method_receiver_element, DefaultINodeTask.class });
+					}
+				} catch (JavaModelException e) {
+					e.printStackTrace();
+				}
+			}
 
+			if (now != null) {
 				// add every connection to now method for each IJavaElement in
 				// current environment.
 				Map<IJavaElement, IRForOneInstruction> curr_env = irc.CopyEnvironment();
@@ -139,6 +154,7 @@ public class IRGeneratorHelper {
 					}
 				}
 
+				// handle dependency and barrier.
 				HandleNodeSelfAndSourceMethodAndBranchDependency(irc, source_method_receiver_element, now,
 						branch_dependency, irgfob.source_invocation_barrier.peek(), irgfob.element_has_set_branch,
 						irgfob.element_has_set_source_method_barrier);
@@ -167,7 +183,8 @@ public class IRGeneratorHelper {
 				// int start = exact_node.getStartPosition();
 				// int end = start + exact_node.getLength() - 1;
 				// IRInstrKind ir_kind = IRInstrKind.ComputeKind(1);
-				IRForOneInstruction now = (IRForOneInstruction) CreateIRInstruction(irgfob, IRForOneOperation.class, new Object[]{irc, ije, code, DefaultINodeTask.class});
+				IRForOneInstruction now = (IRForOneInstruction) CreateIRInstruction(irgfob, IRForOneOperation.class,
+						new Object[] { irc, ije, code, DefaultINodeTask.class });
 				ops.add(now);
 				// irc.GoForwardOneIRTreeNode(ije, now);
 				HandleNodeSelfAndSourceMethodAndBranchDependency(irc, ije, now, branch_dependency,
@@ -182,14 +199,15 @@ public class IRGeneratorHelper {
 			String code) {
 		return GenerateGeneralIR(irgfob, node, code, DefaultINodeTask.class);
 	}
-	
+
 	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
 			String code, Class<? extends IIRNodeTask> task_class) {
 		return GenerateGeneralIR(irgfob, node, code, task_class, IRForOneOperation.class);
 	}
 
 	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
-			String code, Class<? extends IIRNodeTask> task_class, Class<? extends IRForOneInstruction> operation_class) {
+			String code, Class<? extends IIRNodeTask> task_class,
+			Class<? extends IRForOneInstruction> operation_class) {
 		IRCode irc = irgfob.irc;
 		// Map<IJavaElement, Integer> all_count = irgfob.all_count;
 		HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
@@ -232,7 +250,7 @@ public class IRGeneratorHelper {
 
 	public static void HandleNodeSelfAndSourceMethodAndBranchDependency(IRCode irc, IJavaElement ije,
 			IRForOneInstruction now, HashMap<IJavaElement, IRForOneInstruction> branch_dependency,
-			IRForOneSourceMethodInvocation source_method_barrier, HashMap<IJavaElement, Boolean> element_has_set_branch,
+			IRForOneInstruction source_method_barrier, HashMap<IJavaElement, Boolean> element_has_set_branch,
 			HashMap<IJavaElement, Boolean> element_has_set_source_method_barrier) {
 		irc.GoForwardOneIRTreeNode(ije, now);
 		if (branch_dependency != null) {

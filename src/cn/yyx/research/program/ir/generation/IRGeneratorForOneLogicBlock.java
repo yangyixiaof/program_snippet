@@ -136,7 +136,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	protected HashMap<IJavaElement, Boolean> element_has_set_branch = new HashMap<IJavaElement, Boolean>();
 	protected HashMap<IJavaElement, Boolean> element_has_set_source_method_barrier = new HashMap<IJavaElement, Boolean>();
 	protected Stack<HashMap<IJavaElement, IRForOneInstruction>> branch_var_instr_order = new Stack<HashMap<IJavaElement, IRForOneInstruction>>();
-	protected Stack<IRForOneSourceMethodInvocation> source_invocation_barrier = new Stack<IRForOneSourceMethodInvocation>();
+	protected Stack<IRForOneInstruction> source_invocation_barrier = new Stack<IRForOneInstruction>();
 	{
 		source_invocation_barrier.add(null);
 	}
@@ -391,7 +391,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (dec_class != null) {
 			from_source = true;
 		}
-		IRForOneSourceMethodInvocation now = null;
+		IRForOneInstruction now = null;
 		IJavaElement jele = imb.getJavaElement();
 		if (imb != null && dec_class != null && from_source && jele != null && jele instanceof IMethod) {
 			// source method invocation.

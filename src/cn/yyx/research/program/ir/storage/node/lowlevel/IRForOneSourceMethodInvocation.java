@@ -26,9 +26,14 @@ public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 	private Map<IRForOneInstruction, List<Integer>> para_order_instr_index_map = null;
 	// this im has already contained the information about which IJavaElement this all about.
 	// Solved. HashMap<IRForOneInstruction, Integer> should be HashMap<IRForOneInstruction, List<Integer>>.
+	public IRForOneSourceMethodInvocation(String method_name, IJavaElement im, IRCode parent_env, Class<? extends IIRNodeTask> task_class) {
+		super(im, parent_env, task_class);
+		this.SetMethodName(method_name);
+	}
+	
 	public IRForOneSourceMethodInvocation(String method_name, IRCode parent_env, IJavaElement im, Collection<IMethod> methods, Class<? extends IIRNodeTask> task_class, Map<IRForOneInstruction, List<Integer>> para_order_instr_index_map) {
 		super(im, parent_env, task_class);
-		this.method_name = method_name;
+		this.SetMethodName(method_name);
 		this.AddMethods(methods);
 		this.para_order_instr_index_map = para_order_instr_index_map;
 	}
@@ -55,12 +60,20 @@ public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 
 	@Override
 	public String ToVisual() {
-		return "Method:" + method_name;
+		return "Method:" + GetMethodName();
 	}
 	
 	@Override
 	public String toString() {
 		return ToVisual();
+	}
+
+	public String GetMethodName() {
+		return method_name;
+	}
+
+	public void SetMethodName(String method_name) {
+		this.method_name = method_name;
 	}
 	
 //	public void AddVariableParameterOrderInstructionIndexs(Map<IRForOneInstruction, List<Integer>> para_order_instr_index_map) {
