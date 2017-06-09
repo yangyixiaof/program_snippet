@@ -15,10 +15,11 @@ public class TodoList {
 	
 	// Solved. variable count and two/three further steps' environment are no longer needed.
 	// Solved. SkipSelfTask should add the information of IJavaElement if there are no source connections.
-	// TODO wrong when handling invoking constructors and super-methods in full traces.
+	// Solved. wrong when handling invoking constructors and super-methods in full traces.
+	// TODO if constructor is null, how to invoke field IRCode, IRCodeForOneFiled I mean.
 	// Solved. do not traverse from root methods (exclude constructors) which contains no statements.
 	
-	// TODO how to recognize the global relationship, eclipse jdt offers?
+	// Solved. how to recognize the global relationship, eclipse jdt offers? append to tails of irs of that ije.
 	// TODO how to recognize relationships including code snippet not on the execution path from main root?.
 	
 }
