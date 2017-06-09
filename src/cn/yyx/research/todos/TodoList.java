@@ -21,5 +21,6 @@ public class TodoList {
 	
 	// Solved. how to recognize the global relationship, eclipse jdt offers? append to tails of irs of that ije.
 	// TODO how to recognize relationships including code snippet not on the execution path from main root?.
+	// TODO the total IJavaElement temp_statement_set and need to be changed to Stack, former stack gain all ijes of later stack element. do it in HandleIJavaElement.
 	
 }

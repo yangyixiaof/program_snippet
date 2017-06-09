@@ -27,6 +27,7 @@ import cn.yyx.research.program.ir.element.SourceMethodHolderElement;
 import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
+import cn.yyx.research.program.ir.generation.state.IJavaElementState;
 import cn.yyx.research.program.ir.generation.traversal.task.IRASTNodeTask;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneElement;
@@ -1428,15 +1429,15 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	// handling expressions.
 
-	private boolean HandleBinding(IBinding ib, ASTNode happen) {
+	private IJavaElementState HandleBinding(IBinding ib, ASTNode happen) {
 		if (!BindingManager.QualifiedBinding(ib)) {
-			return false;
+			return IJavaElementState.HandledWrong;
 		}
 		IJavaElement jele = ib.getJavaElement();
 		return HandleIJavaElement(jele, happen);
 	}
 
-	private boolean HandleIJavaElement(IJavaElement jele, ASTNode happen) {
+	private IJavaElementState HandleIJavaElement(IJavaElement jele, ASTNode happen) {
 		// handle loop_bind, just for no variable bind statements such as
 		// break and continue.
 		// if (!BindingManager.QualifiedBinding(ib)) {
@@ -1444,8 +1445,18 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// }
 		// IJavaElement jele = ib.getJavaElement();
 		if (jele == null) {
-			return false;
+			return IJavaElementState.HandledWrong;
 		}
+		
+		Iterator<IJavaElement> ije_itr = temp_statement_environment_set.iterator();
+		while (ije_itr.hasNext()) {
+			IJavaElement ije = ije_itr.next();
+			ASTNode node = all_happen.get(ije);
+			if (ASTSearch.ASTNodeContainsAnASTNode(node, happen)) {
+				return IJavaElementState.NoNeedToHandle;
+			}
+		}
+		
 		if (jele instanceof IMember) {
 			IMember im = (IMember) jele;
 			IType dec_type = im.getDeclaringType();
@@ -1458,12 +1469,12 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				System.exit(1);
 			}
 			if (dec_type.isBinary()) {
-				return false;
+				return IJavaElementState.HandledWrong;
 			}
 		} else {
 			if (!(jele instanceof ILocalVariable) && !(jele instanceof UnresolvedLambdaUniqueElement)
 					&& !(jele instanceof UnresolvedTypeElement) && !(jele instanceof ConstantUniqueElement)) {
-				return false;
+				return IJavaElementState.HandledWrong;
 			}
 		}
 		irc.GetIRTreeForOneElement(jele);
@@ -1486,7 +1497,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		all_happen.put(jele, happen);
 		temp_statement_environment_set.add(jele);
 		temp_statement_expression_environment_set.add(jele);
-		return true;
+		return IJavaElementState.HandledSuccessful;
 	}
 
 	@Override
@@ -1552,17 +1563,18 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(TypeLiteral node) {
 		ITypeBinding itb = node.resolveTypeBinding();
-		boolean source_resolved = HandleBinding(itb, node);
-		if (!source_resolved) {
-			HandleIJavaElement(IRGeneratorForOneProject.GetInstance()
-					.FetchConstantUniqueElement(IRConstantMeta.TypeConstant + "$" + node.toString()), node);
-		}
+		HandleType(itb, IRConstantMeta.TypeConstant + "$" + node.toString(), node);
+//		IJavaElementState source_resolved = HandleBinding(itb, node);
+//		if (source_resolved == IJavaElementState.HandledWrong) {
+//			HandleIJavaElement(IRGeneratorForOneProject.GetInstance()
+//					.FetchConstantUniqueElement(IRConstantMeta.TypeConstant + "$" + node.toString()), node);
+//		}
 		return super.visit(node);
 	}
-
+	
 	private void HandleType(IBinding ib, String represent, ASTNode happen) {
-		boolean source_resolved = HandleBinding(ib, happen);
-		if (!source_resolved) {
+		IJavaElementState source_resolved = HandleBinding(ib, happen);
+		if (source_resolved == IJavaElementState.HandledWrong) {
 			UnresolvedTypeElement ele = IRGeneratorForOneProject.GetInstance().FetchUnresolvedTypeElement(represent);
 			HandleIJavaElement(ele, happen);
 		}
@@ -1570,37 +1582,61 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(ArrayType node) {
-		HandleType(node.resolveBinding(), node.toString(), node);
+		// HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
 
 	@Override
 	public boolean visit(SimpleType node) {
-		HandleType(node.resolveBinding(), node.toString(), node);
+		// HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
 
 	@Override
 	public boolean visit(PrimitiveType node) {
-		HandleType(node.resolveBinding(), node.toString(), node);
+		// HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
 
 	@Override
 	public boolean visit(QualifiedType node) {
-		HandleType(node.resolveBinding(), node.toString(), node);
+		// HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
 
 	@Override
 	public boolean visit(NameQualifiedType node) {
-		HandleType(node.resolveBinding(), node.toString(), node);
+		// HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
 
 	@Override
 	public boolean visit(QualifiedName node) {
-		HandleType(node.resolveBinding(), node.toString(), node);
+		// HandleType(node.resolveBinding(), node.toString(), node);
+		return false;
+	}
+	
+	@Override
+	public boolean visit(ParameterizedType node) {
+		// it won't happen.
+		return false;
+	}
+	
+	@Override
+	public boolean visit(WildcardType node) {
+		// do not need to handle.
+		return false;
+	}
+
+	@Override
+	public boolean visit(UnionType node) {
+		// do not need to handle.
+		return false;
+	}
+
+	@Override
+	public boolean visit(IntersectionType node) {
+		// do not need to handle.
 		return false;
 	}
 
@@ -1797,10 +1833,12 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(CastExpression node) {
 		IRGeneratorForOneLogicBlock this_ref = this;
-		post_visit_task.Put(node.getType(), new Runnable() {
+		final Type ntype = node.getType();
+		post_visit_task.Put(ntype, new Runnable() {
 			@Override
 			public void run() {
-				IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getType(), IRMeta.CastType);
+				HandleType(ntype.resolveBinding(), ntype.toString(), ntype);
+				IRGeneratorHelper.GenerateGeneralIR(this_ref, ntype, IRMeta.CastType);
 			}
 		});
 		return super.visit(node);
@@ -2040,19 +2078,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	@Override
-	public boolean visit(ParameterizedType node) {
-		// it won't happen.
-		return super.visit(node);
-	}
-
-	@Override
 	public boolean visit(BlockComment node) {
-		// do not need to handle.
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(WildcardType node) {
 		// do not need to handle.
 		return super.visit(node);
 	}
@@ -2083,18 +2109,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(LineComment node) {
-		// do not need to handle.
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(UnionType node) {
-		// do not need to handle.
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(IntersectionType node) {
 		// do not need to handle.
 		return super.visit(node);
 	}
