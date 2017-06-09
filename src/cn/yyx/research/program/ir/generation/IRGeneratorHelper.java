@@ -12,9 +12,11 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForIMember;
 import cn.yyx.research.program.ir.ast.ASTSearch;
@@ -60,7 +62,7 @@ public class IRGeneratorHelper {
 	}
 
 	public static IRForOneInstruction GenerateMethodInvocationIR(IRGeneratorForOneLogicBlock irgfob,
-			List<Expression> nlist, IMethod parent_im, IMethod im, Expression expr, String identifier, ASTNode node) {
+			List<Expression> nlist, IMethod parent_im, IMethod im, IMethodBinding imb, Expression expr, String identifier, ASTNode node) {
 		IRForOneSourceMethodInvocation now = null;
 		IRCode irc = irgfob.irc;
 		HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>> temp_statement_instr_order = irgfob.method_parameter_element_instr_order;
@@ -127,41 +129,44 @@ public class IRGeneratorHelper {
 								.RegistConnection(new StaticConnection(source, now, EdgeBaseType.Sequential.Value()));
 					}
 				}
-			} else {
-				try {
-					if (im.isConstructor()) {
-						now = (IRForOneSourceMethodInvocation) CreateIRInstruction(irgfob,
-								IRForOneEmptyConstructorInvocation.class, new Object[] { im.getElementName(), irc,
-										source_method_receiver_element, DefaultINodeTask.class });
-					}
-				} catch (JavaModelException e) {
-					e.printStackTrace();
+			}
+		} else {
+			ITypeBinding itb = imb.getDeclaringClass();
+			IType decl_type = null;
+			if (itb != null && itb.isFromSource()) {
+				IJavaElement jele = itb.getJavaElement();
+				if (jele != null && jele instanceof IType) {
+					decl_type = (IType)jele;
+				}
+			}
+			if (decl_type != null) {
+				now = (IRForOneSourceMethodInvocation) CreateIRInstruction(irgfob,
+						IRForOneEmptyConstructorInvocation.class, new Object[] { decl_type, decl_type.getElementName(), irc,
+								source_method_receiver_element, DefaultINodeTask.class });
+			}
+		}
+		if (now != null) {
+			// add every connection to now method for each IJavaElement in
+			// current environment.
+			Map<IJavaElement, IRForOneInstruction> curr_env = irc.CopyEnvironment();
+			Set<IJavaElement> curr_keys = curr_env.keySet();
+			Iterator<IJavaElement> curr_itr = curr_keys.iterator();
+			while (curr_itr.hasNext()) {
+				IJavaElement cije = curr_itr.next();
+				IRForOneInstruction cirfoi = curr_env.get(cije);
+				if (!(cirfoi instanceof IRForOneSentinel)) {
+					IRGeneratorForOneProject.GetInstance()
+							.RegistConnection(new StaticConnection(cirfoi, now, EdgeBaseType.Sequential.Value()));
 				}
 			}
 
-			if (now != null) {
-				// add every connection to now method for each IJavaElement in
-				// current environment.
-				Map<IJavaElement, IRForOneInstruction> curr_env = irc.CopyEnvironment();
-				Set<IJavaElement> curr_keys = curr_env.keySet();
-				Iterator<IJavaElement> curr_itr = curr_keys.iterator();
-				while (curr_itr.hasNext()) {
-					IJavaElement cije = curr_itr.next();
-					IRForOneInstruction cirfoi = curr_env.get(cije);
-					if (!(cirfoi instanceof IRForOneSentinel)) {
-						IRGeneratorForOneProject.GetInstance()
-								.RegistConnection(new StaticConnection(cirfoi, now, EdgeBaseType.Sequential.Value()));
-					}
-				}
-
-				// handle dependency and barrier.
-				HandleNodeSelfAndSourceMethodAndBranchDependency(irc, source_method_receiver_element, now,
-						branch_dependency, irgfob.source_invocation_barrier.peek(), irgfob.element_has_set_branch,
-						irgfob.element_has_set_source_method_barrier);
-				irgfob.source_invocation_barrier.pop();
-				irgfob.source_invocation_barrier.push(now);
-				irgfob.element_has_set_source_method_barrier.clear();
-			}
+			// handle dependency and barrier.
+			HandleNodeSelfAndSourceMethodAndBranchDependency(irc, source_method_receiver_element, now,
+					branch_dependency, irgfob.source_invocation_barrier.peek(), irgfob.element_has_set_branch,
+					irgfob.element_has_set_source_method_barrier);
+			irgfob.source_invocation_barrier.pop();
+			irgfob.source_invocation_barrier.push(now);
+			irgfob.element_has_set_source_method_barrier.clear();
 		}
 		return now;
 	}

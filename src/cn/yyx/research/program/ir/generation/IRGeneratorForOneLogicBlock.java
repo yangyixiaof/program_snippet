@@ -393,10 +393,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 		IRForOneInstruction now = null;
 		IJavaElement jele = imb.getJavaElement();
-		if (imb != null && dec_class != null && from_source && jele != null && jele instanceof IMethod) {
+		if (imb != null && dec_class != null && from_source && ((jele == null && imb.isConstructor()) || (jele != null && jele instanceof IMethod))) {
 			// source method invocation.
-			IMethod im = (IMethod) jele;
-			now = IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, im, expr, identifier, node);
+			if (jele == null) {
+				now = IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, null, imb, expr, identifier, node);
+			} else {
+				now = IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, (IMethod) jele, imb, expr, identifier, node);
+			}
 			
 			// handle return type and its corresponding reference.
 			ITypeBinding itb = imb.getReturnType();

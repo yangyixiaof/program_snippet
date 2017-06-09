@@ -292,7 +292,7 @@ public class SearchIMethodVisitor extends ASTVisitor {
 						+ ";" + (ibinding.getReturnType().getQualifiedName().equals("void")));
 				System.out.println("MethodInvocation:" + node + " Search for declarations.");
 				if (imethod == null) {
-					System.out.println("Method Element is null:" + node);
+					System.out.println("Method Element is null:" + node + ";ibinding declaraing class:" + ibinding.getDeclaringClass());
 				}
 				IRSearchMethodRequestor sr = new IRSearchMethodRequestor(java_project, imethod);
 				EclipseSearchForIMember search = new EclipseSearchForIMember();

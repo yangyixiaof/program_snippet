@@ -149,14 +149,7 @@ public class CodeOnOneTraceGenerator {
 			// Solved. handle constructor here.
 			if (irfom instanceof IRForOneConstructor) {
 				IRForOneConstructor irfoc = (IRForOneConstructor) irfom;
-				IType it = irfoc.getWrap_class();
-				IRForOneClass irfot = IRGeneratorForOneProject.GetInstance().GetClassIR(it);
-				if (irfot != null) {
-					IRForOneField field_level = irfot.GetFieldLevel();
-					if (field_level != null) {
-						GenerateFullTrace(field_level, null, GetID(field_level), ft, false);
-					}
-				}
+				HandleFieldIRCode(irfoc.getWrap_class(), ft);
 			}
 			HandleCallerToCallee(irfom, now_instruction, ft, env_idx, execution_memory);
 		}
@@ -178,6 +171,16 @@ public class CodeOnOneTraceGenerator {
 					execution_memory, env_idx, false, null);
 		}
 		branch_control.Pop();
+	}
+	
+	private void HandleFieldIRCode(IType it, FullTrace ft) {
+		IRForOneClass irfot = IRGeneratorForOneProject.GetInstance().GetClassIR(it);
+		if (irfot != null) {
+			IRForOneField field_level = irfot.GetFieldLevel();
+			if (field_level != null) {
+				GenerateFullTrace(field_level, null, GetID(field_level), ft, false);
+			}
+		}
 	}
 
 	private void BreadthFirstToVisitIR(FullTrace ft, ExecutionMemory memory, int env_idx, IRCode irfom) {
@@ -215,7 +218,7 @@ public class CodeOnOneTraceGenerator {
 					could_continue = could_continue || (in_conns != null);
 					if (in_conns != null) {
 						if (inode instanceof IRForOneSourceMethodInvocation) {
-							HandleStaticConnectionForTarget(ft, (IRForOneSourceMethodInvocation) inode);
+							HandleStaticConnectionForTargetMethod(ft, (IRForOneSourceMethodInvocation) inode);
 						} else {
 							Iterator<StaticConnection> in_itr = in_conns.iterator();
 							while (in_itr.hasNext()) {
@@ -271,7 +274,7 @@ public class CodeOnOneTraceGenerator {
 		}
 	}
 
-	private void HandleStaticConnectionForTarget(FullTrace ft, IRForOneSourceMethodInvocation irfosm) {
+	private void HandleStaticConnectionForTargetMethod(FullTrace ft, IRForOneSourceMethodInvocation irfosm) {
 		// && (source.getIm() instanceof SourceMethodHolderElement)
 		IMethod select_method = method_selection.GetMethodSelection(irfosm);
 		if (select_method != null) {
@@ -283,7 +286,8 @@ public class CodeOnOneTraceGenerator {
 			}
 		} else {
 			if (irfosm instanceof IRForOneEmptyConstructorInvocation) {
-				
+				IRForOneEmptyConstructorInvocation irfoeci = (IRForOneEmptyConstructorInvocation)irfosm;
+				HandleFieldIRCode(irfoeci.GetIType(), ft);
 			}
 		}
 	}
