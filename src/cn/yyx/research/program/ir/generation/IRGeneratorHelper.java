@@ -204,13 +204,29 @@ public class IRGeneratorHelper {
 			String code) {
 		return GenerateGeneralIR(irgfob, node, code, DefaultINodeTask.class);
 	}
+	
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, ASTNode node,
+			String code) {
+		return GenerateGeneralIR(irgfob, temp_statement_set, node, code, DefaultINodeTask.class);
+	}
 
 	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
 			String code, Class<? extends IIRNodeTask> task_class) {
 		return GenerateGeneralIR(irgfob, node, code, task_class, IRForOneOperation.class);
 	}
-
+	
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, ASTNode node,
+			String code, Class<? extends IIRNodeTask> task_class) {
+		return GenerateGeneralIR(irgfob, temp_statement_set, node, code, task_class, IRForOneOperation.class);
+	}
+	
 	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
+			String code, Class<? extends IIRNodeTask> task_class,
+			Class<? extends IRForOneInstruction> operation_class) {
+		return GenerateGeneralIR(irgfob, irgfob.CurrentElements(), node, code, task_class, operation_class);
+	}
+
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, ASTNode node,
 			String code, Class<? extends IIRNodeTask> task_class,
 			Class<? extends IRForOneInstruction> operation_class) {
 		IRCode irc = irgfob.irc;
@@ -220,7 +236,7 @@ public class IRGeneratorHelper {
 		if (!irgfob.branch_var_instr_order.isEmpty()) {
 			branch_dependency = irgfob.branch_var_instr_order.peek();
 		}
-		HashSet<IJavaElement> temp_statement_set = irgfob.temp_statement_environment_set;
+		// Set<IJavaElement> temp_statement_set = irgfob.temp_statement_environment_set;
 		Set<IJavaElement> concern = new HashSet<IJavaElement>(temp_statement_set);
 		// Iterator<IJavaElement> oitr = temp_statement_set.iterator();
 		// while (oitr.hasNext()) {

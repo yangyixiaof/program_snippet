@@ -173,7 +173,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		source_invocation_barrier.add(null);
 	}
 	
-	private Set<IJavaElement> CurrentElements() {
+	public Set<IJavaElement> CurrentElements() {
 		return node_element_stack.Peek().GetIJavaElementSet();
 	}
 
@@ -392,6 +392,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			// RecordASTNodePreEnvironment(expr);
 			// }
 			// });
+			node_element_memory.put(expr, null);
 			post_visit_task.Put(expr, new Runnable() {
 				@Override
 				public void run() {
@@ -417,6 +418,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 					}
 					method_parameter_element_instr_order.put(expr, new_env);
 					ExpressionOverHandle();
+					node_element_memory.remove(expr);
 				}
 			});
 		}
@@ -1030,6 +1032,31 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		PostVisitBranch(node, true);
 		super.endVisit(node);
 	}
+	
+	private void RememberExpressionList(List<Expression> exp_list) {
+		for (Expression exp : exp_list) {
+			node_element_memory.put(exp, null);
+		}
+	}
+	
+	private void ForgetExpressionList(List<Expression> exp_list) {
+		for (Expression exp : exp_list) {
+			node_element_memory.remove(exp);
+		}
+	}
+	
+	private Set<IJavaElement> GetAllElementsFromExpressionList(List<Expression> exp_list) {
+		Set<IJavaElement> ele_set = new HashSet<IJavaElement>();
+		Iterator<Expression> eitr = exp_list.iterator();
+		while (eitr.hasNext()) {
+			Expression expr = eitr.next();
+			Set<IJavaElement> one_ele_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(expr);
+			if (one_ele_set != null) {
+				ele_set.addAll(one_ele_set);
+			}
+		}
+		return ele_set;
+	}
 
 	@Override
 	public boolean visit(ForStatement node) {
@@ -1041,20 +1068,25 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (ini_list != null) {
 			last_expr = ini_list.get(ini_list.size() - 1);
 			final Expression temp_last_expr = last_expr;
-			final ASTNode exp = last_expr;
+			// final ASTNode exp = last_expr;
+			RememberExpressionList(ini_list);
 			if (last_expr != null) {
 				post_visit_task.Put(last_expr, new Runnable() {
 					@Override
 					public void run() {
-						HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
-						this_ref.temp_statement_environment_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
-								temp_last_expr);
+						// HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
+						// Set<IJavaElement> ele_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
+						//		temp_last_expr);
+						
+						Set<IJavaElement> ele_set = GetAllElementsFromExpressionList(ini_list);
+						
 						// this_ref.temp_statement_expression_environment_set
-
-						IRGeneratorHelper.GenerateGeneralIR(this_ref, exp, IRMeta.For_Initial);
+						// ele_set, 
+						IRGeneratorHelper.GenerateGeneralIR(this_ref, ele_set, temp_last_expr, IRMeta.For_Initial);
 
 						ExpressionOverHandle();
-						this_ref.temp_statement_environment_set = temp;
+						ForgetExpressionList(ini_list);
+						// this_ref.temp_statement_environment_set = temp;
 					}
 				});
 			}
@@ -1063,21 +1095,24 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (expr != null) {
 			last_expr = expr;
 			final Expression temp_last_expr = last_expr;
-			final ASTNode exp = last_expr;
+			node_element_memory.put(last_expr, null);
 			if (last_expr != null) {
 				post_visit_task.Put(last_expr, new Runnable() {
 					@Override
 					public void run() {
-						HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
-						this_ref.temp_statement_environment_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
+//						HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
+//						this_ref.temp_statement_environment_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
+//								temp_last_expr);
+						Set<IJavaElement> ele_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
 								temp_last_expr);
 						// this_ref.temp_statement_expression_environment_set;
 
-						IRGeneratorHelper.GenerateGeneralIR(this_ref, exp, IRMeta.For_Judge);
+						IRGeneratorHelper.GenerateGeneralIR(this_ref, ele_set, temp_last_expr, IRMeta.For_Judge);
 						// PushBranchInstructionOrder(GetBranchInstructions());
 
 						ExpressionOverHandle();
-						this_ref.temp_statement_environment_set = temp;
+						node_element_memory.remove(temp_last_expr);
+						// this_ref.temp_statement_environment_set = temp;
 					}
 				});
 			}
@@ -1087,20 +1122,26 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (upd_list != null) {
 			last_expr = upd_list.get(upd_list.size() - 1);
 			final Expression temp_last_expr = last_expr;
-			final ASTNode exp = last_expr;
+			RememberExpressionList(upd_list);
 			if (last_expr != null) {
 				post_visit_task.Put(last_expr, new Runnable() {
 					@Override
 					public void run() {
-						HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
-						this_ref.temp_statement_environment_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
-								temp_last_expr);
+//						HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
+//						this_ref.temp_statement_environment_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
+//								temp_last_expr);
+						
+						// Set<IJavaElement> ele_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
+						//		temp_last_expr);
+						Set<IJavaElement> ele_set = GetAllElementsFromExpressionList(upd_list);
+						
 						// this_ref.temp_statement_expression_environment_set;
 
-						IRGeneratorHelper.GenerateGeneralIR(this_ref, exp, IRMeta.For_Update);
+						IRGeneratorHelper.GenerateGeneralIR(this_ref, ele_set, temp_last_expr, IRMeta.For_Update);
 
 						ExpressionOverHandle();
-						this_ref.temp_statement_environment_set = temp;
+						ForgetExpressionList(upd_list);
+						// this_ref.temp_statement_environment_set = temp;
 					}
 				});
 			}
@@ -1242,21 +1283,30 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (right == null) {
 			return;
 		}
-		Set<IJavaElement> temp_copy = new HashSet<IJavaElement>(temp_statement_environment_set);
-		temp_statement_environment_set.clear();
+		// Set<IJavaElement> temp_copy = new HashSet<IJavaElement>(temp_statement_environment_set);
+		// temp_statement_environment_set.clear();
+		node_element_memory.put(right, null);
+		preVisit(right);
 		right.accept(this);
-		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment(temp_statement_environment_set);
-		temp_copy.addAll(temp_statement_environment_set);
+		postVisit(right);
+		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment(SearchAndRememberAllElementsInASTNodeInJustEnvironment(right));
+		node_element_memory.remove(right);
+		// temp_copy.addAll(temp_statement_environment_set);
 
 		StatementOverHandle();
-
+		
+		node_element_memory.put(left, null);
+		preVisit(left);
 		left.accept(this);
+		postVisit(left);
+		Set<IJavaElement> left_ijes = SearchAndRememberAllElementsInASTNodeInJustEnvironment(left);
+		node_element_memory.remove(left);
+		IRGeneratorHelper.GenerateGeneralIR(this, left_ijes, left, IRMeta.LeftHandAssign, SkipSelfTask.class);
 
-		IRGeneratorHelper.GenerateGeneralIR(this, left, IRMeta.LeftHandAssign, SkipSelfTask.class);
 		// System.err.println("============= start =============");
 		// System.err.println(temp_statement_environment_set);
 		// System.err.println("============= over =============");
-		Iterator<IJavaElement> itr = temp_statement_environment_set.iterator();
+		Iterator<IJavaElement> itr = left_ijes.iterator();
 		while (itr.hasNext()) {
 			IJavaElement t_ije = itr.next();
 			IRForOneInstruction last_node = irc.GetLastIRTreeNode(t_ije);
@@ -1282,7 +1332,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			// HashSet<IJavaElement>(env.keySet()));
 		}
 
-		temp_statement_environment_set.addAll(temp_copy);
+		// temp_statement_environment_set.addAll(temp_copy);
 		// StatementOverHandle();
 	}
 
@@ -1771,12 +1821,14 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 					}
 				}
 			});
+			node_element_memory.put(expr, null);
 			post_visit_task.Put(expr, new Runnable() {
 				@Override
 				public void run() {
 					Set<IJavaElement> all_elements = SearchAndRememberAllElementsInASTNodeInJustEnvironment(expr);
 					PrepareCurrentEnvironmentToMerge(all_elements, merge);
 					ExpressionOverHandle();
+					node_element_memory.remove(expr);
 				}
 			});
 		}
