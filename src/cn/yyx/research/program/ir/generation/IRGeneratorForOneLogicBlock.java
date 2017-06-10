@@ -229,6 +229,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void preVisit(ASTNode node) {
+		PushNodeIJavaElementStack(node, null);
 		if (node instanceof Block) {
 			ast_block_bind.put(node, new HashSet<IJavaElement>());
 		}
@@ -246,6 +247,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			StatementOverHandle();
 		}
 		post_visit_task.ProcessAndRemoveTask(node);
+		PopNodeIJavaElementStack();
 		super.postVisit(node);
 	}
 
