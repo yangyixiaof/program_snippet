@@ -1,5 +1,7 @@
 package cn.yyx.research.program.ir.orgranization;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
@@ -24,6 +26,15 @@ public class IRTreeForOneElement {
 		SetRootNode(new IRForOneSentinel(ije, parent_env, SkipSelfTask.class));
 		SetLastNode(GetRootNode());
 		// SetRootNode(new IRForOneOperation(parent_env, ije, IRMeta.VirtualSentinel, SkipSelfTask.class));
+	}
+	
+	public boolean HasRootConnection()
+	{
+		Set<StaticConnection> out_cnns = IRGeneratorForOneProject.GetInstance().GetOutConnections(root_node);
+		if (out_cnns != null && out_cnns.size() > 0) {
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean HasElement()

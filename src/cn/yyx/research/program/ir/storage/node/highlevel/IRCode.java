@@ -237,7 +237,9 @@ public abstract class IRCode {
 			IJavaElement ije = kitr.next();
 			IRTreeForOneElement irtree = irs.get(ije);
 			if (!irtree.HasElement()) {
-				removed_ijes.add(ije);
+				if (!irtree.HasRootConnection()) {
+					removed_ijes.add(ije);
+				}
 			}
 		}
 		Iterator<IJavaElement> ritr = removed_ijes.iterator();
