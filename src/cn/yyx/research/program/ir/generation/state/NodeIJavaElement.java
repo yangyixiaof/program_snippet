@@ -12,7 +12,7 @@ public class NodeIJavaElement {
 	
 	public NodeIJavaElement(ASTNode node, Set<IJavaElement> set) {
 		this.SetNode(node);
-		this.SetIJavaElement(set);
+		this.SetIJavaElementSet(set);
 	}
 
 	public ASTNode GetNode() {
@@ -23,12 +23,16 @@ public class NodeIJavaElement {
 		this.node = node;
 	}
 
-	public Set<IJavaElement> GetIJavaElement() {
+	public Set<IJavaElement> GetIJavaElementSet() {
 		return ije;
 	}
 
-	private void SetIJavaElement(Set<IJavaElement> ije) {
+	private void SetIJavaElementSet(Set<IJavaElement> ije) {
 		this.ije = ije;
+	}
+	
+	public void Merge(NodeIJavaElement nije) {
+		ije.addAll(nije.GetIJavaElementSet());
 	}
 	
 	@Override

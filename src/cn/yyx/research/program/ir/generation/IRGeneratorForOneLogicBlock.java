@@ -28,6 +28,7 @@ import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.generation.state.IJavaElementState;
+import cn.yyx.research.program.ir.generation.state.NodeIJavaElement;
 import cn.yyx.research.program.ir.generation.state.NodeIJavaElementStack;
 import cn.yyx.research.program.ir.generation.traversal.task.IRASTNodeTask;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
@@ -50,6 +51,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public static int max_level = Integer.MAX_VALUE; // Integer.MAX_VALUE partly
 														// means infinite.
 	public static final int un_exist = -100;
+	// TODO remember to add remember nodes.
 	// Solved. return and assign right should add special task.
 	// Solved. variable declarations should be removed, only assignment in it
 	// should be retained.
@@ -69,10 +71,33 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// above used for method invocation only.
 	// Solved. this element is not assigned. should be assigned in
 	// HandleIJavaElement.
-
-	protected HashMap<ASTNode, Set<IJavaElement>> temp_statement_expression_element_memory = new HashMap<ASTNode, Set<IJavaElement>>();
+	
+	protected HashMap<ASTNode, Set<IJavaElement>> node_element_memory = new HashMap<ASTNode, Set<IJavaElement>>();
 	
 	protected NodeIJavaElementStack node_element_stack = new NodeIJavaElementStack();
+	
+	private void PushNodeIJavaElementStack(ASTNode node, Set<IJavaElement> ijes) {
+		node_element_stack.Push(node, ijes);
+	}
+	
+	private NodeIJavaElement PopNodeIJavaElementStack() {
+		NodeIJavaElement node_ele = node_element_stack.Pop();
+		if (!node_element_stack.IsEmpty()) {
+			NodeIJavaElement now_node_ele = node_element_stack.Peek();
+			now_node_ele.Merge(node_ele);
+		}
+		ASTNode node = node_ele.GetNode();
+		Set<IJavaElement> node_ijes = node_ele.GetIJavaElementSet();
+		if (node_element_memory.containsKey(node)) {
+			Set<IJavaElement> ijes = node_element_memory.get(node);
+			if (ijes == null) {
+				ijes = new HashSet<IJavaElement>();
+				node_element_memory.put(node, ijes);
+			}
+			ijes.addAll(node_ijes);
+		}
+		return node_ele;
+	}
 	
 	// protected HashSet<IJavaElement> temp_statement_expression_environment_set = new HashSet<IJavaElement>();
 	// protected HashSet<IJavaElement> temp_statement_environment_set = new HashSet<IJavaElement>();
@@ -96,28 +121,29 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// protected HashMap<ASTNode, IJavaElement> source_method_return_element =
 	// new HashMap<ASTNode, IJavaElement>();
 
-	private HashSet<IJavaElement> SearchAndRememberAllElementsInASTNodeInJustEnvironment(Expression expr) {
-		HashSet<IJavaElement> result = new HashSet<IJavaElement>();
-		result.addAll(temp_statement_expression_environment_set);
-		Set<ASTNode> tkeys = temp_statement_expression_element_memory.keySet();
-		Iterator<ASTNode> titr = tkeys.iterator();
-		List<ASTNode> remove_nodes = new LinkedList<ASTNode>();
-		while (titr.hasNext()) {
-			ASTNode astnode = titr.next();
-			if (ASTSearch.ASTNodeContainsAnASTNode(expr, astnode)) {
-				remove_nodes.add(astnode);
-				Set<IJavaElement> set = temp_statement_expression_element_memory.get(astnode);
-				result.addAll(set);
-			}
-		}
-		Iterator<ASTNode> rnitr = remove_nodes.iterator();
-		while (rnitr.hasNext()) {
-			ASTNode an = rnitr.next();
-			temp_statement_expression_element_memory.remove(an);
-		}
-		remove_nodes.clear();
-		temp_statement_expression_element_memory.put(expr, result);
-		return result;
+	private Set<IJavaElement> SearchAndRememberAllElementsInASTNodeInJustEnvironment(Expression expr) {
+//		HashSet<IJavaElement> result = new HashSet<IJavaElement>();
+//		result.addAll(temp_statement_expression_environment_set);
+//		Set<ASTNode> tkeys = node_element_memory.keySet();
+//		Iterator<ASTNode> titr = tkeys.iterator();
+//		List<ASTNode> remove_nodes = new LinkedList<ASTNode>();
+//		while (titr.hasNext()) {
+//			ASTNode astnode = titr.next();
+//			if (ASTSearch.ASTNodeContainsAnASTNode(expr, astnode)) {
+//				remove_nodes.add(astnode);
+//				Set<IJavaElement> set = node_element_memory.get(astnode);
+//				result.addAll(set);
+//			}
+//		}
+//		Iterator<ASTNode> rnitr = remove_nodes.iterator();
+//		while (rnitr.hasNext()) {
+//			ASTNode an = rnitr.next();
+//			node_element_memory.remove(an);
+//		}
+//		remove_nodes.clear();
+//		node_element_memory.put(expr, result);
+		
+		return node_element_memory.get(expr);
 	}
 
 	// ASTNode node, boolean remember
@@ -128,14 +154,15 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// HashSet<IJavaElement>(temp_statement_expression_environment_set));
 		// }
 
-		temp_statement_expression_environment_set.clear();
+		// temp_statement_expression_environment_set.clear();
 	}
 
 	protected void StatementOverHandle() {
 		// no need to do that anymore.
 		// temp_statement_instr_order.clear();
-		temp_statement_expression_environment_set.clear();
-		temp_statement_environment_set.clear();
+		
+		// temp_statement_expression_environment_set.clear();
+		// temp_statement_environment_set.clear();
 	}
 
 	protected HashMap<IJavaElement, Boolean> element_has_set_branch = new HashMap<IJavaElement, Boolean>();
@@ -145,9 +172,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	{
 		source_invocation_barrier.add(null);
 	}
+	
+	private Set<IJavaElement> CurrentElements() {
+		return node_element_stack.Peek().GetIJavaElementSet();
+	}
 
 	protected Map<IJavaElement, IRForOneInstruction> GetBranchInstructions() {
-		return irc.CopyEnvironment(temp_statement_environment_set);
+		return irc.CopyEnvironment();
 	}
 
 	protected void PushBranchInstructionOrder(Map<IJavaElement, IRForOneInstruction> branch_instrs) {
@@ -301,7 +332,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// method invocation.
 
 	private IJavaElement WholeExpressionIsAnElement(ASTNode expr) {
-		Iterator<IJavaElement> titr = temp_statement_expression_environment_set.iterator();
+		Iterator<IJavaElement> titr = CurrentElements().iterator();
 		while (titr.hasNext()) {
 			IJavaElement ije = titr.next();
 			ASTNode happen = all_happen.get(ije);
@@ -804,7 +835,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		post_visit_task.Put(node.getExpression(), new Runnable() {
 			@Override
 			public void run() {
-				switch_judge_members.push(new HashSet<IJavaElement>(temp_statement_environment_set));
+				switch_judge_members.push(new HashSet<IJavaElement>(CurrentElements()));
 				// IRGeneratorHelper.GenerateGeneralIR(this_ref, node,
 				// IRMeta.Switch);
 				// PushBranchInstructionOrder();
@@ -1330,7 +1361,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				public void run() {
 					IJavaElement ije = WholeExpressionIsAnElement(expr);
 					if (ije != null) {
-						Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
+						Iterator<IJavaElement> titr = CurrentElements().iterator();
 						while (titr.hasNext()) {
 							IJavaElement t_ije = titr.next();
 							IRForOneInstruction iru = irc.GetLastIRTreeNode(t_ije);
@@ -1350,7 +1381,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public void endVisit(ReturnStatement node) {
 		// IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.Return);
-		Iterator<IJavaElement> titr = temp_statement_environment_set.iterator();
+		Iterator<IJavaElement> titr = CurrentElements().iterator();
 		while (titr.hasNext()) {
 			IJavaElement ije = titr.next();
 			IRForOneInstruction iru = irc.GetLastIRTreeNode(ije);
@@ -1452,7 +1483,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			return IJavaElementState.HandledWrong;
 		}
 		
-		Iterator<IJavaElement> ije_itr = temp_statement_environment_set.iterator();
+		Iterator<IJavaElement> ije_itr = CurrentElements().iterator();
 		while (ije_itr.hasNext()) {
 			IJavaElement ije = ije_itr.next();
 			ASTNode node = all_happen.get(ije);
@@ -1499,8 +1530,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// next isolated tasks.
 		// all_count.put(jele, -1);
 		all_happen.put(jele, happen);
-		temp_statement_environment_set.add(jele);
-		temp_statement_expression_environment_set.add(jele);
+		// temp_statement_environment_set.add(jele);
+		// temp_statement_expression_environment_set.add(jele);
+		CurrentElements().add(jele);
 		return IJavaElementState.HandledSuccessful;
 	}
 

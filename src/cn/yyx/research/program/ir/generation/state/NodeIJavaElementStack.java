@@ -1,5 +1,6 @@
 package cn.yyx.research.program.ir.generation.state;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
@@ -16,6 +17,9 @@ public class NodeIJavaElementStack {
 	
 	public void Push(ASTNode node, Set<IJavaElement> ijes) {
 		nodes.push(node);
+		if (ijes == null) {
+			ijes = new HashSet<IJavaElement>();
+		}
 		node_ijes.push(ijes);
 	}
 	
