@@ -1537,14 +1537,15 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			return IJavaElementState.HandledWrong;
 		}
 		
-		Iterator<IJavaElement> ije_itr = CurrentElements().iterator();
-		while (ije_itr.hasNext()) {
-			IJavaElement ije = ije_itr.next();
-			ASTNode node = all_happen.get(ije);
-			if (ASTSearch.ASTNodeContainsAnASTNode(node, happen)) {
-				return IJavaElementState.NoNeedToHandle;
-			}
-		}
+		// TODO this judgment should be implemented in each ASTNode such as FieldAccess, etc.
+//		Iterator<IJavaElement> ije_itr = CurrentElements().iterator();
+//		while (ije_itr.hasNext()) {
+//			IJavaElement ije = ije_itr.next();
+//			ASTNode node = all_happen.get(ije);
+//			if (ASTSearch.ASTNodeContainsAnASTNode(node, happen)) {
+//				return IJavaElementState.NoNeedToHandle;
+//			}
+//		}
 		
 		if (jele instanceof IMember) {
 			IMember im = (IMember) jele;
