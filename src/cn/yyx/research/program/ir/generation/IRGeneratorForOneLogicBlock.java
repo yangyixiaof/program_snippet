@@ -28,6 +28,7 @@ import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.generation.state.IJavaElementState;
+import cn.yyx.research.program.ir.generation.state.NodeIJavaElementStack;
 import cn.yyx.research.program.ir.generation.traversal.task.IRASTNodeTask;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneElement;
@@ -70,8 +71,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// HandleIJavaElement.
 
 	protected HashMap<ASTNode, Set<IJavaElement>> temp_statement_expression_element_memory = new HashMap<ASTNode, Set<IJavaElement>>();
-	protected HashSet<IJavaElement> temp_statement_expression_environment_set = new HashSet<IJavaElement>();
-	protected HashSet<IJavaElement> temp_statement_environment_set = new HashSet<IJavaElement>();
+	
+	protected NodeIJavaElementStack node_element_stack = new NodeIJavaElementStack();
+	
+	// protected HashSet<IJavaElement> temp_statement_expression_environment_set = new HashSet<IJavaElement>();
+	// protected HashSet<IJavaElement> temp_statement_environment_set = new HashSet<IJavaElement>();
 	// protected HashMap<IJavaElement, Integer> all_count = new
 	// HashMap<IJavaElement, Integer>();
 	protected HashMap<IJavaElement, ASTNode> all_happen = new HashMap<IJavaElement, ASTNode>();
