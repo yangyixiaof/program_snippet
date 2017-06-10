@@ -51,7 +51,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public static int max_level = Integer.MAX_VALUE; // Integer.MAX_VALUE partly
 														// means infinite.
 	public static final int un_exist = -100;
-	// TODO remember to add remember nodes.
+	// Solved. remember to add remember nodes.
 	// Solved. return and assign right should add special task.
 	// Solved. variable declarations should be removed, only assignment in it
 	// should be retained.
@@ -229,10 +229,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void preVisit(ASTNode node) {
-		PushNodeIJavaElementStack(node, null);
 		if (node instanceof Block) {
 			ast_block_bind.put(node, new HashSet<IJavaElement>());
 		}
+		PushNodeIJavaElementStack(node, null);
+		
 		pre_visit_task.ProcessAndRemoveTask(node);
 		super.preVisit(node);
 	}
@@ -246,8 +247,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (node instanceof Statement) {
 			StatementOverHandle();
 		}
-		post_visit_task.ProcessAndRemoveTask(node);
 		PopNodeIJavaElementStack();
+		
+		post_visit_task.ProcessAndRemoveTask(node);
 		super.postVisit(node);
 	}
 
