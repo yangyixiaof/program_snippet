@@ -232,9 +232,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (node instanceof Block) {
 			ast_block_bind.put(node, new HashSet<IJavaElement>());
 		}
-		PushNodeIJavaElementStack(node, null);
 		
 		pre_visit_task.ProcessAndRemoveTask(node);
+		PushNodeIJavaElementStack(node, null);
 		super.preVisit(node);
 	}
 
