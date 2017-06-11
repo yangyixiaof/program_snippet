@@ -353,7 +353,11 @@ public class CodeOnOneTraceGenerator {
 		while (eitr.hasNext()) {
 			IJavaElement ije = eitr.next();
 			List<IRForOneInstruction> ins = new LinkedList<IRForOneInstruction>();
-			ins.add(irc.GetFirstIRTreeNode(ije));
+			IRForOneInstruction iroot = irc.GetFirstIRTreeNode(ije);
+			Set<StaticConnection> iroot_in_conns = IRGeneratorForOneProject.GetInstance().GetInConnections(iroot);
+			if (iroot_in_conns == null || iroot_in_conns.isEmpty()) {
+				ins.add(iroot);
+			}
 			memory.last_waiting_execution.put(ije, ins);
 			// instr_pc.add(irc.GetFirstIRTreeNode(ije));
 		}

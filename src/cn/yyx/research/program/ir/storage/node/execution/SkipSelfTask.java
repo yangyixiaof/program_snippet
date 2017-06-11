@@ -24,6 +24,14 @@ public class SkipSelfTask extends IIRNodeTask {
 			FullTrace ft) {
 		// Solved. need to handle IRForOneRawMethodBarrier.
 		
+		// debugging.
+		if (source.toString().trim().startsWith("@Sentinel_URE#")) {
+			System.currentTimeMillis();
+		}
+		if (source.toString().trim().startsWith("EmptyConstructor:")) {
+			System.currentTimeMillis();
+		}
+		
 		int final_type = TaskExecutionHelper.ComputeFinalType(source, target, connect_info);
 		
 		Set<DynamicConnection> in_conns = ft.GetInConnections(source);
