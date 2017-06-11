@@ -61,7 +61,7 @@ public class IRGeneratorHelper {
 		return now;
 	}
 
-	public static IRForOneInstruction GenerateMethodInvocationIR(IRGeneratorForOneLogicBlock irgfob,
+	public static IRForOneSourceMethodInvocation GenerateMethodInvocationIR(IRGeneratorForOneLogicBlock irgfob,
 			List<Expression> nlist, IMethod parent_im, IMethod im, IMethodBinding imb, Expression expr, String identifier, ASTNode node) {
 		IRForOneSourceMethodInvocation now = null;
 		IRCode irc = irgfob.irc;

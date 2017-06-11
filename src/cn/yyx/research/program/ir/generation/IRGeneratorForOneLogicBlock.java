@@ -433,7 +433,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (dec_class != null) {
 			from_source = true;
 		}
-		IRForOneInstruction now = null;
+		IRForOneSourceMethodInvocation now = null;
 		IJavaElement jele = imb.getJavaElement();
 		if (imb != null && dec_class != null && from_source && ((jele == null && imb.isConstructor()) || (jele != null && jele instanceof IMethod))) {
 			// source method invocation.
@@ -444,14 +444,16 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			}
 			
 			// handle return type and its corresponding reference.
-			ITypeBinding itb = imb.getReturnType();
-			if (itb != null && itb.isPrimitive() && !itb.getQualifiedName().equals("void")) {
-				IRForOneSourceMethodInvocation irfomi = (IRForOneSourceMethodInvocation) irc
-						.GetLastIRTreeNode(source_method_virtual_holder_element);
+			// ITypeBinding itb = imb.getReturnType();
+			// if (itb != null && itb.isPrimitive() && !itb.getQualifiedName().equals("void")) {
+				// IRForOneSourceMethodInvocation irfomi = (IRForOneSourceMethodInvocation) irc
+				//		.GetLastIRTreeNode(source_method_virtual_holder_element);
 				UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
 				HandleIJavaElement(ure, node);
-				IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, irfomi);
-			}
+				if (now != null) {
+					IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, now);
+				}
+			// }
 		}
 
 		// add sequential edge.
