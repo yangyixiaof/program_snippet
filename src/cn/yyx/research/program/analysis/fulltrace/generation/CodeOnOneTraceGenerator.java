@@ -19,6 +19,7 @@ import cn.yyx.research.program.analysis.fulltrace.storage.BranchControlForOneIRC
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
+import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
@@ -34,6 +35,7 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneEmptyConstructorInvocation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodBarrier;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSentinel;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 import cn.yyx.research.program.ir.util.IMemberDescriptionHelper;
 import cn.yyx.research.program.ir.visual.dot.debug.DebugShowDotPic;
@@ -214,6 +216,12 @@ public class CodeOnOneTraceGenerator {
 				Iterator<IRForOneInstruction> iitr = inodes.iterator();
 				while (iitr.hasNext()) {
 					IRForOneInstruction inode = iitr.next();
+					
+					//debugging.
+					if (inode.toString().startsWith("@Sentinel_URE#")) {
+						System.currentTimeMillis();
+					}
+					
 					Set<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory);
 					could_continue = could_continue || (in_conns != null);
 					if (in_conns != null) {
@@ -299,7 +307,7 @@ public class CodeOnOneTraceGenerator {
 		ft.NodeCreated(source.getIm(), null, source_dn, branch_control_stack_total.peek());
 		ft.NodeCreated(target.getIm(), source_dn, target_dn, branch_control_stack_total.peek());
 		IIRNodeTask out_task = source.GetOutConnectionMergeTask();
-		if (source instanceof IRForOneSourceMethodInvocation) {
+		if (source instanceof IRForOneSourceMethodInvocation && !(target.getIm() instanceof UncertainReferenceElement && target instanceof IRForOneSentinel)) {
 			IRForOneSourceMethodInvocation irmethod_source = (IRForOneSourceMethodInvocation) source;
 			IMethod select_im = method_selection.GetMethodSelection(irmethod_source);
 			IRForOneMethod im = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(select_im);
