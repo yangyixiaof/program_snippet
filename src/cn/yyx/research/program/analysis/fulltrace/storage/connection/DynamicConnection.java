@@ -7,11 +7,13 @@ public class DynamicConnection {
 	private DynamicNode source = null;
 	private DynamicNode target = null;
 	private int type = -1;
+	private int num = -1;
 	
-	public DynamicConnection(DynamicNode source, DynamicNode target, int type) {
+	public DynamicConnection(DynamicNode source, DynamicNode target, int type, int num) {
 		this.setSource(source);
 		this.setTarget(target);
 		this.setType(type);
+		this.setNum(num);
 	}
 
 	public DynamicNode GetSource() {
@@ -43,7 +45,15 @@ public class DynamicConnection {
 			System.err.println("source is not source or target is not target.");
 			System.exit(1);
 		}
-		return new DynamicConnection(source, target, type | dnn.getType());
+		return new DynamicConnection(source, target, type | dnn.getType(), Math.max(num, dnn.getNum()));
+	}
+
+	public int getNum() {
+		return num;
+	}
+
+	private void setNum(int num) {
+		this.num = num;
 	}
 	
 }

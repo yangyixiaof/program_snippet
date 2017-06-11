@@ -37,7 +37,7 @@ public class SkipSelfTask extends IIRNodeTask {
 		Set<DynamicConnection> in_conns = ft.GetInConnections(source);
 		
 		if (in_conns.isEmpty()) {
-			ft.AddConnection(new DynamicConnection(source, target, connect_info.getType()));
+			ft.AddConnection(new DynamicConnection(source, target, connect_info.getType(), connect_info.getNum()));
 		} else {
 			// System.err.println("====== Real skip task is running!");
 			boolean skip = true;
@@ -64,12 +64,12 @@ public class SkipSelfTask extends IIRNodeTask {
 					DynamicNode nsource = dc.GetSource();
 					DynamicNode ntarget = target;
 					int addition = ntarget.getInstr().getIm().equals(nsource.getInstr().getIm()) ? EdgeBaseType.Self.Value() : 0;
-					DynamicConnection new_dc = new DynamicConnection(nsource, ntarget, dc.getType() & final_type | addition);
+					DynamicConnection new_dc = new DynamicConnection(nsource, ntarget, dc.getType() & final_type | addition, dc.getNum() * connect_info.getNum());
 					ft.AddConnection(new_dc);
 				}
 				ft.HandleRootsAfterRemovingAllConnections(in_conns);
 			} else {
-				ft.AddConnection(new DynamicConnection(source, target, connect_info.getType()));
+				ft.AddConnection(new DynamicConnection(source, target, connect_info.getType(), connect_info.getNum()));
 			}
 //			DynamicConnection conn = ft.GetSpecifiedConnection(source, target);
 //			if (conn == null) {

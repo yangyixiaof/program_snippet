@@ -278,9 +278,9 @@ public class CodeOnOneTraceGenerator {
 						DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
 						DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
 						ft.AddConnection(
-								new DynamicConnection(source_dn, target_dn, iirn.GetStaticConnectionInfo().getType()));
+								new DynamicConnection(source_dn, target_dn, iirn.GetStaticConnectionInfo().getType(), iirn.GetStaticConnectionInfo().getNum()));
 						ft.AddConnection(
-								new DynamicConnection(target_dn, source_dn, iirn.GetStaticConnectionInfo().getType()));
+								new DynamicConnection(target_dn, source_dn, iirn.GetStaticConnectionInfo().getType(), iirn.GetStaticConnectionInfo().getNum()));
 					}
 				}
 			}
@@ -390,7 +390,7 @@ public class CodeOnOneTraceGenerator {
 						non_null_params.add(param);
 						IRForOneInstruction irpara = irc.GetFirstIRTreeNode(param);
 						HandleStaticConnectionForSource(ft_run, irfoi, irpara,
-								new StaticConnectionInfo(EdgeBaseType.Sequential.Value()), env_idx);
+								new StaticConnectionInfo(EdgeBaseType.Sequential.Value(), 1), env_idx);
 					}
 				}
 			}

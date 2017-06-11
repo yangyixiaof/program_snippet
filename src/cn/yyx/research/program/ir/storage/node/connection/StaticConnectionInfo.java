@@ -3,9 +3,11 @@ package cn.yyx.research.program.ir.storage.node.connection;
 public class StaticConnectionInfo {
 	
 	private int type = 0;
+	private int num = 0;
 	
-	public StaticConnectionInfo(int type) {
+	public StaticConnectionInfo(int type, int num) {
 		this.setType(type);
+		this.setNum(num);
 	}
 
 	public int getType() {
@@ -26,6 +28,14 @@ public class StaticConnectionInfo {
 			return false;
 		}
 		return super.equals(obj);
+	}
+
+	public int getNum() {
+		return num;
+	}
+
+	public void setNum(int num) {
+		this.num = num;
 	}
 	
 }

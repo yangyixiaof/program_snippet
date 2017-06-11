@@ -386,7 +386,7 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 			while (oitr.hasNext()) {
 				IRForOneInstruction irfoi = oitr.next();
 				StaticConnection sc = out_map.get(irfoi);
-				IVConnection ivc = new IVConnection(source, irfoi, new StaticConnectionInfo(sc.getType()));
+				IVConnection ivc = new IVConnection(source, irfoi, new StaticConnectionInfo(sc.getType(), sc.getNum()));
 				result.add(ivc);
 			}
 		}

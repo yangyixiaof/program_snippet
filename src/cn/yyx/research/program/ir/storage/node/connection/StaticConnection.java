@@ -5,6 +5,7 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 public class StaticConnection {
 	
 	private int type = 0;
+	private int num = 1;
 	private IRForOneInstruction source = null;
 	private IRForOneInstruction target = null;
 	
@@ -96,7 +97,15 @@ public class StaticConnection {
 	
 	public StaticConnectionInfo GetStaticConnectionInfo()
 	{
-		return new StaticConnectionInfo(type);
+		return new StaticConnectionInfo(type, num);
 	}
+
+	public int getNum() {
+		return num;
+	}
+
+//	private void setNum(int num) {
+//		this.num = num;
+//	}
 	
 }

@@ -17,7 +17,7 @@ public class RequireHandleTask extends IIRNodeTask {
 	public void HandleOutConnection(DynamicNode source, DynamicNode target, StaticConnectionInfo connect_info,
 			FullTrace ft) {
 		int final_type = TaskExecutionHelper.ComputeFinalType(source, target, connect_info);
-		DynamicConnection conn = new DynamicConnection(source, target, final_type);
+		DynamicConnection conn = new DynamicConnection(source, target, final_type, connect_info.getNum());
 		ft.AddConnection(conn);
 	}
 	
