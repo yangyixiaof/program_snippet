@@ -1,16 +1,10 @@
 package cn.yyx.research.program.ir.generation.state;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Statement;
-
-import cn.yyx.research.program.ir.ast.ASTSearch;
 
 public class NodeIJavaElement {
 	
@@ -39,26 +33,26 @@ public class NodeIJavaElement {
 	}
 	
 	public void Merge(NodeIJavaElement nije, Map<IJavaElement, ASTNode> all_happen) {
-		Set<IJavaElement> remove = new HashSet<IJavaElement>();
-		if (!(nije.GetNode() instanceof Statement)) {
-			// need to do contains judge.
-			Iterator<IJavaElement> iitr = ijes.iterator();
-			while (iitr.hasNext()) {
-				IJavaElement iije = iitr.next();
-				ASTNode happen = all_happen.get(iije);
-				Set<IJavaElement> next_level_set = nije.GetIJavaElementSet();
-				Iterator<IJavaElement> nitr = next_level_set.iterator();
-				while (nitr.hasNext()) {
-					IJavaElement next_level_ije = nitr.next();
-					ASTNode next_level_happen = all_happen.get(next_level_ije);
-					if (ASTSearch.ASTNodeContainsAnASTNode(happen, next_level_happen)) {
-						remove.add(next_level_ije);
-					}
-				}
-			}
-		}
+//		Set<IJavaElement> remove = new HashSet<IJavaElement>();
+//		if (!(nije.GetNode() instanceof Statement)) {
+//			// need to do contains judge.
+//			Iterator<IJavaElement> iitr = ijes.iterator();
+//			while (iitr.hasNext()) {
+//				IJavaElement iije = iitr.next();
+//				ASTNode happen = all_happen.get(iije);
+//				Set<IJavaElement> next_level_set = nije.GetIJavaElementSet();
+//				Iterator<IJavaElement> nitr = next_level_set.iterator();
+//				while (nitr.hasNext()) {
+//					IJavaElement next_level_ije = nitr.next();
+//					ASTNode next_level_happen = all_happen.get(next_level_ije);
+//					if (ASTSearch.ASTNodeContainsAnASTNode(happen, next_level_happen)) {
+//						remove.add(next_level_ije);
+//					}
+//				}
+//			}
+//		}
 		ijes.addAll(nije.GetIJavaElementSet());
-		ijes.removeAll(remove);
+//		ijes.removeAll(remove);
 	}
 	
 	@Override

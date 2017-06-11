@@ -84,7 +84,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		NodeIJavaElement node_ele = node_element_stack.Pop();
 		if (!node_element_stack.IsEmpty()) {
 			NodeIJavaElement now_node_ele = node_element_stack.Peek();
-			now_node_ele.Merge(node_ele);
+			now_node_ele.Merge(node_ele, all_happen);
 		}
 		ASTNode node = node_ele.GetNode();
 		Set<IJavaElement> node_ijes = node_ele.GetIJavaElementSet();
@@ -1537,7 +1537,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			return IJavaElementState.HandledWrong;
 		}
 		
-		// TODO this judgment should be implemented in each ASTNode such as FieldAccess, etc.
+		// Solved. this judgment should be implemented in each ASTNode such as FieldAccess, etc.
 //		Iterator<IJavaElement> ije_itr = CurrentElements().iterator();
 //		while (ije_itr.hasNext()) {
 //			IJavaElement ije = ije_itr.next();
@@ -1598,6 +1598,16 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 		return super.visit(node);
 	}
+	
+	@Override
+	public boolean visit(FieldAccess node) {
+		IVariableBinding ib = node.resolveFieldBinding();
+		if (ib != null && ib.getJavaElement() != null) {
+			HandleBinding(ib, node);
+			return false;
+		}
+		return super.visit(node);
+	}
 
 	@Override
 	public void endVisit(FieldAccess node) {
@@ -1605,6 +1615,16 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (ib == null || ib.getJavaElement() == null) {
 			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.FieldAccess + node.getName().toString());
 		}
+	}
+	
+	@Override
+	public boolean visit(SuperFieldAccess node) {
+		IVariableBinding ib = node.resolveFieldBinding();
+		if (ib != null && ib.getJavaElement() != null) {
+			HandleBinding(ib, node);
+			return false;
+		}
+		return super.visit(node);
 	}
 
 	@Override
