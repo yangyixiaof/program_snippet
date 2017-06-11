@@ -41,6 +41,7 @@ public class IRMeta {
 	public static final String ArrayCreationIndex = "@ArrayCreationIndex";
 	public static final String MethodReference = "@MethodRef_";
 	public static final String FieldAccess = "@FieldAccess_";
+	public static final String QualifiedName = "@QualifiedName_";
 	
 	public static final String VirtualMethodReturn = "@VirtualMethodReturn";
 	public static final String VirtualSentinel = "@Sentinel_";

@@ -1600,6 +1600,26 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 	
 	@Override
+	public boolean visit(QualifiedName node) {
+		IBinding ib = node.resolveBinding();
+		if (ib != null && ib.getJavaElement() != null) {
+			HandleBinding(ib, node);
+			return false;
+		}
+		// HandleType(node.resolveBinding(), node.toString(), node);
+		return super.visit(node);
+	}
+	
+	@Override
+	public void endVisit(QualifiedName node) {
+		IBinding ib = node.resolveBinding();
+		if (ib == null || ib.getJavaElement() == null) {
+			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.QualifiedName + node.getName().toString());
+		}
+		super.endVisit(node);
+	}
+	
+	@Override
 	public boolean visit(FieldAccess node) {
 		IVariableBinding ib = node.resolveFieldBinding();
 		if (ib != null && ib.getJavaElement() != null) {
@@ -1717,12 +1737,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(NameQualifiedType node) {
-		// HandleType(node.resolveBinding(), node.toString(), node);
-		return false;
-	}
-
-	@Override
-	public boolean visit(QualifiedName node) {
 		// HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
