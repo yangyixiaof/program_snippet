@@ -40,6 +40,9 @@ public class CommonDotGenerator {
 			String color = "black";
 			StaticConnectionInfo info = conn.getInfo();
 			int conn_type = info.getType();
+			if (EdgeTypeUtil.HasSpecificType(conn_type, EdgeBaseType.Barrier.Value())) {
+				color = "yellow";
+			}
 			if (EdgeTypeUtil.HasSpecificType(conn_type, EdgeBaseType.SameOperations.Value())) {
 				color = "green";
 			}
@@ -48,9 +51,6 @@ public class CommonDotGenerator {
 			}
 			if (EdgeTypeUtil.HasSpecificType(conn_type, EdgeBaseType.Branch.Value())) {
 				color = "red";
-			}
-			if (EdgeTypeUtil.HasSpecificType(conn_type, EdgeBaseType.Barrier.Value())) {
-				color = "yellow";
 			}
 			if (EdgeTypeUtil.HasSpecificType(conn_type, EdgeBaseType.Self.Value())) {
 				color = "black";

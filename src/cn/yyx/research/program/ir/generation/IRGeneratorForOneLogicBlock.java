@@ -71,15 +71,15 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// above used for method invocation only.
 	// Solved. this element is not assigned. should be assigned in
 	// HandleIJavaElement.
-	
+
 	protected HashMap<ASTNode, Set<IJavaElement>> node_element_memory = new HashMap<ASTNode, Set<IJavaElement>>();
-	
+
 	protected NodeIJavaElementStack node_element_stack = new NodeIJavaElementStack();
-	
+
 	private void PushNodeIJavaElementStack(ASTNode node, Set<IJavaElement> ijes) {
 		node_element_stack.Push(node, ijes);
 	}
-	
+
 	private NodeIJavaElement PopNodeIJavaElementStack() {
 		NodeIJavaElement node_ele = node_element_stack.Pop();
 		if (!node_element_stack.IsEmpty()) {
@@ -98,13 +98,15 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 		return node_ele;
 	}
-	
-	// protected HashSet<IJavaElement> temp_statement_expression_environment_set = new HashSet<IJavaElement>();
-	// protected HashSet<IJavaElement> temp_statement_environment_set = new HashSet<IJavaElement>();
+
+	// protected HashSet<IJavaElement> temp_statement_expression_environment_set
+	// = new HashSet<IJavaElement>();
+	// protected HashSet<IJavaElement> temp_statement_environment_set = new
+	// HashSet<IJavaElement>();
 	// protected HashMap<IJavaElement, Integer> all_count = new
 	// HashMap<IJavaElement, Integer>();
 	protected HashMap<IJavaElement, ASTNode> all_happen = new HashMap<IJavaElement, ASTNode>();
-	
+
 	protected InfixExpression most_parent_infix = null;
 	protected Map<IJavaElement, Set<IRForOneInstruction>> instrs_under_most_parent_infix = new HashMap<IJavaElement, Set<IRForOneInstruction>>();
 	// check if all_happen is all right assigned. yes.
@@ -122,27 +124,27 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// new HashMap<ASTNode, IJavaElement>();
 
 	private Set<IJavaElement> SearchAndRememberAllElementsInASTNodeInJustEnvironment(Expression expr) {
-//		HashSet<IJavaElement> result = new HashSet<IJavaElement>();
-//		result.addAll(temp_statement_expression_environment_set);
-//		Set<ASTNode> tkeys = node_element_memory.keySet();
-//		Iterator<ASTNode> titr = tkeys.iterator();
-//		List<ASTNode> remove_nodes = new LinkedList<ASTNode>();
-//		while (titr.hasNext()) {
-//			ASTNode astnode = titr.next();
-//			if (ASTSearch.ASTNodeContainsAnASTNode(expr, astnode)) {
-//				remove_nodes.add(astnode);
-//				Set<IJavaElement> set = node_element_memory.get(astnode);
-//				result.addAll(set);
-//			}
-//		}
-//		Iterator<ASTNode> rnitr = remove_nodes.iterator();
-//		while (rnitr.hasNext()) {
-//			ASTNode an = rnitr.next();
-//			node_element_memory.remove(an);
-//		}
-//		remove_nodes.clear();
-//		node_element_memory.put(expr, result);
-		
+		// HashSet<IJavaElement> result = new HashSet<IJavaElement>();
+		// result.addAll(temp_statement_expression_environment_set);
+		// Set<ASTNode> tkeys = node_element_memory.keySet();
+		// Iterator<ASTNode> titr = tkeys.iterator();
+		// List<ASTNode> remove_nodes = new LinkedList<ASTNode>();
+		// while (titr.hasNext()) {
+		// ASTNode astnode = titr.next();
+		// if (ASTSearch.ASTNodeContainsAnASTNode(expr, astnode)) {
+		// remove_nodes.add(astnode);
+		// Set<IJavaElement> set = node_element_memory.get(astnode);
+		// result.addAll(set);
+		// }
+		// }
+		// Iterator<ASTNode> rnitr = remove_nodes.iterator();
+		// while (rnitr.hasNext()) {
+		// ASTNode an = rnitr.next();
+		// node_element_memory.remove(an);
+		// }
+		// remove_nodes.clear();
+		// node_element_memory.put(expr, result);
+
 		return node_element_memory.get(expr);
 	}
 
@@ -160,7 +162,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	protected void StatementOverHandle() {
 		// no need to do that anymore.
 		// temp_statement_instr_order.clear();
-		
+
 		// temp_statement_expression_environment_set.clear();
 		// temp_statement_environment_set.clear();
 	}
@@ -172,7 +174,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	{
 		source_invocation_barrier.add(null);
 	}
-	
+
 	public Set<IJavaElement> CurrentElements() {
 		return node_element_stack.Peek().GetIJavaElementSet();
 	}
@@ -232,7 +234,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (node instanceof Block) {
 			ast_block_bind.put(node, new HashSet<IJavaElement>());
 		}
-		
+
 		pre_visit_task.ProcessAndRemoveTask(node);
 		PushNodeIJavaElementStack(node, null);
 		super.preVisit(node);
@@ -248,7 +250,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			StatementOverHandle();
 		}
 		PopNodeIJavaElementStack();
-		
+
 		post_visit_task.ProcessAndRemoveTask(node);
 		super.postVisit(node);
 	}
@@ -435,26 +437,31 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 		IRForOneSourceMethodInvocation now = null;
 		IJavaElement jele = imb.getJavaElement();
-		if (imb != null && dec_class != null && from_source && ((jele == null && imb.isConstructor()) || (jele != null && jele instanceof IMethod))) {
+		if (imb != null && dec_class != null && from_source
+				&& ((jele == null && imb.isConstructor()) || (jele != null && jele instanceof IMethod))) {
 			// source method invocation.
 			if (jele == null) {
-				now = IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, null, imb, expr, identifier, node);
+				now = IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, null, imb, expr, identifier,
+						node);
 			} else {
-				now = IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, (IMethod) jele, imb, expr, identifier, node);
+				now = IRGeneratorHelper.GenerateMethodInvocationIR(this, nlist, parent_im, (IMethod) jele, imb, expr,
+						identifier, node);
 			}
-			
-			// handle return type and its corresponding reference.
-			// ITypeBinding itb = imb.getReturnType();
-			// if (itb != null && itb.isPrimitive() && !itb.getQualifiedName().equals("void")) {
-				// IRForOneSourceMethodInvocation irfomi = (IRForOneSourceMethodInvocation) irc
-				//		.GetLastIRTreeNode(source_method_virtual_holder_element);
-				UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
-				HandleIJavaElement(ure, node);
-				if (now != null) {
-					IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, now);
-				}
-			// }
 		}
+
+		// handle return type and its corresponding reference.
+		// ITypeBinding itb = imb.getReturnType();
+		// if (itb != null && itb.isPrimitive() &&
+		// !itb.getQualifiedName().equals("void")) {
+		// IRForOneSourceMethodInvocation irfomi =
+		// (IRForOneSourceMethodInvocation) irc
+		// .GetLastIRTreeNode(source_method_virtual_holder_element);
+		if (now != null) {
+			UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
+			HandleIJavaElement(ure, node);
+			IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, now);
+		}
+		// }
 
 		// add sequential edge.
 		List<IRForOneInstruction> ops = IRGeneratorHelper.GenerateGeneralIR(this, node,
@@ -622,7 +629,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 						Iterator<IJavaElement> eleitr = eles.iterator();
 						while (eleitr.hasNext()) {
 							IJavaElement eije = eleitr.next();
-							IRForOneOperation irfop = (IRForOneOperation) IRGeneratorHelper.CreateIRInstruction(this_ref, IRForOneOperation.class, new Object[]{irc, eije, "nothing.", SkipSelfTask.class});
+							IRForOneOperation irfop = (IRForOneOperation) IRGeneratorHelper.CreateIRInstruction(
+									this_ref, IRForOneOperation.class,
+									new Object[] { irc, eije, "nothing.", SkipSelfTask.class });
 							IRTreeForOneElement itree = irc.GetIRTreeForOneElement(eije);
 							itree.GoForwardANode(irfop);
 						}
@@ -668,7 +677,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		Iterator<IJavaElement> itr = merge.keySet().iterator();
 		while (itr.hasNext()) {
 			IJavaElement ije = itr.next();
-			IRForOneInstruction irfop = (IRForOneInstruction) IRGeneratorHelper.CreateIRInstruction(this, IRForOneOperation.class, new Object[]{irc, ije, IRMeta.BranchOver, DefaultINodeTask.class});
+			IRForOneInstruction irfop = (IRForOneInstruction) IRGeneratorHelper.CreateIRInstruction(this,
+					IRForOneOperation.class, new Object[] { irc, ije, IRMeta.BranchOver, DefaultINodeTask.class });
 			ops.add(irfop);
 			List<IRForOneInstruction> merge_list = merge.get(ije);
 			MergeListParallelToOne(merge_list, ije, irfop);
@@ -1036,19 +1046,19 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		PostVisitBranch(node, true);
 		super.endVisit(node);
 	}
-	
+
 	private void RememberExpressionList(List<Expression> exp_list) {
 		for (Expression exp : exp_list) {
 			node_element_memory.put(exp, null);
 		}
 	}
-	
+
 	private void ForgetExpressionList(List<Expression> exp_list) {
 		for (Expression exp : exp_list) {
 			node_element_memory.remove(exp);
 		}
 	}
-	
+
 	private Set<IJavaElement> GetAllElementsFromExpressionList(List<Expression> exp_list) {
 		Set<IJavaElement> ele_set = new HashSet<IJavaElement>();
 		Iterator<Expression> eitr = exp_list.iterator();
@@ -1078,14 +1088,16 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				post_visit_task.Put(last_expr, new Runnable() {
 					@Override
 					public void run() {
-						// HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
-						// Set<IJavaElement> ele_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
-						//		temp_last_expr);
-						
+						// HashSet<IJavaElement> temp =
+						// this_ref.temp_statement_environment_set;
+						// Set<IJavaElement> ele_set =
+						// SearchAndRememberAllElementsInASTNodeInJustEnvironment(
+						// temp_last_expr);
+
 						Set<IJavaElement> ele_set = GetAllElementsFromExpressionList(ini_list);
-						
+
 						// this_ref.temp_statement_expression_environment_set
-						// ele_set, 
+						// ele_set,
 						IRGeneratorHelper.GenerateGeneralIR(this_ref, ele_set, temp_last_expr, IRMeta.For_Initial);
 
 						ExpressionOverHandle();
@@ -1104,9 +1116,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				post_visit_task.Put(last_expr, new Runnable() {
 					@Override
 					public void run() {
-//						HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
-//						this_ref.temp_statement_environment_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
-//								temp_last_expr);
+						// HashSet<IJavaElement> temp =
+						// this_ref.temp_statement_environment_set;
+						// this_ref.temp_statement_environment_set =
+						// SearchAndRememberAllElementsInASTNodeInJustEnvironment(
+						// temp_last_expr);
 						Set<IJavaElement> ele_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
 								temp_last_expr);
 						// this_ref.temp_statement_expression_environment_set;
@@ -1131,14 +1145,17 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				post_visit_task.Put(last_expr, new Runnable() {
 					@Override
 					public void run() {
-//						HashSet<IJavaElement> temp = this_ref.temp_statement_environment_set;
-//						this_ref.temp_statement_environment_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
-//								temp_last_expr);
-						
-						// Set<IJavaElement> ele_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
-						//		temp_last_expr);
+						// HashSet<IJavaElement> temp =
+						// this_ref.temp_statement_environment_set;
+						// this_ref.temp_statement_environment_set =
+						// SearchAndRememberAllElementsInASTNodeInJustEnvironment(
+						// temp_last_expr);
+
+						// Set<IJavaElement> ele_set =
+						// SearchAndRememberAllElementsInASTNodeInJustEnvironment(
+						// temp_last_expr);
 						Set<IJavaElement> ele_set = GetAllElementsFromExpressionList(upd_list);
-						
+
 						// this_ref.temp_statement_expression_environment_set;
 
 						IRGeneratorHelper.GenerateGeneralIR(this_ref, ele_set, temp_last_expr, IRMeta.For_Update);
@@ -1287,18 +1304,20 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (right == null) {
 			return;
 		}
-		// Set<IJavaElement> temp_copy = new HashSet<IJavaElement>(temp_statement_environment_set);
+		// Set<IJavaElement> temp_copy = new
+		// HashSet<IJavaElement>(temp_statement_environment_set);
 		// temp_statement_environment_set.clear();
 		node_element_memory.put(right, null);
 		preVisit(right);
 		right.accept(this);
 		postVisit(right);
-		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment(SearchAndRememberAllElementsInASTNodeInJustEnvironment(right));
+		Map<IJavaElement, IRForOneInstruction> env = irc
+				.CopyEnvironment(SearchAndRememberAllElementsInASTNodeInJustEnvironment(right));
 		node_element_memory.remove(right);
 		// temp_copy.addAll(temp_statement_environment_set);
 
 		StatementOverHandle();
-		
+
 		node_element_memory.put(left, null);
 		preVisit(left);
 		left.accept(this);
@@ -1538,17 +1557,18 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		if (jele == null) {
 			return IJavaElementState.HandledWrong;
 		}
-		
-		// Solved. this judgment should be implemented in each ASTNode such as FieldAccess, etc.
-//		Iterator<IJavaElement> ije_itr = CurrentElements().iterator();
-//		while (ije_itr.hasNext()) {
-//			IJavaElement ije = ije_itr.next();
-//			ASTNode node = all_happen.get(ije);
-//			if (ASTSearch.ASTNodeContainsAnASTNode(node, happen)) {
-//				return IJavaElementState.NoNeedToHandle;
-//			}
-//		}
-		
+
+		// Solved. this judgment should be implemented in each ASTNode such as
+		// FieldAccess, etc.
+		// Iterator<IJavaElement> ije_itr = CurrentElements().iterator();
+		// while (ije_itr.hasNext()) {
+		// IJavaElement ije = ije_itr.next();
+		// ASTNode node = all_happen.get(ije);
+		// if (ASTSearch.ASTNodeContainsAnASTNode(node, happen)) {
+		// return IJavaElementState.NoNeedToHandle;
+		// }
+		// }
+
 		if (jele instanceof IMember) {
 			IMember im = (IMember) jele;
 			IType dec_type = im.getDeclaringType();
@@ -1600,7 +1620,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(QualifiedName node) {
 		IBinding ib = node.resolveBinding();
@@ -1611,7 +1631,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// HandleType(node.resolveBinding(), node.toString(), node);
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public void endVisit(QualifiedName node) {
 		IBinding ib = node.resolveBinding();
@@ -1620,7 +1640,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 		super.endVisit(node);
 	}
-	
+
 	@Override
 	public boolean visit(FieldAccess node) {
 		IVariableBinding ib = node.resolveFieldBinding();
@@ -1638,7 +1658,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.FieldAccess + node.getName().toString());
 		}
 	}
-	
+
 	@Override
 	public boolean visit(SuperFieldAccess node) {
 		IVariableBinding ib = node.resolveFieldBinding();
@@ -1697,14 +1717,15 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public boolean visit(TypeLiteral node) {
 		ITypeBinding itb = node.resolveTypeBinding();
 		HandleType(itb, IRConstantMeta.TypeConstant + "$" + node.toString(), node);
-//		IJavaElementState source_resolved = HandleBinding(itb, node);
-//		if (source_resolved == IJavaElementState.HandledWrong) {
-//			HandleIJavaElement(IRGeneratorForOneProject.GetInstance()
-//					.FetchConstantUniqueElement(IRConstantMeta.TypeConstant + "$" + node.toString()), node);
-//		}
+		// IJavaElementState source_resolved = HandleBinding(itb, node);
+		// if (source_resolved == IJavaElementState.HandledWrong) {
+		// HandleIJavaElement(IRGeneratorForOneProject.GetInstance()
+		// .FetchConstantUniqueElement(IRConstantMeta.TypeConstant + "$" +
+		// node.toString()), node);
+		// }
 		return super.visit(node);
 	}
-	
+
 	private void HandleType(IBinding ib, String represent, ASTNode happen) {
 		IJavaElementState source_resolved = HandleBinding(ib, happen);
 		if (source_resolved == IJavaElementState.HandledWrong) {
@@ -1742,13 +1763,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// HandleType(node.resolveBinding(), node.toString(), node);
 		return false;
 	}
-	
+
 	@Override
 	public boolean visit(ParameterizedType node) {
 		// it won't happen.
 		return false;
 	}
-	
+
 	@Override
 	public boolean visit(WildcardType node) {
 		// do not need to handle.
@@ -1823,16 +1844,16 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			list.add(irc.GetLastIRTreeNode(ije));
 		}
 	}
-	
+
 	// Solved. Add group to each IRForOneInstruction.
-	
+
 	@Override
 	public boolean visit(InfixExpression node) {
 		if (most_parent_infix == null) {
 			most_parent_infix = node;
 			instrs_under_most_parent_infix.clear();
 		}
-		
+
 		HashMap<IJavaElement, List<IRForOneInstruction>> merge = new HashMap<IJavaElement, List<IRForOneInstruction>>();
 		node_to_merge.put(node, merge);
 
@@ -1904,9 +1925,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		while (mitr.hasNext()) {
 			IJavaElement ije = mitr.next();
 			List<IRForOneInstruction> list = merge.get(ije);
-			// this is the only place which generates meaningful codes but not through IRGeneratorHelper.
-			IRForOneInstruction irfop = (IRForOneInstruction) IRGeneratorHelper.CreateIRInstruction(this, IRForOneOperation.class, new Object[]{irc, ije, node.getOperator().toString(),
-					DefaultINodeTask.class});
+			// this is the only place which generates meaningful codes but not
+			// through IRGeneratorHelper.
+			IRForOneInstruction irfop = (IRForOneInstruction) IRGeneratorHelper.CreateIRInstruction(this,
+					IRForOneOperation.class,
+					new Object[] { irc, ije, node.getOperator().toString(), DefaultINodeTask.class });
 			if (node.equals(most_parent_infix)) {
 				Set<IRForOneInstruction> instrs = instrs_under_most_parent_infix.get(ije);
 				Iterator<IRForOneInstruction> initr = instrs.iterator();
@@ -1915,7 +1938,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 					iroi.SetGroup(irfop);
 				}
 			}
-			IRGeneratorHelper.HandleNodeSelfAndSourceMethodAndBranchDependency(irc, ije, irfop, branch_var_instr_order.empty() ? null : branch_var_instr_order.peek(), source_invocation_barrier.peek(), element_has_set_branch, element_has_set_source_method_barrier);
+			IRGeneratorHelper.HandleNodeSelfAndSourceMethodAndBranchDependency(irc, ije, irfop,
+					branch_var_instr_order.empty() ? null : branch_var_instr_order.peek(),
+					source_invocation_barrier.peek(), element_has_set_branch, element_has_set_source_method_barrier);
 			new_creation.add(irfop);
 			MergeListParallelToOne(list, ije, irfop);
 		}
