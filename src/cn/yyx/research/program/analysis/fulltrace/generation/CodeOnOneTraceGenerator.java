@@ -212,7 +212,8 @@ public class CodeOnOneTraceGenerator {
 
 				// Solved. handle operations first, remember to handle
 				// IRForMethodInvocation which is totally different.
-
+				Set<IRForOneInstruction> inodes_remove = new HashSet<IRForOneInstruction>();
+				Set<IRForOneInstruction> inodes_add = new HashSet<IRForOneInstruction>();
 				Iterator<IRForOneInstruction> iitr = inodes.iterator();
 				while (iitr.hasNext()) {
 					IRForOneInstruction inode = iitr.next();
@@ -237,7 +238,8 @@ public class CodeOnOneTraceGenerator {
 						}
 						HandleStaticConnectionForTheSameOperation(ft, memory, inode, env_idx);
 						memory.executed_conns.addAll(IRGeneratorForOneProject.GetInstance().GetOutConnections(inode));
-						inodes.remove(inode);
+						// inodes.remove(inode);
+						inodes_remove.add(inode);
 						memory.executed_nodes.add(inode);
 						Set<IRForOneInstruction> outinodes = IRGeneratorForOneProject.GetInstance()
 								.GetOutINodesByContainingSpecificType(inode, EdgeBaseType.Self.Value());
@@ -245,11 +247,14 @@ public class CodeOnOneTraceGenerator {
 						while (oitr.hasNext()) {
 							IRForOneInstruction oiri = oitr.next();
 							if (!memory.executed_nodes.contains(oiri)) {
-								inodes.add(oiri);
+								inodes_add.add(oiri);
+								// inodes.add(oiri);
 							}
 						}
 					}
 				}
+				inodes.removeAll(inodes_remove);
+				inodes.addAll(inodes_add);
 			}
 
 			if (!could_continue) {
