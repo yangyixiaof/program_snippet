@@ -115,4 +115,9 @@ public class UncertainReferenceElement implements IJavaElement {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return getElementName();
+	}
+	
 }

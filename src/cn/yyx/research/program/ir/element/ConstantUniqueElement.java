@@ -114,5 +114,10 @@ public class ConstantUniqueElement implements IJavaElement {
 	public boolean isStructureKnown() throws JavaModelException {
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return getElementName();
+	}
 	
 }

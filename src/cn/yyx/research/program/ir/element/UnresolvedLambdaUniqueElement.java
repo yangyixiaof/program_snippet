@@ -334,5 +334,10 @@ public class UnresolvedLambdaUniqueElement implements IMethod {
 		}
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return getElementName();
+	}
 	
 }
