@@ -5,7 +5,7 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 public class StaticConnection {
 	
 	private int type = 0;
-	private int num = 1;
+	private int num = 0;
 	private IRForOneInstruction source = null;
 	private IRForOneInstruction target = null;
 	
@@ -63,6 +63,7 @@ public class StaticConnection {
 	public int hashCode() {
 		final int prime = 31;
         int result = getType();
+        result = prime * result + num;
         result = prime * result + ((source == null) ? 0 : source.hashCode());
         result = prime * result + ((target == null) ? 0 : target.hashCode());
         return result;

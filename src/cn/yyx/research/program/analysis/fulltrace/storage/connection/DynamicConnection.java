@@ -45,7 +45,7 @@ public class DynamicConnection {
 			System.err.println("source is not source or target is not target.");
 			System.exit(1);
 		}
-		return new DynamicConnection(source, target, type | dnn.getType(), Math.max(num, dnn.getNum()));
+		return new DynamicConnection(source, target, type | dnn.getType(), num + dnn.getNum());
 	}
 
 	public int getNum() {

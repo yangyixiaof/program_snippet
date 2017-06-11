@@ -390,7 +390,7 @@ public class CodeOnOneTraceGenerator {
 						non_null_params.add(param);
 						IRForOneInstruction irpara = irc.GetFirstIRTreeNode(param);
 						HandleStaticConnectionForSource(ft_run, irfoi, irpara,
-								new StaticConnectionInfo(EdgeBaseType.Sequential.Value(), 1), env_idx);
+								new StaticConnectionInfo(EdgeBaseType.Sequential.Value(), 0), env_idx);
 					}
 				}
 			}

@@ -64,7 +64,11 @@ public class SkipSelfTask extends IIRNodeTask {
 					DynamicNode nsource = dc.GetSource();
 					DynamicNode ntarget = target;
 					int addition = ntarget.getInstr().getIm().equals(nsource.getInstr().getIm()) ? EdgeBaseType.Self.Value() : 0;
-					DynamicConnection new_dc = new DynamicConnection(nsource, ntarget, dc.getType() & final_type | addition, dc.getNum() * connect_info.getNum());
+					int num = dc.getNum() + connect_info.getNum();
+					if (dc.getNum() > 0 && connect_info.getNum() > 0) {
+						num = dc.getNum() * connect_info.getNum();
+					}
+					DynamicConnection new_dc = new DynamicConnection(nsource, ntarget, dc.getType() & final_type | addition, num);
 					ft.AddConnection(new_dc);
 				}
 				ft.HandleRootsAfterRemovingAllConnections(in_conns);
