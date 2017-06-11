@@ -12,7 +12,7 @@ import org.eclipse.jdt.core.JavaModelException;
 
 import cn.yyx.research.program.ir.IRElementMeta;
 
-public class UnresolvedTypeElement implements IJavaElement {
+public class UnresolvedTypeElement extends VirtualDefinedElement {
 	
 	String represent = null;
 	

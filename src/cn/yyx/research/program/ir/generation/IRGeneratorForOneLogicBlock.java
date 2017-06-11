@@ -21,12 +21,11 @@ import cn.yyx.research.program.ir.IRConstantMeta;
 import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.bind.BindingManager;
-import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.ControlLogicHolderElement;
 import cn.yyx.research.program.ir.element.SourceMethodHolderElement;
 import cn.yyx.research.program.ir.element.UncertainReferenceElement;
-import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
+import cn.yyx.research.program.ir.element.VirtualDefinedElement;
 import cn.yyx.research.program.ir.generation.state.IJavaElementState;
 import cn.yyx.research.program.ir.generation.state.NodeIJavaElement;
 import cn.yyx.research.program.ir.generation.state.NodeIJavaElementStack;
@@ -1584,8 +1583,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				return IJavaElementState.HandledWrong;
 			}
 		} else {
-			if (!(jele instanceof ILocalVariable) && !(jele instanceof UnresolvedLambdaUniqueElement)
-					&& !(jele instanceof UnresolvedTypeElement) && !(jele instanceof ConstantUniqueElement)) {
+			if (!(jele instanceof ILocalVariable) && !(jele instanceof VirtualDefinedElement)) {
+				// && !(jele instanceof UnresolvedTypeElement) && !(jele instanceof ConstantUniqueElement)
 				return IJavaElementState.HandledWrong;
 			}
 		}

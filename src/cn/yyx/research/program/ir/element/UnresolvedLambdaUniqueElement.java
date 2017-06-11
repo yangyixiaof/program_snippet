@@ -27,7 +27,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import cn.yyx.research.program.ir.IRElementMeta;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
-public class UnresolvedLambdaUniqueElement implements IMethod {
+public class UnresolvedLambdaUniqueElement extends VirtualDefinedElement implements IMethod {
 	
 	String represent = null;
 	IMember parent_im = null;

@@ -12,7 +12,7 @@ import org.eclipse.jdt.core.JavaModelException;
 
 import cn.yyx.research.program.ir.IRElementMeta;
 
-public class ConstantUniqueElement implements IJavaElement {
+public class ConstantUniqueElement extends VirtualDefinedElement {
 	
 	private String represent = null;
 	

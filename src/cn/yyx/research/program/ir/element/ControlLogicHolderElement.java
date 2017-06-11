@@ -10,7 +10,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IOpenable;
 import org.eclipse.jdt.core.JavaModelException;
 
-public class ControlLogicHolderElement implements IJavaElement {
+public class ControlLogicHolderElement extends VirtualDefinedElement {
 	
 	String represent = null;
 	

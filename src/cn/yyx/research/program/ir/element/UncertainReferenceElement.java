@@ -12,7 +12,7 @@ import org.eclipse.jdt.core.JavaModelException;
 
 import cn.yyx.research.program.ir.IRElementMeta;
 
-public class UncertainReferenceElement implements IJavaElement {
+public class UncertainReferenceElement extends VirtualDefinedElement {
 	
 	String reference = null;
 	

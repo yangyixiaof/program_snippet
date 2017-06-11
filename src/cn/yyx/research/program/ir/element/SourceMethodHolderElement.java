@@ -10,7 +10,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IOpenable;
 import org.eclipse.jdt.core.JavaModelException;
 
-public class SourceMethodHolderElement implements IJavaElement {
+public class SourceMethodHolderElement extends VirtualDefinedElement {
 	
 	String represent = null;
 	
