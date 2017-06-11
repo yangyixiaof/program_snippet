@@ -23,7 +23,6 @@ import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.element.ControlLogicHolderElement;
 import cn.yyx.research.program.ir.element.SourceMethodHolderElement;
-import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.element.VirtualDefinedElement;
 import cn.yyx.research.program.ir.generation.state.IJavaElementState;
@@ -455,11 +454,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// IRForOneSourceMethodInvocation irfomi =
 		// (IRForOneSourceMethodInvocation) irc
 		// .GetLastIRTreeNode(source_method_virtual_holder_element);
-		if (now != null) {
-			UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
-			HandleIJavaElement(ure, node);
-			IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, now);
-		}
+//		if (now != null) {
+//			UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
+//			HandleIJavaElement(ure, node);
+//			IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, now);
+//		}
 		// }
 
 		// add sequential edge.
