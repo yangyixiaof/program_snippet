@@ -8,7 +8,7 @@ public class StaticConnection {
 	private int num = 0;
 	private IRForOneInstruction source = null;
 	private IRForOneInstruction target = null;
-	
+	// TODO whether int num should be parameter?
 	public StaticConnection(IRForOneInstruction source, IRForOneInstruction target, int type) {
 		this.setSource(source);
 		this.setTarget(target);

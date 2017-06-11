@@ -191,7 +191,7 @@ public class FullTrace implements IVNodeContainer {
 					if (!last_dn.IsSameGroup(new_dn)) {
 						// Warning. Serious bug! The child node may be created before the parent node.
 						// Warning. The reason is that the new_node is not created after all its in_connections been visited.
-						AddConnection(new DynamicConnection(last_dn, new_dn, EdgeBaseType.Self.Value(), 1));
+						AddConnection(new DynamicConnection(last_dn, new_dn, EdgeBaseType.Self.Value(), 0));
 						remove.add(last_dn);
 					} else {
 						if (last_dn.equals(source_dn)) {

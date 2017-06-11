@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 import cn.yyx.research.program.ir.IRConstantMeta;
 import cn.yyx.research.program.ir.IRMeta;
@@ -1847,9 +1848,41 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	// Solved. Add group to each IRForOneInstruction.
-	// TODO
+	// Infix operator:
+	// ===== could swap =====
+	// *  TIMES
+	// +  PLUS
+	// ==  EQUALS
+	// !=  NOT_EQUALS
+	// ^  XOR
+	// |  OR
+	// ||  CONDITIONAL_OR
+	// &  AND
+	// &&  CONDITIONAL_AND
+	
+	private boolean IsInfixOperatorMetCommutativeLaw(Operator op) {
+		if (op.equals(Operator.TIMES) || op.equals(Operator.PLUS) || op.equals(Operator.EQUALS) || op.equals(Operator.NOT_EQUALS) || op.equals(Operator.XOR) || op.equals(Operator.OR) || op.equals(Operator.CONDITIONAL_OR) || op.equals(Operator.AND) || op.equals(Operator.CONDITIONAL_AND)) {
+			return true;
+		}
+		return false;
+	}
+	
+	// ===== could not swap =====
+	// /  DIVIDE
+	// %  REMAINDER
+	// -  MINUS
+	// <<  LEFT_SHIFT
+	// >>  RIGHT_SHIFT_SIGNED
+	// >>>  RIGHT_SHIFT_UNSIGNED
+	// <  LESS
+	// >  GREATER
+	// <=  LESS_EQUALS
+	// >=  GREATER_EQUALS
+	// TODO 
 	@Override
 	public boolean visit(InfixExpression node) {
+		Operator op = node.getOperator();
+		
 		if (most_parent_infix == null) {
 			most_parent_infix = node;
 			instrs_under_most_parent_infix.clear();
