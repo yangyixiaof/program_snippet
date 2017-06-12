@@ -1,19 +1,23 @@
 package cn.yyx.research.program.analysis.fulltrace.storage.connection;
 
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
+import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 
 public class DynamicConnection {
 	
 	private DynamicNode source = null;
 	private DynamicNode target = null;
-	private int type = -1;
-	private int num = -1;
+	private ConnectionInfo info = null;
+//	private int type = -1;
+//	private int num = -1;
 	
-	public DynamicConnection(DynamicNode source, DynamicNode target, int type, int num) {
+	// , int type, int num
+	public DynamicConnection(DynamicNode source, DynamicNode target, ConnectionInfo info) {
 		this.setSource(source);
 		this.setTarget(target);
-		this.setType(type);
-		this.setNum(num);
+		this.setInfo(info);
+//		this.setType(type);
+//		this.setNum(num);
 	}
 
 	public DynamicNode GetSource() {
@@ -54,6 +58,14 @@ public class DynamicConnection {
 
 	private void setNum(int num) {
 		this.num = num;
+	}
+
+	public ConnectionInfo getInfo() {
+		return info;
+	}
+
+	private void setInfo(ConnectionInfo info) {
+		this.info = info;
 	}
 	
 }

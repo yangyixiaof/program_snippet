@@ -30,11 +30,13 @@ import cn.yyx.research.program.ir.element.VirtualDefinedElement;
 import cn.yyx.research.program.ir.generation.state.IJavaElementState;
 import cn.yyx.research.program.ir.generation.state.NodeIJavaElement;
 import cn.yyx.research.program.ir.generation.state.NodeIJavaElementStack;
+import cn.yyx.research.program.ir.generation.structure.NodeConnectionDetailPair;
 import cn.yyx.research.program.ir.generation.traversal.task.IRASTNodeTask;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneElement;
 import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.connection.StaticConnection;
+import cn.yyx.research.program.ir.storage.connection.detail.InfixExpressionIndexConnection;
 import cn.yyx.research.program.ir.storage.node.execution.DefaultINodeTask;
 import cn.yyx.research.program.ir.storage.node.execution.RequireHandleTask;
 import cn.yyx.research.program.ir.storage.node.execution.SkipSelfTask;
@@ -1831,16 +1833,16 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	// Reminding: begin to handle infix expression.
-	private Map<ASTNode, Map<IJavaElement, List<IRForOneInstruction>>> node_to_merge = new HashMap<ASTNode, Map<IJavaElement, List<IRForOneInstruction>>>();
+	private Map<ASTNode, Map<IJavaElement, List<NodeConnectionDetailPair>>> node_to_merge = new HashMap<ASTNode, Map<IJavaElement, List<NodeConnectionDetailPair>>>();
 
 	private void PrepareCurrentEnvironmentToMerge(Set<IJavaElement> bind_elements,
-			Map<IJavaElement, List<IRForOneInstruction>> merge) {
+			Map<IJavaElement, List<NodeConnectionDetailPair>> merge, InfixExpressionIndexConnection conn_detail) {
 		Iterator<IJavaElement> itr = bind_elements.iterator();
 		while (itr.hasNext()) {
 			IJavaElement ije = itr.next();
-			List<IRForOneInstruction> list = merge.get(ije);
+			List<NodeConnectionDetailPair> list = merge.get(ije);
 			if (list == null) {
-				list = new LinkedList<IRForOneInstruction>();
+				list = new LinkedList<NodeConnectionDetailPair>();
 				merge.put(ije, list);
 			}
 			list.add(irc.GetLastIRTreeNode(ije));
@@ -1888,7 +1890,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			instrs_under_most_parent_infix.clear();
 		}
 
-		HashMap<IJavaElement, List<IRForOneInstruction>> merge = new HashMap<IJavaElement, List<IRForOneInstruction>>();
+		HashMap<IJavaElement, List<NodeConnectionDetailPair>> merge = new HashMap<IJavaElement, List<NodeConnectionDetailPair>>();
 		node_to_merge.put(node, merge);
 
 		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment();
@@ -1943,7 +1945,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		while (litr.hasNext()) {
 			IRForOneInstruction tn = litr.next();
 			IRGeneratorForOneProject.GetInstance()
-					.RegistConnection(new StaticConnection(tn, irfop, EdgeBaseType.Self.Value()));
+					.RegistConnection(new StaticConnection(tn, irfop, 
+							EdgeBaseType.Self.Value()));
 		}
 		irc.SwitchDirection(ije, irfop);
 	}
@@ -1964,6 +1967,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			IRForOneInstruction irfop = (IRForOneInstruction) IRGeneratorHelper.CreateIRInstruction(this,
 					IRForOneOperation.class,
 					new Object[] { irc, ije, node.getOperator().toString(), DefaultINodeTask.class });
+			// handle group.
 			if (node.equals(most_parent_infix)) {
 				Set<IRForOneInstruction> instrs = instrs_under_most_parent_infix.get(ije);
 				Iterator<IRForOneInstruction> initr = instrs.iterator();
@@ -1972,13 +1976,16 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 					iroi.SetGroup(irfop);
 				}
 			}
+			// handle connection.
 			IRGeneratorHelper.HandleNodeSelfAndSourceMethodAndBranchDependency(irc, ije, irfop,
 					branch_var_instr_order.empty() ? null : branch_var_instr_order.peek(),
 					source_invocation_barrier.peek(), element_has_set_branch, element_has_set_source_method_barrier);
 			new_creation.add(irfop);
 			MergeListParallelToOne(list, ije, irfop);
 		}
+		// TODO this needs to be changed.
 		IRGeneratorHelper.HandleEachElementInSameOperationDependency(new_creation);
+		// clear.
 		node_to_merge.get(node).clear();
 		node_to_merge.remove(node);
 		if (node.equals(most_parent_infix)) {

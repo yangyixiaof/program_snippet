@@ -24,6 +24,7 @@ import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICompilationUn
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
+import cn.yyx.research.program.ir.exception.NotCastConnectionDetailException;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
@@ -97,7 +98,7 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 			while (iitr.hasNext()) {
 				IRForOneInstruction iir = iitr.next();
 				StaticConnection sc = is.get(iir);
-				if (jt.MeetCondition(sc.getType(), judged_type)) {
+				if (jt.MeetCondition(sc.getInfo().getType(), judged_type)) {
 					result.add(iir);
 				}
 			}
@@ -116,7 +117,7 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 			while (iitr.hasNext()) {
 				IRForOneInstruction iir = iitr.next();
 				StaticConnection sc = is.get(iir);
-				if (jt.MeetCondition(sc.getType(), judged_type)) {
+				if (jt.MeetCondition(sc.getInfo().getType(), judged_type)) {
 					result.add(sc);
 				}
 			}
@@ -182,7 +183,12 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		StaticConnection origin_conn = ins.get(source);
 		StaticConnection new_conn = conn;
 		if (origin_conn != null) {
-			new_conn = new_conn.MergeStaticConnection(origin_conn);
+			try {
+				new_conn = new_conn.HorizontalMerge(origin_conn);
+			} catch (NotCastConnectionDetailException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 		}
 		ins.put(source, new_conn);
 	}
@@ -386,7 +392,13 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 			while (oitr.hasNext()) {
 				IRForOneInstruction irfoi = oitr.next();
 				StaticConnection sc = out_map.get(irfoi);
-				IVConnection ivc = new IVConnection(source, irfoi, new ConnectionInfo(sc.getType(), sc.getNum()));
+				IVConnection ivc = null;
+				try {
+					ivc = new IVConnection(source, irfoi, (ConnectionInfo)sc.getInfo().clone());
+				} catch (CloneNotSupportedException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
 				result.add(ivc);
 			}
 		}

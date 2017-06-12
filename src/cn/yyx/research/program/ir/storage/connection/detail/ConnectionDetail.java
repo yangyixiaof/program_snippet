@@ -5,7 +5,7 @@ import cn.yyx.research.program.ir.exception.NotCastConnectionDetailException;
 
 public abstract class ConnectionDetail {
 	
-	public abstract ConnectionDetail HorizontalMerge(ConnectionDetail cd) throws NotCastConnectionDetailException;
+	public abstract void HorizontalMergeCheck(ConnectionDetail cd) throws NotCastConnectionDetailException;
 	public abstract ConnectionDetail VerticalMerge(ConnectionDetail cd) throws ConflictConnectionDetailException;
 	
 	@Override
