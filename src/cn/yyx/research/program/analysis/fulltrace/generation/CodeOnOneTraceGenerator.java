@@ -277,10 +277,20 @@ public class CodeOnOneTraceGenerator {
 						memory.executed_conns.add(iirn);
 						DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
 						DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
-						ft.AddConnection(
-								new DynamicConnection(source_dn, target_dn, iirn.GetStaticConnectionInfo().getType(), iirn.GetStaticConnectionInfo().getNum()));
-						ft.AddConnection(
-								new DynamicConnection(target_dn, source_dn, iirn.GetStaticConnectionInfo().getType(), iirn.GetStaticConnectionInfo().getNum()));
+						try {
+							ft.AddConnection(
+									new DynamicConnection(source_dn, target_dn, (ConnectionInfo)iirn.getInfo().clone()));
+						} catch (CloneNotSupportedException e1) {
+							e1.printStackTrace();
+							System.exit(1);
+						}
+						try {
+							ft.AddConnection(
+									new DynamicConnection(target_dn, source_dn, (ConnectionInfo)iirn.getInfo().clone()));
+						} catch (CloneNotSupportedException e) {
+							e.printStackTrace();
+							System.exit(1);
+						}
 					}
 				}
 			}
@@ -390,7 +400,7 @@ public class CodeOnOneTraceGenerator {
 						non_null_params.add(param);
 						IRForOneInstruction irpara = irc.GetFirstIRTreeNode(param);
 						HandleStaticConnectionForSource(ft_run, irfoi, irpara,
-								new ConnectionInfo(EdgeBaseType.Sequential.Value(), 0), env_idx);
+								new ConnectionInfo(EdgeBaseType.Sequential.Value()), env_idx);
 					}
 				}
 			}

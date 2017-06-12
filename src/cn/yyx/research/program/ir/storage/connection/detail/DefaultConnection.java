@@ -5,7 +5,13 @@ import cn.yyx.research.program.ir.exception.NotCastConnectionDetailException;
 
 public class DefaultConnection extends ConnectionDetail {
 	
-	public DefaultConnection() {
+//	private static DefaultConnection default_connection = new DefaultConnection();
+//	
+//	public static DefaultConnection GetDefaultConnection() {
+//		return default_connection;
+//	}
+	
+	private DefaultConnection() {
 	}
 	
 	@Override

@@ -11,6 +11,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
+import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.IgnoreSelfTask;
@@ -57,7 +58,7 @@ public class IRTreeForOneControlElement {
 			}
 			last = list.getLast();
 		}
-		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last, judge, EdgeBaseType.BranchControl.Value()));
+		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last, judge, new ConnectionInfo(EdgeBaseType.BranchControl.Value())));
 		
 		if (branch_judge_stack.isEmpty())
 		{
@@ -72,7 +73,7 @@ public class IRTreeForOneControlElement {
 		{
 			IJavaElement lje = litr.next();
 			IRForOneInstruction ir = logic_env.get(lje);
-			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(ir, judge, EdgeBaseType.BranchControl.Value()));
+			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(ir, judge, new ConnectionInfo(EdgeBaseType.BranchControl.Value())));
 		}
 	}
 	
@@ -91,7 +92,7 @@ public class IRTreeForOneControlElement {
 		while (itr.hasNext())
 		{
 			IRForOneBranchControl irbc_bc = itr.next();
-			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc_bc, branch_over, EdgeBaseType.BranchControl.Value()));
+			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc_bc, branch_over, new ConnectionInfo(EdgeBaseType.BranchControl.Value())));
 		}
 		if (!branch_judge_stack.isEmpty())
 		{

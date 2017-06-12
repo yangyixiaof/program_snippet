@@ -5,6 +5,7 @@ import java.util.Set;
 import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
+import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.SkipSelfTask;
@@ -49,7 +50,7 @@ public class IRTreeForOneElement {
 	
 	public void GoForwardANode(IRForOneInstruction child)
 	{
-		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last_node, child, EdgeBaseType.Self.Value()));
+		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last_node, child, new ConnectionInfo(EdgeBaseType.Self.Value())));
 		SetLastNode(child);
 	}
 

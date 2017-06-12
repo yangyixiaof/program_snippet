@@ -9,15 +9,15 @@ public class NodeConnectionDetailPair {
 	private ConnectionDetail detail = null;
 	
 	public NodeConnectionDetailPair(IRForOneInstruction irfoi, ConnectionDetail detail) {
-		this.setIrfoi(irfoi);
+		this.setInstruction(irfoi);
 		this.setDetail(detail);
 	}
 
-	public IRForOneInstruction getIrfoi() {
+	public IRForOneInstruction getInstruction() {
 		return irfoi;
 	}
 
-	public void setIrfoi(IRForOneInstruction irfoi) {
+	private void setInstruction(IRForOneInstruction irfoi) {
 		this.irfoi = irfoi;
 	}
 

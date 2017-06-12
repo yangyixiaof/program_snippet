@@ -7,10 +7,15 @@ import cn.yyx.research.program.ir.exception.NotCastConnectionDetailException;
 
 public class InfixExpressionIndexConnection extends ConnectionDetail {
 	
-	private ASTNode node = null;
+	private int node = -1;
 	private int index = 0;
 	
 	public InfixExpressionIndexConnection(ASTNode node, int index) {
+		this.setNode(node.hashCode());
+		this.setIndex(index);
+	}
+	
+	public InfixExpressionIndexConnection(int node, int index) {
 		this.setNode(node);
 		this.setIndex(index);
 	}
@@ -31,7 +36,7 @@ public class InfixExpressionIndexConnection extends ConnectionDetail {
 	public boolean equals(Object obj) {
 		if (obj instanceof InfixExpressionIndexConnection) {
 			InfixExpressionIndexConnection iric = (InfixExpressionIndexConnection)obj;
-			if (getIndex() == iric.getIndex() && node.equals(iric.node)) {
+			if (getIndex() == iric.getIndex() && node == iric.node) {
 				return true;
 			}
 		}
@@ -51,11 +56,11 @@ public class InfixExpressionIndexConnection extends ConnectionDetail {
 		this.index = index;
 	}
 
-	public ASTNode getNode() {
+	public int getNode() {
 		return node;
 	}
 
-	private void setNode(ASTNode node) {
+	private void setNode(int node) {
 		this.node = node;
 	}
 

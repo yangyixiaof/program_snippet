@@ -81,7 +81,7 @@ public class FullTrace implements IVNodeContainer {
 	
 	private void HandleRootsBeforeRemovingConnection(DynamicConnection conn) {
 		// just handle waiting_replace_root_pc.
-		if (EdgeTypeUtil.HasSpecificType(conn.getType(), EdgeBaseType.Self.Value())) {
+		if (EdgeTypeUtil.HasSpecificType(conn.getInfo().getType(), EdgeBaseType.Self.Value())) {
 			DynamicNode source = conn.GetSource();
 			DynamicNode target = conn.GetTarget();
 			Set<DynamicNode> roots = root_pc.get(source.getInstr().getIm());
@@ -153,7 +153,13 @@ public class FullTrace implements IVNodeContainer {
 			while (oitr.hasNext()) {
 				DynamicNode irfoi = oitr.next();
 				DynamicConnection sc = out_map.get(irfoi);
-				IVConnection ivc = new IVConnection(source, irfoi, new ConnectionInfo(sc.getType(), sc.getNum()));
+				IVConnection ivc = null;
+				try {
+					ivc = new IVConnection(source, irfoi, (ConnectionInfo)(sc.getInfo().clone()));
+				} catch (CloneNotSupportedException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
 				result.add(ivc);
 			}
 		}
@@ -191,7 +197,7 @@ public class FullTrace implements IVNodeContainer {
 					if (!last_dn.IsSameGroup(new_dn)) {
 						// Warning. Serious bug! The child node may be created before the parent node.
 						// Warning. The reason is that the new_node is not created after all its in_connections been visited.
-						AddConnection(new DynamicConnection(last_dn, new_dn, EdgeBaseType.Self.Value(), 0));
+						AddConnection(new DynamicConnection(last_dn, new_dn, new ConnectionInfo(EdgeBaseType.Self.Value())));
 						remove.add(last_dn);
 					} else {
 						if (last_dn.equals(source_dn)) {

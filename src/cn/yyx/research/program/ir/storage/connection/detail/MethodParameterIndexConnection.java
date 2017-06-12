@@ -7,10 +7,15 @@ import cn.yyx.research.program.ir.exception.NotCastConnectionDetailException;
 
 public class MethodParameterIndexConnection extends ConnectionDetail {
 	
-	private ASTNode node = null;
+	private int node = -1;
 	private int index = 0;
 	
 	public MethodParameterIndexConnection(ASTNode node, int index) {
+		this.setNode(node.hashCode());
+		this.setIndex(index);
+	}
+	
+	public MethodParameterIndexConnection(int node, int index) {
 		this.setNode(node);
 		this.setIndex(index);
 	}
@@ -31,7 +36,7 @@ public class MethodParameterIndexConnection extends ConnectionDetail {
 	public boolean equals(Object obj) {
 		if (obj instanceof MethodParameterIndexConnection) {
 			MethodParameterIndexConnection mpic = (MethodParameterIndexConnection)obj;
-			if (getIndex() == mpic.getIndex() && node.equals(mpic.node)) {
+			if (getIndex() == mpic.getIndex() && node == mpic.node) {
 				return true;
 			}
 		}
@@ -51,11 +56,11 @@ public class MethodParameterIndexConnection extends ConnectionDetail {
 		this.index = index;
 	}
 	
-	public ASTNode getNode() {
+	public int getNode() {
 		return node;
 	}
 
-	private void setNode(ASTNode node) {
+	private void setNode(int node) {
 		this.node = node;
 	}
 

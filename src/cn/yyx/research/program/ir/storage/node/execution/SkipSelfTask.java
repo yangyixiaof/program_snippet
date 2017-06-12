@@ -8,6 +8,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
+import cn.yyx.research.program.ir.exception.ConflictConnectionDetailException;
 import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
@@ -37,7 +38,12 @@ public class SkipSelfTask extends IIRNodeTask {
 		Set<DynamicConnection> in_conns = ft.GetInConnections(source);
 		
 		if (in_conns.isEmpty()) {
-			ft.AddConnection(new DynamicConnection(source, target, connect_info.getType(), connect_info.getNum()));
+			try {
+				ft.AddConnection(new DynamicConnection(source, target, (ConnectionInfo)connect_info.clone()));
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 		} else {
 			// System.err.println("====== Real skip task is running!");
 			boolean skip = true;
@@ -64,16 +70,25 @@ public class SkipSelfTask extends IIRNodeTask {
 					DynamicNode nsource = dc.GetSource();
 					DynamicNode ntarget = target;
 					int addition = ntarget.getInstr().getIm().equals(nsource.getInstr().getIm()) ? EdgeBaseType.Self.Value() : 0;
-					int num = dc.getNum() + connect_info.getNum();
-					if (dc.getNum() > 0 && connect_info.getNum() > 0) {
-						num = dc.getNum() * connect_info.getNum();
+					ConnectionInfo source_info = dc.getInfo();
+					ConnectionInfo new_info = null;
+					try {
+						new_info = source_info.VerticalMerge(connect_info);
+					} catch (ConflictConnectionDetailException e) {
+						e.printStackTrace();
+						System.exit(1);
 					}
-					DynamicConnection new_dc = new DynamicConnection(nsource, ntarget, dc.getType() & final_type | addition, num);
+					DynamicConnection new_dc = new DynamicConnection(nsource, ntarget, new ConnectionInfo(final_type | addition, new_info.GetDetails()));
 					ft.AddConnection(new_dc);
 				}
 				ft.HandleRootsAfterRemovingAllConnections(in_conns);
 			} else {
-				ft.AddConnection(new DynamicConnection(source, target, connect_info.getType(), connect_info.getNum()));
+				try {
+					ft.AddConnection(new DynamicConnection(source, target, (ConnectionInfo)connect_info.clone()));
+				} catch (CloneNotSupportedException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
 			}
 //			DynamicConnection conn = ft.GetSpecifiedConnection(source, target);
 //			if (conn == null) {
