@@ -16,14 +16,14 @@ public class TodoList {
 	// Solved. variable count and two/three further steps' environment are no longer needed.
 	// Solved. SkipSelfTask should add the information of IJavaElement if there are no source connections.
 	// Solved. wrong when handling invoking constructors and super-methods in full traces.
-	// TODO if constructor is null, how to invoke field IRCode, IRCodeForOneFiled I mean.
+	// Solved. if constructor is null, how to invoke field IRCode, IRCodeForOneFiled I mean.
 	// Solved. do not traverse from root methods (exclude constructors) which contains no statements.
 	
 	// Solved. how to recognize the global relationship, eclipse jdt offers? append to tails of irs of that ije.
 	// TODO how to recognize relationships including code snippet not on the execution path from main root?.
 	
 	// Comment: the below two are the same.
-	// TODO the total IJavaElement temp_statement_expression_environment_set and temp_statement_environment_set need to be changed to Stack, former stack element gain all ijes of later stack element. do it in HandleIJavaElement.
-	// TODO designs such as temp_statement_expression_environment_set do have problems.
+	// Solved. the total IJavaElement temp_statement_expression_environment_set and temp_statement_environment_set need to be changed to Stack, former stack element gain all ijes of later stack element. do it in HandleIJavaElement.
+	// Solved. designs such as temp_statement_expression_environment_set do have problems.
 	
 }

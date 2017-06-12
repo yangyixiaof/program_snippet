@@ -10,7 +10,7 @@ public class StaticConnection {
 //	private int num = 0;
 	private IRForOneInstruction source = null;
 	private IRForOneInstruction target = null;
-	// TODO whether int num should be parameter?
+	// Solved. whether int num should be parameter? should not.
 	// int type
 	public StaticConnection(IRForOneInstruction source, IRForOneInstruction target, ConnectionInfo info) {
 		this.setSource(source);
