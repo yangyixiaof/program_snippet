@@ -11,8 +11,8 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
+import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.execution.IgnoreSelfTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRBranchControlType;

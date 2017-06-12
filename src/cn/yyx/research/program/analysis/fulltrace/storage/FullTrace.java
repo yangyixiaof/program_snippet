@@ -10,9 +10,9 @@ import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeTypeUtil;
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
+import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
+import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.connection.EdgeTypeUtil;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.visual.node.IVNode;
@@ -153,7 +153,7 @@ public class FullTrace implements IVNodeContainer {
 			while (oitr.hasNext()) {
 				DynamicNode irfoi = oitr.next();
 				DynamicConnection sc = out_map.get(irfoi);
-				IVConnection ivc = new IVConnection(source, irfoi, new StaticConnectionInfo(sc.getType(), sc.getNum()));
+				IVConnection ivc = new IVConnection(source, irfoi, new ConnectionInfo(sc.getType(), sc.getNum()));
 				result.add(ivc);
 			}
 		}

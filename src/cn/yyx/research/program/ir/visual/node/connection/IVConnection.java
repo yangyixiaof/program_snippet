@@ -1,15 +1,15 @@
 package cn.yyx.research.program.ir.visual.node.connection;
 
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
+import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 import cn.yyx.research.program.ir.visual.node.IVNode;
 
 public class IVConnection {
 	
 	private IVNode source = null;
 	private IVNode target = null;
-	private StaticConnectionInfo info = null;
+	private ConnectionInfo info = null;
 	
-	public IVConnection(IVNode source, IVNode target, StaticConnectionInfo info) {
+	public IVConnection(IVNode source, IVNode target, ConnectionInfo info) {
 		this.setSource(source);
 		this.setTarget(target);
 		this.setInfo(info);
@@ -51,11 +51,11 @@ public class IVConnection {
 		this.target = target;
 	}
 
-	public StaticConnectionInfo getInfo() {
+	public ConnectionInfo getInfo() {
 		return info;
 	}
 
-	public void setInfo(StaticConnectionInfo info) {
+	public void setInfo(ConnectionInfo info) {
 		this.info = info;
 	}
 	

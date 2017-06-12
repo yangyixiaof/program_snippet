@@ -8,9 +8,9 @@ import org.eclipse.jdt.core.IJavaElement;
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
+import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
+import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class SkipSelfTask extends IIRNodeTask {
@@ -20,7 +20,7 @@ public class SkipSelfTask extends IIRNodeTask {
 	}
 
 	@Override
-	public void HandleOutConnection(DynamicNode source, DynamicNode target, StaticConnectionInfo connect_info,
+	public void HandleOutConnection(DynamicNode source, DynamicNode target, ConnectionInfo connect_info,
 			FullTrace ft) {
 		// Solved. need to handle IRForOneRawMethodBarrier.
 		

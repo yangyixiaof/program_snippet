@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.storage.node.connection;
+package cn.yyx.research.program.ir.storage.connection;
 
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
@@ -96,9 +96,9 @@ public class StaticConnection {
 		this.type = type;
 	}
 	
-	public StaticConnectionInfo GetStaticConnectionInfo()
+	public ConnectionInfo GetStaticConnectionInfo()
 	{
-		return new StaticConnectionInfo(type, num);
+		return new ConnectionInfo(type, num);
 	}
 
 	public int getNum() {

@@ -10,9 +10,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeTypeUtil;
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
+import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
+import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.connection.EdgeTypeUtil;
 import cn.yyx.research.program.ir.visual.node.IVNode;
 import cn.yyx.research.program.ir.visual.node.connection.IVConnection;
 import cn.yyx.research.program.ir.visual.node.container.IVNodeContainer;
@@ -38,7 +38,7 @@ public class CommonDotGenerator {
 		while (conitr.hasNext()) {
 			IVConnection conn = conitr.next();
 			String color = "black";
-			StaticConnectionInfo info = conn.getInfo();
+			ConnectionInfo info = conn.getInfo();
 			int conn_type = info.getType();
 			if (EdgeTypeUtil.HasSpecificType(conn_type, EdgeBaseType.Barrier.Value())) {
 				color = "yellow";
@@ -165,7 +165,7 @@ public class CommonDotGenerator {
 			IVConnection conn = citr.next();
 			IVNode source = conn.getSource();
 			IVNode target = conn.getTarget();
-			StaticConnectionInfo info = conn.getInfo();
+			ConnectionInfo info = conn.getInfo();
 			DotCluster source_cluster = GetCluster(source);
 			DotCluster target_cluster = GetCluster(target);
 			if (EdgeTypeUtil.HasSpecificType(info.getType(), EdgeBaseType.Self.Value())) {

@@ -22,10 +22,10 @@ import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
 import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
+import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
+import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
@@ -306,7 +306,7 @@ public class CodeOnOneTraceGenerator {
 	}
 
 	private void HandleStaticConnectionForSource(FullTrace ft, IRForOneInstruction source, IRForOneInstruction target,
-			StaticConnectionInfo sc_info, int env_idx) {
+			ConnectionInfo sc_info, int env_idx) {
 		DynamicNode source_dn = new DynamicNode(source, source.getParentEnv(), env_idx);
 		DynamicNode target_dn = new DynamicNode(target, target.getParentEnv(), env_idx);
 		ft.NodeCreated(source.getIm(), null, source_dn, branch_control_stack_total.peek());
@@ -390,7 +390,7 @@ public class CodeOnOneTraceGenerator {
 						non_null_params.add(param);
 						IRForOneInstruction irpara = irc.GetFirstIRTreeNode(param);
 						HandleStaticConnectionForSource(ft_run, irfoi, irpara,
-								new StaticConnectionInfo(EdgeBaseType.Sequential.Value(), 0), env_idx);
+								new ConnectionInfo(EdgeBaseType.Sequential.Value(), 0), env_idx);
 					}
 				}
 			}

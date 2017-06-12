@@ -25,11 +25,11 @@ import cn.yyx.research.program.ir.element.ConstantUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeBaseType;
-import cn.yyx.research.program.ir.storage.node.connection.EdgeTypeUtil;
-import cn.yyx.research.program.ir.storage.node.connection.JudgeType;
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnectionInfo;
+import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
+import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
+import cn.yyx.research.program.ir.storage.connection.EdgeTypeUtil;
+import cn.yyx.research.program.ir.storage.connection.JudgeType;
+import cn.yyx.research.program.ir.storage.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneClass;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneConstructor;
@@ -386,7 +386,7 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 			while (oitr.hasNext()) {
 				IRForOneInstruction irfoi = oitr.next();
 				StaticConnection sc = out_map.get(irfoi);
-				IVConnection ivc = new IVConnection(source, irfoi, new StaticConnectionInfo(sc.getType(), sc.getNum()));
+				IVConnection ivc = new IVConnection(source, irfoi, new ConnectionInfo(sc.getType(), sc.getNum()));
 				result.add(ivc);
 			}
 		}

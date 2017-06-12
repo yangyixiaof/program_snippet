@@ -1,4 +1,4 @@
-package cn.yyx.research.program.ir.storage.node.connection;
+package cn.yyx.research.program.ir.storage.connection;
 
 public class ConnectionManager {
 	

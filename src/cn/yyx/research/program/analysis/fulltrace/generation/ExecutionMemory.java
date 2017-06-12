@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
 
-import cn.yyx.research.program.ir.storage.node.connection.StaticConnection;
+import cn.yyx.research.program.ir.storage.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class ExecutionMemory {
