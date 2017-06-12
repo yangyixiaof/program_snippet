@@ -64,4 +64,9 @@ public class MethodParameterIndexConnection extends ConnectionDetail {
 		this.node = node;
 	}
 
+	@Override
+	public String toString() {
+		return "MPara:" + index;
+	}
+
 }

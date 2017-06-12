@@ -64,4 +64,9 @@ public class InfixExpressionIndexConnection extends ConnectionDetail {
 		this.node = node;
 	}
 
+	@Override
+	public String toString() {
+		return "Infix:" + index;
+	}
+
 }

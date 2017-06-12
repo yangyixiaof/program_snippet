@@ -42,5 +42,10 @@ public class DefaultConnection extends ConnectionDetail {
 	public Object clone() throws CloneNotSupportedException {
 		return this;
 	}
+
+	@Override
+	public String toString() {
+		return "DefaultConnection";
+	}
 	
 }

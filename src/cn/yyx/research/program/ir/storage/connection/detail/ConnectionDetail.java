@@ -14,4 +14,7 @@ public abstract class ConnectionDetail {
 	@Override
 	public abstract Object clone() throws CloneNotSupportedException;
 	
+	@Override
+	public abstract String toString();
+	
 }

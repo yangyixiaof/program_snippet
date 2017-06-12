@@ -7,12 +7,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.connection.EdgeTypeUtil;
+import cn.yyx.research.program.ir.storage.connection.detail.ConnectionDetail;
 import cn.yyx.research.program.ir.visual.node.IVNode;
 import cn.yyx.research.program.ir.visual.node.connection.IVConnection;
 import cn.yyx.research.program.ir.visual.node.container.IVNodeContainer;
@@ -61,7 +63,17 @@ public class CommonDotGenerator {
 			String source_node = "n" + source_id;
 			int target_id = GetNodeID(target);
 			String target_node = "n" + target_id;
-			one_bw.append(source_node + "->" + target_node + "[color=" + color + "];" + line_seperator);
+			
+			List<ConnectionDetail> details = info.GetDetails();
+			if (details == null || details.size() == 0) {
+				one_bw.append(source_node + "->" + target_node + "[color=" + color + "];" + line_seperator);
+			} else {
+				Iterator<ConnectionDetail> ditr = details.iterator();
+				while (ditr.hasNext()) {
+					ConnectionDetail cd = ditr.next();
+					one_bw.append(source_node + "->" + target_node + "[label=\"" + cd.toString() + "\", color=" + color + "];" + line_seperator);
+				}
+			}
 		}
 	}
 	
