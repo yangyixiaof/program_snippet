@@ -174,13 +174,13 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 	}
 
 	private void OneDirectionRegist(StaticConnection conn, IRForOneInstruction source, IRForOneInstruction target,
-			Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> in_connects) {
-		Map<IRForOneInstruction, StaticConnection> ins = in_connects.get(target);
-		if (ins == null) {
-			ins = new HashMap<IRForOneInstruction, StaticConnection>();
-			in_connects.put(target, ins);
+			Map<IRForOneInstruction, Map<IRForOneInstruction, StaticConnection>> o_connects) {
+		Map<IRForOneInstruction, StaticConnection> outs = o_connects.get(source);
+		if (outs == null) {
+			outs = new HashMap<IRForOneInstruction, StaticConnection>();
+			o_connects.put(source, outs);
 		}
-		StaticConnection origin_conn = ins.get(source);
+		StaticConnection origin_conn = outs.get(target);
 		StaticConnection new_conn = conn;
 		if (origin_conn != null) {
 			try {
@@ -190,14 +190,14 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 				System.exit(1);
 			}
 		}
-		ins.put(source, new_conn);
+		outs.put(target, new_conn);
 	}
 
 	public void RegistConnection(StaticConnection conn) {
 		IRForOneInstruction source = conn.getSource();
 		IRForOneInstruction target = conn.getTarget();
-		OneDirectionRegist(conn, source, target, in_connects);
-		OneDirectionRegist(conn, target, source, out_connects);
+		OneDirectionRegist(conn, target, source, in_connects);
+		OneDirectionRegist(conn, source, target, out_connects);
 	}
 
 	// Solved. source type is dependent on unresolved operations, how to model
