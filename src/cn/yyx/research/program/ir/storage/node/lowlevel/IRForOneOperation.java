@@ -24,7 +24,7 @@ public class IRForOneOperation extends IRForOneInstruction {
 
 	@Override
 	public String ToVisual() {
-		return im.getElementName() + ";Op:" + ir;
+		return im.getElementName() + "$Op:" + ir;
 	}
 
 	@Override

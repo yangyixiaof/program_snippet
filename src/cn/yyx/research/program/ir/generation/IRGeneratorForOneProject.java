@@ -63,6 +63,8 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 
 	private Map<IRForOneBranchControl, Set<IRForOneBranchControl>> children_of_control = new HashMap<IRForOneBranchControl, Set<IRForOneBranchControl>>();
 
+	private static IRGeneratorForOneProject irgfop = null;
+	
 	public void AddCalleeCaller(IMethod callee, IMethod caller) {
 		Set<IMethod> callers = callee_callers.get(callee);
 		if (callers == null) {
@@ -230,8 +232,6 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		}
 		return yce;
 	}
-
-	private static IRGeneratorForOneProject irgfop = null;
 
 	public static IRGeneratorForOneProject GetInstance() {
 		return irgfop;
