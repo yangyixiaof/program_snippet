@@ -46,7 +46,7 @@ public class IRForOneSentinel extends IRForOneInstruction {
 			IType it = (IType)im;
 			im_str = IRElementMeta.Type + "#" + it.getElementName();
 		}
-		return im.getElementName() + "$" + IRMeta.VirtualSentinel + im_str;
+		return im.getElementName() + "^" + IRMeta.VirtualSentinel + im_str;
 	}
 	
 	@Override

@@ -25,7 +25,7 @@ public class IRForOneEmptyConstructorInvocation extends IRForOneSourceMethodInvo
 
 	@Override
 	public String ToVisual() {
-		return im.getElementName() + "$EmptyConstructor:" + GetMethodName();
+		return im.getElementName() + "^EmptyConstructor:" + GetMethodName();
 	}
 	
 	@Override
