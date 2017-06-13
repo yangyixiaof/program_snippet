@@ -118,4 +118,9 @@ public class ConnectionInfo {
 		return details;
 	}
 	
+	@Override
+	public String toString() {
+		return "type:" + type + ";" + details.toString();
+	}
+	
 }
