@@ -180,6 +180,10 @@ public class CommonDotGenerator {
 			ConnectionInfo info = conn.getInfo();
 			DotCluster source_cluster = GetCluster(source);
 			DotCluster target_cluster = GetCluster(target);
+			
+			// showing.
+//			System.out.println("===== now handling conn:" + conn);
+			
 			if (EdgeTypeUtil.HasSpecificType(info.getType(), EdgeBaseType.Self.Value())) {
 				// Merge clusters.
 				// handle the merge of cluster connections.
@@ -207,15 +211,17 @@ public class CommonDotGenerator {
 //				}
 				
 				// handle other merges.
-				clusters.remove(target_cluster);
-				source_cluster.Merge(target_cluster);
-				source_cluster.AddIVConnection(conn);
-				Set<IVNode> target_ivns = target_cluster.GetIvns();
-				Iterator<IVNode> titr = target_ivns.iterator();
-				while (titr.hasNext()) {
-					IVNode tivn = titr.next();
-					ivn_cluster.put(tivn, source_cluster);
+				if (!source_cluster.equals(target_cluster)) {
+					clusters.remove(target_cluster);
+					source_cluster.Merge(target_cluster);
+					Set<IVNode> target_ivns = target_cluster.GetIvns();
+					Iterator<IVNode> titr = target_ivns.iterator();
+					while (titr.hasNext()) {
+						IVNode tivn = titr.next();
+						ivn_cluster.put(tivn, source_cluster);
+					}
 				}
+				source_cluster.AddIVConnection(conn);
 			} else {
 				non_cluster_ivn_conns.add(conn);
 				
@@ -232,6 +238,12 @@ public class CommonDotGenerator {
 //				num++;
 //				conn_cluster.put(target_cluster, num);
 			}
+			
+			// showing.
+//			for (DotCluster cluster : clusters) {
+//				System.out.println("one cluster:" + cluster);
+//			}
+			
 			GenerateDotForOneTempRoot(target, already_visit);
 		}
 	}

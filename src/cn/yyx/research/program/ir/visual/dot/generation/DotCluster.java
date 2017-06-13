@@ -36,4 +36,9 @@ public class DotCluster {
 		return ivn_conns;
 	}
 	
+	@Override
+	public String toString() {
+		return "nodes:" + ivns + ";conns:" + ivn_conns;
+	}
+	
 }

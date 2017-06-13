@@ -60,6 +60,8 @@ public class SnippetExtractor implements IApplication {
 				GenerateDotForEachIRCodeInIRProject irproj_local_generation = new GenerateDotForEachIRCodeInIRProject(DotMeta.ProjectEachMethodDotDir, DotMeta.ProjectEachMethodPicDir);
 				irproj_local_generation.GenerateDots();
 				
+				if (false)
+				{
 				// generate for each full trace.
 				IRGeneratorForOneProject irinstance = IRGeneratorForOneProject.GetInstance();
 				Set<IMethod> roots = EclipseSearchForICallGraph.GetRootCallEntries(irinstance.GetInverseCallGraph());
@@ -81,6 +83,7 @@ public class SnippetExtractor implements IApplication {
 				}
 				GenerateDotForEachFullTrace full_trace_generator = new GenerateDotForEachFullTrace(DotMeta.FullTraceDotDir, DotMeta.FullTracePicDir, ft_traces);
 				full_trace_generator.GenerateDots();
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
