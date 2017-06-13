@@ -259,8 +259,8 @@ public class CodeOnOneTraceGenerator {
 						}
 					}
 				}
-				inodes.removeAll(inodes_remove);
 				inodes.addAll(inodes_add);
+				inodes.removeAll(inodes_remove);
 			}
 
 			if (!could_continue) {
