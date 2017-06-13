@@ -103,9 +103,10 @@ public class StaticConnection {
 	private void setInfo(ConnectionInfo info) {
 		this.info = info;
 	}
-
-//	private void setNum(int num) {
-//		this.num = num;
-//	}
+	
+	@Override
+	public String toString() {
+		return source.toString() + ";" + target.toString() + ";" + info.toString();
+	}
 	
 }
