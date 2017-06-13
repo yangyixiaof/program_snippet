@@ -29,4 +29,9 @@ public class NodeConnectionDetailPair {
 		this.detail = detail;
 	}
 	
+	@Override
+	public String toString() {
+		return irfoi.toString() + ";" + detail;
+	}
+	
 }
