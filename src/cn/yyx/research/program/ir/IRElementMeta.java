@@ -9,5 +9,6 @@ public class IRElementMeta {
 	public static final String UncertainReferenceElement = "URE";
 	public static final String UnresolvedLambdaUniqueElement = "ULE";
 	public static final String UnresolvedTypeElement = "USToV";
+	public static final String UnresolvedNameOrFieldAccessElement = "UNoFAE";
 	
 }

@@ -12,11 +12,11 @@ import org.eclipse.jdt.core.JavaModelException;
 
 import cn.yyx.research.program.ir.IRElementMeta;
 
-public class UnresolvedSimpleNameElement extends VirtualDefinedElement {
+public class UnresolvedNameOrFieldAccessElement extends VirtualDefinedElement {
 	
 	String reference = null;
 	
-	public UnresolvedSimpleNameElement(String reference) {
+	public UnresolvedNameOrFieldAccessElement(String reference) {
 		this.reference = reference;
 	}
 	
@@ -47,7 +47,7 @@ public class UnresolvedSimpleNameElement extends VirtualDefinedElement {
 
 	@Override
 	public String getElementName() {
-		return IRElementMeta.UncertainReferenceElement + "#" + reference;
+		return IRElementMeta.UnresolvedNameOrFieldAccessElement + "#" + reference;
 	}
 
 	@Override

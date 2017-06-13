@@ -24,7 +24,7 @@ import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.element.ControlLogicHolderElement;
 import cn.yyx.research.program.ir.element.SourceMethodHolderElement;
 import cn.yyx.research.program.ir.element.UncertainReferenceElement;
-import cn.yyx.research.program.ir.element.UnresolvedSimpleNameElement;
+import cn.yyx.research.program.ir.element.UnresolvedNameOrFieldAccessElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.element.VirtualDefinedElement;
 import cn.yyx.research.program.ir.generation.state.IJavaElementState;
@@ -1634,19 +1634,20 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(SimpleName node) {
 		IBinding ib = node.resolveBinding();
-		IJavaElementState state = HandleBinding(ib, node);
-		handle_binding_state.put(node, state);
+		// IJavaElementState state = null;
+		HandleBinding(ib, node);
+//		handle_binding_state.put(node, state);
 		return super.visit(node);
 	}
 	
-	@Override
-	public void endVisit(SimpleName node) {
-		IJavaElementState state = handle_binding_state.remove(node);
-		if (state == IJavaElementState.HandledWrong) {
-			HandleIJavaElement(new UnresolvedSimpleNameElement(node.toString()), node);
-		}
-		super.endVisit(node);
-	}
+//	@Override
+//	public void endVisit(SimpleName node) {
+//		IJavaElementState state = handle_binding_state.remove(node);
+//		if (state == IJavaElementState.HandledWrong) {
+//			HandleIJavaElement(new UnresolvedSimpleNameElement(node.toString()), node);
+//		}
+//		super.endVisit(node);
+//	}
 	
 	Map<ASTNode, IJavaElementState> handle_binding_state = new HashMap<ASTNode, IJavaElementState>();
 	
@@ -1666,7 +1667,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public void endVisit(QualifiedName node) {
 		IJavaElementState state = handle_binding_state.remove(node);
 		if (state == IJavaElementState.HandledWrong) {
-			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.QualifiedName + node.getName().toString());
+			HandleIJavaElement(new UnresolvedNameOrFieldAccessElement(node.toString()), node);
+			// IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.QualifiedName + node.getName().toString());
 		}
 		super.endVisit(node);
 	}
@@ -1692,7 +1694,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 //		if (ib == null || ib.getJavaElement() == null) {
 		IJavaElementState state = handle_binding_state.remove(node);
 		if (state == IJavaElementState.HandledWrong) {
-			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.FieldAccess + node.getName().toString());
+			HandleIJavaElement(new UnresolvedNameOrFieldAccessElement(node.toString()), node);
+			// IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.FieldAccess + node.getName().toString());
 		}
 	}
 
@@ -1718,6 +1721,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		IJavaElementState state = handle_binding_state.remove(node);
 		if (state == IJavaElementState.HandledWrong) {
 			TreatSuperClassElement(node);
+			// HandleIJavaElement(new UnresolvedNameOrFieldAccessElement(node.toString()), node);
 			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.FieldAccess + node.getName().toString());
 		}
 	}
@@ -2210,6 +2214,23 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return continue_visit;
 	}
 
+	@Override
+	public void endVisit(SuperMethodReference node) {
+		TreatSuperClassElement(node);
+		HandleMethodReferenceEnd(node.resolveMethodBinding(), node, node.getName().toString());
+		super.endVisit(node);
+	}
+	
+//	private String GetSuperClass(ASTNode node) {
+//		ASTNode temp_node = ASTSearch.FindMostCloseAbstractTypeDeclaration(node);
+//		if (temp_node instanceof TypeDeclaration) {
+//			TypeDeclaration td = (TypeDeclaration) temp_node;
+//			Type tp = td.getSuperclassType();
+//			return tp.toString();
+//		}
+//		return "UnKnown#";
+//	}
+	
 	private boolean TreatSuperClassElement(ASTNode node) {
 		ASTNode temp_node = ASTSearch.FindMostCloseAbstractTypeDeclaration(node);
 		if (temp_node instanceof TypeDeclaration) {
@@ -2237,13 +2258,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public void endVisit(SuperMethodReference node) {
-		TreatSuperClassElement(node);
-		HandleMethodReferenceEnd(node.resolveMethodBinding(), node, node.getName().toString());
-		super.endVisit(node);
 	}
 
 	// handle type declarations.
