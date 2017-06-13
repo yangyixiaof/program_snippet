@@ -106,7 +106,7 @@ public class StaticConnection {
 	
 	@Override
 	public String toString() {
-		return source.toString() + ";" + target.toString() + ";" + info.toString();
+		return source.toString() + "&" + target.toString() + "&" + info.toString();
 	}
 	
 }

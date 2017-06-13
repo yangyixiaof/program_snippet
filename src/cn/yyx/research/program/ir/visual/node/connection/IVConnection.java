@@ -59,4 +59,9 @@ public class IVConnection {
 		this.info = info;
 	}
 	
+	@Override
+	public String toString() {
+		return source.toString() + "&" + target.toString() + "&" + info;
+	}
+	
 }
