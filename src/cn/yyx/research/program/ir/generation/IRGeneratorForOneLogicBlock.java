@@ -1637,12 +1637,15 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 		return super.visit(node);
 	}
-
+	
+	Map<ASTNode, IJavaElementState> handle_binding_state = new HashMap<ASTNode, IJavaElementState>();
+	
 	@Override
 	public boolean visit(QualifiedName node) {
 		IBinding ib = node.resolveBinding();
-		if (ib != null && ib.getJavaElement() != null) {
-			HandleBinding(ib, node);
+		IJavaElementState state = HandleBinding(ib, node);
+		handle_binding_state.put(node, state);
+		if (state == IJavaElementState.HandledSuccessful || state == IJavaElementState.NoNeedToHandle) {
 			return false;
 		}
 		// HandleType(node.resolveBinding(), node.toString(), node);
@@ -1651,8 +1654,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void endVisit(QualifiedName node) {
-		IBinding ib = node.resolveBinding();
-		if (ib == null || ib.getJavaElement() == null) {
+		IJavaElementState state = handle_binding_state.remove(node);
+		if (state == IJavaElementState.HandledWrong) {
 			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.QualifiedName + node.getName().toString());
 		}
 		super.endVisit(node);
@@ -1661,35 +1664,50 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(FieldAccess node) {
 		IVariableBinding ib = node.resolveFieldBinding();
-		if (ib != null && ib.getJavaElement() != null) {
-			HandleBinding(ib, node);
+		IJavaElementState state = HandleBinding(ib, node);
+		handle_binding_state.put(node, state);
+		if (state == IJavaElementState.HandledSuccessful || state == IJavaElementState.NoNeedToHandle) {
 			return false;
 		}
+//		if (ib != null && ib.getJavaElement() != null) {
+//			HandleBinding(ib, node);
+//			return false;
+//		}
 		return super.visit(node);
 	}
 
 	@Override
 	public void endVisit(FieldAccess node) {
-		IVariableBinding ib = node.resolveFieldBinding();
-		if (ib == null || ib.getJavaElement() == null) {
+//		IVariableBinding ib = node.resolveFieldBinding();
+//		if (ib == null || ib.getJavaElement() == null) {
+		IJavaElementState state = handle_binding_state.remove(node);
+		if (state == IJavaElementState.HandledWrong) {
 			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.FieldAccess + node.getName().toString());
 		}
 	}
 
 	@Override
 	public boolean visit(SuperFieldAccess node) {
+		// TODO
 		IVariableBinding ib = node.resolveFieldBinding();
-		if (ib != null && ib.getJavaElement() != null) {
-			HandleBinding(ib, node);
+		IJavaElementState state = HandleBinding(ib, node);
+		handle_binding_state.put(node, state);
+		if (state == IJavaElementState.HandledSuccessful || state == IJavaElementState.NoNeedToHandle) {
 			return false;
 		}
+//		if (ib != null && ib.getJavaElement() != null) {
+//			HandleBinding(ib, node);
+//			return false;
+//		}
 		return super.visit(node);
 	}
 
 	@Override
 	public void endVisit(SuperFieldAccess node) {
-		IVariableBinding ib = node.resolveFieldBinding();
-		if (ib == null || ib.getJavaElement() == null) {
+//		IVariableBinding ib = node.resolveFieldBinding();
+//		if (ib == null || ib.getJavaElement() == null) {
+		IJavaElementState state = handle_binding_state.remove(node);
+		if (state == IJavaElementState.HandledWrong) {
 			TreatSuperClassElement(node);
 			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.FieldAccess + node.getName().toString());
 		}
