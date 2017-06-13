@@ -60,7 +60,7 @@ public class IRForOneSourceMethodInvocation extends IRForOneInstruction {
 
 	@Override
 	public String ToVisual() {
-		return "Method:" + GetMethodName();
+		return im.getElementName() + ";Method:" + GetMethodName();
 	}
 	
 	@Override

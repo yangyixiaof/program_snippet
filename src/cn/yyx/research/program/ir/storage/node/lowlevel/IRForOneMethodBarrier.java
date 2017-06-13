@@ -24,7 +24,7 @@ public class IRForOneMethodBarrier extends IRForOneInstruction {
 
 	@Override
 	public String ToVisual() {
-		return "Op:" + ir;
+		return im.getElementName() + ";Op:" + ir;
 	}
 
 	@Override
