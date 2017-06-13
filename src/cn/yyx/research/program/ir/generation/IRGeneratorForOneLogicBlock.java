@@ -1921,6 +1921,10 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			pre_visit_task.Put(expr, new Runnable() {
 				@Override
 				public void run() {
+					
+					//just for debugging.
+					expr.getFlags();
+					
 					Set<IJavaElement> ekeys = env.keySet();
 					Iterator<IJavaElement> eijeitr = ekeys.iterator();
 					while (eijeitr.hasNext()) {
