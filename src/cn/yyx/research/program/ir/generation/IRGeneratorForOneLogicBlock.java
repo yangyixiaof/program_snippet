@@ -1994,7 +1994,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				}
 			}
 			// handle connection.
-			IRGeneratorHelper.HandleNodeSelfAndSourceMethodAndBranchDependency(irc, ije, irfop,
+			IRGeneratorHelper.HandleSourceMethodAndBranchDependency(irc, ije, irfop,
 					branch_var_instr_order.empty() ? null : branch_var_instr_order.peek(),
 					source_invocation_barrier.peek(), element_has_set_branch, element_has_set_source_method_barrier);
 			new_creation.add(irfop);

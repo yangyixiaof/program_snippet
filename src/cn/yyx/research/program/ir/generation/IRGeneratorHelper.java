@@ -306,11 +306,17 @@ public class IRGeneratorHelper {
 		}
 	}
 	
-	public static void HandleNodeSelfAndSourceMethodAndBranchDependency(IRCode irc, IJavaElement ije,
+	public static void HandleNodeSelfDependency(IRCode irc, IJavaElement ije,
 			IRForOneInstruction now, HashMap<IJavaElement, IRForOneInstruction> branch_dependency,
 			IRForOneInstruction source_method_barrier, HashMap<IJavaElement, Boolean> element_has_set_branch,
 			HashMap<IJavaElement, Boolean> element_has_set_source_method_barrier) {
 		irc.GoForwardOneIRTreeNode(ije, now);
+	}
+	
+	public static void HandleSourceMethodAndBranchDependency(IRCode irc, IJavaElement ije,
+			IRForOneInstruction now, HashMap<IJavaElement, IRForOneInstruction> branch_dependency,
+			IRForOneInstruction source_method_barrier, HashMap<IJavaElement, Boolean> element_has_set_branch,
+			HashMap<IJavaElement, Boolean> element_has_set_source_method_barrier) {
 		if (branch_dependency != null) {
 			Boolean has_set = element_has_set_branch.get(ije);
 			if (has_set == null) {
@@ -335,6 +341,14 @@ public class IRGeneratorHelper {
 				element_has_set_source_method_barrier.put(ije, true);
 			}
 		}
+	}
+	
+	public static void HandleNodeSelfAndSourceMethodAndBranchDependency(IRCode irc, IJavaElement ije,
+			IRForOneInstruction now, HashMap<IJavaElement, IRForOneInstruction> branch_dependency,
+			IRForOneInstruction source_method_barrier, HashMap<IJavaElement, Boolean> element_has_set_branch,
+			HashMap<IJavaElement, Boolean> element_has_set_source_method_barrier) {
+		HandleNodeSelfDependency(irc, ije, now, branch_dependency, source_method_barrier, element_has_set_branch, element_has_set_source_method_barrier);
+		HandleSourceMethodAndBranchDependency(irc, ije, now, branch_dependency, source_method_barrier, element_has_set_branch, element_has_set_source_method_barrier);
 	}
 
 	public static void AddMethodReturnVirtualReceiveDependency(IRCode irc, IJavaElement ije,
