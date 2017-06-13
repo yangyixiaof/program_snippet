@@ -24,6 +24,7 @@ import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.element.ControlLogicHolderElement;
 import cn.yyx.research.program.ir.element.SourceMethodHolderElement;
 import cn.yyx.research.program.ir.element.UncertainReferenceElement;
+import cn.yyx.research.program.ir.element.UnresolvedSimpleNameElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.element.VirtualDefinedElement;
 import cn.yyx.research.program.ir.generation.state.IJavaElementState;
@@ -1633,9 +1634,18 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	@Override
 	public boolean visit(SimpleName node) {
 		IBinding ib = node.resolveBinding();
-		HandleBinding(ib, node);
-
+		IJavaElementState state = HandleBinding(ib, node);
+		handle_binding_state.put(node, state);
 		return super.visit(node);
+	}
+	
+	@Override
+	public void endVisit(SimpleName node) {
+		IJavaElementState state = handle_binding_state.remove(node);
+		if (state == IJavaElementState.HandledWrong) {
+			HandleIJavaElement(new UnresolvedSimpleNameElement(node.toString()), node);
+		}
+		super.endVisit(node);
 	}
 	
 	Map<ASTNode, IJavaElementState> handle_binding_state = new HashMap<ASTNode, IJavaElementState>();
@@ -1688,7 +1698,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(SuperFieldAccess node) {
-		// TODO
 		IVariableBinding ib = node.resolveFieldBinding();
 		IJavaElementState state = HandleBinding(ib, node);
 		handle_binding_state.put(node, state);
