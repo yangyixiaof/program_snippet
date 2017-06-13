@@ -26,10 +26,13 @@ public class SkipSelfTask extends IIRNodeTask {
 		// Solved. need to handle IRForOneRawMethodBarrier.
 		
 		// debugging.
-		if (source.toString().trim().startsWith("@Sentinel_URE#")) {
+		if (source.toString().trim().startsWith("y^Op:@LeftAssign")) {
 			System.currentTimeMillis();
 		}
-		if (source.toString().trim().startsWith("EmptyConstructor:")) {
+		if (source.toString().trim().startsWith("y^Op:+")) {
+			System.currentTimeMillis();
+		}
+		if (target.toString().trim().startsWith("y^Op:*")) {
 			System.currentTimeMillis();
 		}
 		

@@ -189,7 +189,7 @@ public class CodeOnOneTraceGenerator {
 		while (true) {
 			boolean could_continue = false;
 			IJavaElement source_mi = irfom.GetSourceMethodReceiverElement();
-			List<IJavaElement> exe_key_list = new LinkedList<IJavaElement>();
+			Set<IJavaElement> exe_key_list = new HashSet<IJavaElement>();
 			Set<IJavaElement> exe_keys = new HashSet<IJavaElement>(memory.last_waiting_execution.keySet());
 			if (memory.last_waiting_execution.containsKey(source_mi)) {
 				exe_key_list.add(source_mi);
@@ -199,14 +199,14 @@ public class CodeOnOneTraceGenerator {
 			Iterator<IJavaElement> exe_itr = exe_key_list.iterator();
 			while (exe_itr.hasNext()) {
 				IJavaElement ije = exe_itr.next();
-				List<IRForOneInstruction> inodes = memory.last_waiting_execution.get(ije);
+				Set<IRForOneInstruction> inodes = memory.last_waiting_execution.get(ije);
 				
 				// debugging code.
 				if (inodes == null) {
 					System.err.println("What!!!!!! inodes is null??????");
 					System.exit(1);
 
-					inodes = new LinkedList<IRForOneInstruction>();
+					inodes = new HashSet<IRForOneInstruction>();
 					memory.last_waiting_execution.put(ije, inodes);
 				}
 
@@ -246,6 +246,12 @@ public class CodeOnOneTraceGenerator {
 						Iterator<IRForOneInstruction> oitr = outinodes.iterator();
 						while (oitr.hasNext()) {
 							IRForOneInstruction oiri = oitr.next();
+							
+							// debugging.
+							if (oiri.toString().startsWith("y^Op:*")) {
+								System.currentTimeMillis();
+							}
+							
 							if (!memory.executed_nodes.contains(oiri)) {
 								inodes_add.add(oiri);
 								// inodes.add(oiri);
@@ -375,7 +381,7 @@ public class CodeOnOneTraceGenerator {
 		Iterator<IJavaElement> eitr = eles.iterator();
 		while (eitr.hasNext()) {
 			IJavaElement ije = eitr.next();
-			List<IRForOneInstruction> ins = new LinkedList<IRForOneInstruction>();
+			Set<IRForOneInstruction> ins = new HashSet<IRForOneInstruction>();
 			ins.add(irc.GetFirstIRTreeNode(ije));
 			memory.last_waiting_execution.put(ije, ins);
 			// instr_pc.add(irc.GetFirstIRTreeNode(ije));
