@@ -1608,7 +1608,8 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			}
 		}
 		irc.GetIRTreeForOneElement(jele);
-
+		
+		// TODO ast_block_bind be replaced by memory.
 		Set<ASTNode> ks = ast_block_bind.keySet();
 		Iterator<ASTNode> kitr = ks.iterator();
 		while (kitr.hasNext()) {
