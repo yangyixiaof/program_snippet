@@ -222,10 +222,21 @@ public class CodeOnOneTraceGenerator {
 					if (inode.toString().startsWith("@Sentinel_URE#")) {
 						System.currentTimeMillis();
 					}
+					// debugging.
+					if (inode.toString().startsWith("y^Op:@LeftAssign")) {
+						System.currentTimeMillis();
+					}
 					
 					Set<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory);
-					could_continue = could_continue || (in_conns != null);
+					boolean current_could_continue = (in_conns != null);
+					could_continue = could_continue || current_could_continue;
 					if (in_conns != null) {
+						
+						// debugging.
+						if (inode.toString().startsWith("y^Op:*")) {
+							System.currentTimeMillis();
+						}
+						
 						if (inode instanceof IRForOneSourceMethodInvocation) {
 							HandleStaticConnectionForTargetMethod(ft, (IRForOneSourceMethodInvocation) inode);
 						} else {
@@ -237,7 +248,14 @@ public class CodeOnOneTraceGenerator {
 							}
 						}
 						HandleStaticConnectionForTheSameOperation(ft, memory, inode, env_idx);
-						memory.executed_conns.addAll(IRGeneratorForOneProject.GetInstance().GetOutConnections(inode));
+						
+						// debugging.
+						if (inode.toString().startsWith("x^Op:*") || inode.toString().startsWith("y^Op:*")) {
+							System.currentTimeMillis();
+						}
+						
+						Set<StaticConnection> inode_out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(inode);
+						memory.executed_conns.addAll(inode_out_conns);
 						// inodes.remove(inode);
 						inodes_remove.add(inode);
 						memory.executed_nodes.add(inode);

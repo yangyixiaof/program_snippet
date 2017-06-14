@@ -11,11 +11,11 @@ public class InfixExpressionIndexConnection extends ConnectionDetail {
 	private int index = 0;
 	
 	public InfixExpressionIndexConnection(ASTNode node, int index) {
-		this.setNode(node.hashCode());
+		this.setNode(node.toString().hashCode());
 		this.setIndex(index);
 	}
 	
-	public InfixExpressionIndexConnection(int node, int index) {
+	private InfixExpressionIndexConnection(int node, int index) {
 		this.setNode(node);
 		this.setIndex(index);
 	}
@@ -67,6 +67,11 @@ public class InfixExpressionIndexConnection extends ConnectionDetail {
 	@Override
 	public String toString() {
 		return "Infix:" + index;
+	}
+
+	@Override
+	public int hashCode() {
+		return node * 31 + index;
 	}
 
 }

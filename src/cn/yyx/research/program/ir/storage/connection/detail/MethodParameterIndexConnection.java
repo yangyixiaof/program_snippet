@@ -11,11 +11,11 @@ public class MethodParameterIndexConnection extends ConnectionDetail {
 	private int index = 0;
 	
 	public MethodParameterIndexConnection(ASTNode node, int index) {
-		this.setNode(node.hashCode());
+		this.setNode(node.toString().hashCode());
 		this.setIndex(index);
 	}
 	
-	public MethodParameterIndexConnection(int node, int index) {
+	private MethodParameterIndexConnection(int node, int index) {
 		this.setNode(node);
 		this.setIndex(index);
 	}
@@ -67,6 +67,11 @@ public class MethodParameterIndexConnection extends ConnectionDetail {
 	@Override
 	public String toString() {
 		return "MPara:" + index;
+	}
+
+	@Override
+	public int hashCode() {
+		return node * 31 + index;
 	}
 
 }

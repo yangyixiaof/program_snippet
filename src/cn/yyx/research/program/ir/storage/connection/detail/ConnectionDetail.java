@@ -9,6 +9,9 @@ public abstract class ConnectionDetail {
 	public abstract ConnectionDetail VerticalMerge(ConnectionDetail cd) throws ConflictConnectionDetailException;
 	
 	@Override
+	public abstract int hashCode();
+	
+	@Override
 	public abstract boolean equals(Object obj);
 	
 	@Override

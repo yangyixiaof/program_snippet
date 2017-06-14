@@ -52,6 +52,16 @@ public class ConnectionInfo {
 	}
 	
 	@Override
+	public int hashCode() {
+		int result = type;
+		final int prime = 31;
+		for (ConnectionDetail detail : details) {
+			result =result * prime + detail.hashCode();
+		}
+		return result;
+	}
+	
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof ConnectionInfo) {
 			ConnectionInfo sci = (ConnectionInfo)obj;

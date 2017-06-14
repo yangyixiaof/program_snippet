@@ -47,5 +47,10 @@ public class DefaultConnection extends ConnectionDetail {
 	public String toString() {
 		return "DefaultConnection";
 	}
+
+	@Override
+	public int hashCode() {
+		return 0;
+	}
 	
 }
