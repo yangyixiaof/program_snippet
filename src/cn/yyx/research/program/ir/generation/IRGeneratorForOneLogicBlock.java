@@ -1923,7 +1923,8 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		// do not need to handle.
 		return super.visit(node);
 	}
-
+	
+	// TODO
 	@Override
 	public boolean visit(InstanceofExpression node) {
 		IRGeneratorForOneLogicBlock this_ref = this;
@@ -1938,7 +1939,11 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 
 	@Override
 	public void endVisit(InstanceofExpression node) {
-		IRGeneratorHelper.GenerateGeneralIR(this, node.getRightOperand(), IRMeta.InstanceOfType);
+		Type right = node.getRightOperand();
+		preVisit(right);
+		HandleType(right.resolveBinding(), right.toString(), right);
+		IRGeneratorHelper.GenerateGeneralIR(this, right, IRMeta.InstanceOfType);
+		postVisit(right);
 		super.endVisit(node);
 	}
 
