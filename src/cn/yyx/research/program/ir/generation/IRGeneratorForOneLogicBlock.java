@@ -1232,6 +1232,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		LinkedList<ASTNode> to = new LinkedList<ASTNode>();
 		to.add(node.getBody());
 		ntlist.add(to);
+		// here: last_expr could be used because the judge-info are nearly not used.
 		PreVisitBranch(node, IRMeta.For, last_expr, nslist, nelist, ntlist, true, true);
 		return super.visit(node);
 	}
