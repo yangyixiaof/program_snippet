@@ -43,10 +43,11 @@ public class IRGeneratorForValidation extends ASTVisitor {
 	
 	@Override
 	public boolean preVisit2(ASTNode node) {
+		boolean contigo = super.preVisit2(node);
 		if (forbid.remove(node)) {
-			return false;
+			contigo = contigo && false;
 		}
-		return super.preVisit2(node);
+		return contigo;
 	}
 	
 	@SuppressWarnings("unchecked")
