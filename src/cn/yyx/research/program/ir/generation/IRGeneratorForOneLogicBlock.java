@@ -1718,23 +1718,25 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	public boolean visit(QualifiedName node) {
 		IBinding ib = node.resolveBinding();
 		IJavaElementState state = HandleBinding(ib, node);
-		handle_binding_state.put(node, state);
-		if (state == IJavaElementState.HandledSuccessful || state == IJavaElementState.NoNeedToHandle) {
-			return false;
-		}
-		// HandleType(node.resolveBinding(), node.toString(), node);
-		return super.visit(node);
-	}
-
-	@Override
-	public void endVisit(QualifiedName node) {
-		IJavaElementState state = handle_binding_state.remove(node);
+		// handle_binding_state.put(node, state);
+		// state == IJavaElementState.HandledSuccessful || state == IJavaElementState.NoNeedToHandle
 		if (state == IJavaElementState.HandledWrong) {
 			HandleIJavaElement(new UnresolvedNameOrFieldAccessElement(node.toString()), node);
-			// IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.QualifiedName + node.getName().toString());
 		}
-		super.endVisit(node);
+		// HandleType(node.resolveBinding(), node.toString(), node);
+		super.visit(node);
+		return false;
 	}
+
+//	@Override
+//	public void endVisit(QualifiedName node) {
+//		IJavaElementState state = handle_binding_state.remove(node);
+//		if (state == IJavaElementState.HandledWrong) {
+//			HandleIJavaElement(new UnresolvedNameOrFieldAccessElement(node.toString()), node);
+//			// IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.QualifiedName + node.getName().toString());
+//		}
+//		super.endVisit(node);
+//	}
 
 	@Override
 	public boolean visit(FieldAccess node) {
@@ -1757,8 +1759,8 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 //		if (ib == null || ib.getJavaElement() == null) {
 		IJavaElementState state = handle_binding_state.remove(node);
 		if (state == IJavaElementState.HandledWrong) {
-			HandleIJavaElement(new UnresolvedNameOrFieldAccessElement(node.toString()), node);
-			// IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.FieldAccess + node.getName().toString());
+			// HandleIJavaElement(new UnresolvedNameOrFieldAccessElement(node.toString()), node);
+			IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.FieldAccess + node.getName().toString());
 		}
 	}
 
