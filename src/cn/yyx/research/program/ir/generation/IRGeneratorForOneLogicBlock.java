@@ -248,9 +248,8 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		if (node instanceof Statement) {
 			StatementOverHandle();
 		}
-		System.err.println("node:" + node);
+		
 		PopNodeIJavaElementStack();
-
 		post_visit_task.ProcessAndRemoveTask(node);
 		super.postVisit(node);
 	}
