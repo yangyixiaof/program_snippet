@@ -619,23 +619,30 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	private void SwitchAndPrepareMergeInBranch(ASTNode all_in_control, ASTNode branch_first_stat,
-			ASTNode branch_last_stat, boolean clear, boolean just_one_branch) {
+			ASTNode branch_last_stat, List<ASTNode> first_to_last, boolean clear, boolean just_one_branch) {
 		final IRGeneratorForOneLogicBlock this_ref = this;
 		if (branch_first_stat != null) {
 			pre_visit_task.Put(branch_first_stat, new Runnable() {
 				@Override
 				public void run() {
 					PreVisitToGoNewBranchInSwitch(all_in_control);
-					node_element_memory.put(branch_first_stat, null);
+					for (ASTNode node : first_to_last) {
+						node_element_memory.put(node, null);
+					}
 					// ast_block_bind.put(branch_first_stat, new HashSet<IJavaElement>());
 				}
 			});
 			post_visit_task.Put(branch_last_stat, new Runnable() {
 				@Override
 				public void run() {
-					Set<IJavaElement> eles = node_element_memory.get(branch_first_stat);
+					Set<IJavaElement> eles = new HashSet<IJavaElement>();
+					for (ASTNode node : first_to_last) {
+						eles.addAll(node_element_memory.remove(node));
+					}
+					// Set<IJavaElement> eles = node_element_memory.get(branch_first_stat);
+					// node_element_memory.remove(branch_first_stat);
+					
 					PostVisitToHandleMergeListInSwitch(all_in_control, eles);
-					node_element_memory.remove(branch_first_stat);
 					
 					if (clear) {
 						StatementOverHandle();
@@ -661,7 +668,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	}
 
 	private void PreVisitBranch(ASTNode all_in_control, String branch_code, Expression judge,
-			List<ASTNode> branch_first_stats, List<ASTNode> branch_last_stats, boolean clear, boolean just_one_branch) {
+			List<ASTNode> branch_first_stats, List<ASTNode> branch_last_stats, LinkedList<LinkedList<ASTNode>> branch_first_to_last, boolean clear, boolean just_one_branch) {
 		IRGeneratorForOneLogicBlock this_ref = this;
 		post_visit_task.Put(judge, new Runnable() {
 			@Override
@@ -682,10 +689,12 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		});
 		Iterator<ASTNode> bfitr = branch_first_stats.iterator();
 		Iterator<ASTNode> blitr = branch_last_stats.iterator();
+		Iterator<LinkedList<ASTNode>> btitr = branch_first_to_last.iterator();
 		while (bfitr.hasNext()) {
 			ASTNode bfast = bfitr.next();
 			ASTNode blast = blitr.next();
-			SwitchAndPrepareMergeInBranch(all_in_control, bfast, blast, clear, just_one_branch);
+			List<ASTNode> bts = btitr.next();
+			SwitchAndPrepareMergeInBranch(all_in_control, bfast, blast, bts, clear, just_one_branch);
 		}
 	}
 
@@ -721,19 +730,26 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		boolean just_one_branch = false;
 		LinkedList<ASTNode> nslist = new LinkedList<ASTNode>();
 		LinkedList<ASTNode> nelist = new LinkedList<ASTNode>();
+		LinkedList<LinkedList<ASTNode>> ntlist = new LinkedList<LinkedList<ASTNode>>();
 		if (node.getThenStatement() != null) {
 			nslist.add(node.getThenStatement());
 			nelist.add(node.getThenStatement());
+			LinkedList<ASTNode> to = new LinkedList<ASTNode>();
+			ntlist.add(to);
+			to.add(node.getThenStatement());
 		} else {
 			just_one_branch = true;
 		}
 		if (node.getElseStatement() != null) {
 			nslist.add(node.getElseStatement());
 			nelist.add(node.getElseStatement());
+			LinkedList<ASTNode> to = new LinkedList<ASTNode>();
+			ntlist.add(to);
+			to.add(node.getElseStatement());
 		} else {
 			just_one_branch = true;
 		}
-		PreVisitBranch(node, IRMeta.If, node.getExpression(), nslist, nelist, true, just_one_branch);
+		PreVisitBranch(node, IRMeta.If, node.getExpression(), nslist, nelist, ntlist, true, just_one_branch);
 		// Statement thenstat = node.getThenStatement();
 		// if (thenstat != null)
 		// {
@@ -774,13 +790,24 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// highly related to IfStatement.
 	@Override
 	public boolean visit(ConditionalExpression node) {
-		LinkedList<ASTNode> ntlist = new LinkedList<ASTNode>();
-		ntlist.add(node.getThenExpression());
-		ntlist.add(node.getElseExpression());
+		LinkedList<ASTNode> nslist = new LinkedList<ASTNode>();
+		nslist.add(node.getThenExpression());
+		nslist.add(node.getElseExpression());
 		LinkedList<ASTNode> nelist = new LinkedList<ASTNode>();
 		nelist.add(node.getThenExpression());
 		nelist.add(node.getElseExpression());
-		PreVisitBranch(node, IRMeta.ConditionExpression, node.getExpression(), ntlist, nelist, false, false);
+		LinkedList<LinkedList<ASTNode>> ntlist = new LinkedList<LinkedList<ASTNode>>();
+		{
+			LinkedList<ASTNode> to = new LinkedList<ASTNode>();
+			ntlist.add(to);
+			to.add(node.getThenExpression());
+		}
+		{
+			LinkedList<ASTNode> to = new LinkedList<ASTNode>();
+			ntlist.add(to);
+			to.add(node.getElseExpression());
+		}
+		PreVisitBranch(node, IRMeta.ConditionExpression, node.getExpression(), nslist, nelist, ntlist, false, false);
 		// IRGeneratorForOneLogicBlock this_ref = this;
 		// post_visit_task.Put(node.getExpression(), new Runnable() {
 		// @Override
@@ -827,6 +854,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	class TwoPairList {
 		List<ASTNode> branch_first_stats = new LinkedList<ASTNode>();
 		List<ASTNode> branch_last_stats = new LinkedList<ASTNode>();
+		LinkedList<LinkedList<ASTNode>> branch_first_to_last = new LinkedList<LinkedList<ASTNode>>();
 	}
 
 	private TwoPairList SearchForBranchBlocks(SwitchStatement node) {
@@ -839,14 +867,20 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			Statement stmt = sitr.next();
 			if (stmt instanceof SwitchCase) {
 				tpl.branch_first_stats.add(stmt);
+				tpl.branch_first_to_last.add(new LinkedList<ASTNode>());
 				if (previous != null) {
 					tpl.branch_last_stats.add(previous);
 				}
 			}
+			tpl.branch_first_to_last.getLast().add(stmt);
 			previous = stmt;
 		}
 		if (previous != null) {
 			tpl.branch_last_stats.add(previous);
+		}
+		if (tpl.branch_first_stats.size() != tpl.branch_last_stats.size() || tpl.branch_first_stats.size() != tpl.branch_first_to_last.size()) {
+			System.err.println("What the fuck! size is different.");
+			System.exit(1);
 		}
 		return tpl;
 	}
@@ -880,7 +914,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 			}
 		});
 		TwoPairList tpl = SearchForBranchBlocks(node);
-		PreVisitBranch(node, IRMeta.Switch, node.getExpression(), tpl.branch_first_stats, tpl.branch_last_stats, true,
+		PreVisitBranch(node, IRMeta.Switch, node.getExpression(), tpl.branch_first_stats, tpl.branch_last_stats, tpl.branch_first_to_last, true,
 				false);
 		return super.visit(node);
 	}
@@ -1016,7 +1050,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		nslist.add(node.getBody());
 		List<ASTNode> nelist = new LinkedList<ASTNode>();
 		nelist.add(node.getBody());
-		PreVisitBranch(node, IRMeta.While, node.getExpression(), nslist, nelist, true, true);
+		LinkedList<LinkedList<ASTNode>> ntlist = new LinkedList<LinkedList<ASTNode>>();
+		LinkedList<ASTNode> to = new LinkedList<ASTNode>();
+		to.add(node.getBody());
+		ntlist.add(to);
+		PreVisitBranch(node, IRMeta.While, node.getExpression(), nslist, nelist, ntlist, true, true);
 		// IRGeneratorForOneLogicBlock this_ref = this;
 		// post_visit_task.Put(node.getExpression(), new Runnable() {
 		// @Override
@@ -1044,7 +1082,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		nslist.add(node.getBody());
 		List<ASTNode> nelist = new LinkedList<ASTNode>();
 		nelist.add(node.getBody());
-		PreVisitBranch(node, IRMeta.While, node.getExpression(), nslist, nelist, true, true);
+		LinkedList<LinkedList<ASTNode>> ntlist = new LinkedList<LinkedList<ASTNode>>();
+		LinkedList<ASTNode> to = new LinkedList<ASTNode>();
+		to.add(node.getBody());
+		ntlist.add(to);
+		PreVisitBranch(node, IRMeta.While, node.getExpression(), nslist, nelist, ntlist, true, true);
 		// IRGeneratorForOneLogicBlock this_ref = this;
 		// post_visit_task.Put(node.getExpression(), new Runnable() {
 		// @Override
@@ -1190,7 +1232,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		nslist.add(node.getBody());
 		List<ASTNode> nelist = new LinkedList<ASTNode>();
 		nelist.add(node.getBody());
-		PreVisitBranch(node, IRMeta.For, last_expr, nslist, nelist, true, true);
+		LinkedList<LinkedList<ASTNode>> ntlist = new LinkedList<LinkedList<ASTNode>>();
+		LinkedList<ASTNode> to = new LinkedList<ASTNode>();
+		to.add(node.getBody());
+		ntlist.add(to);
+		PreVisitBranch(node, IRMeta.For, last_expr, nslist, nelist, ntlist, true, true);
 		return super.visit(node);
 	}
 
@@ -1211,7 +1257,11 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		nslist.add(node.getBody());
 		List<ASTNode> nelist = new LinkedList<ASTNode>();
 		nelist.add(node.getBody());
-		PreVisitBranch(node, IRMeta.EnhancedFor, node.getExpression(), nslist, nelist, true, true);
+		LinkedList<LinkedList<ASTNode>> ntlist = new LinkedList<LinkedList<ASTNode>>();
+		LinkedList<ASTNode> to = new LinkedList<ASTNode>();
+		to.add(node.getBody());
+		ntlist.add(to);
+		PreVisitBranch(node, IRMeta.EnhancedFor, node.getExpression(), nslist, nelist, ntlist, true, true);
 		// IRGeneratorForOneLogicBlock this_ref = this;
 		// post_visit_task.Put(node.getExpression(), new Runnable() {
 		// @Override

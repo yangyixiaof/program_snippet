@@ -20,7 +20,7 @@ public class TodoList {
 	// Solved. do not traverse from root methods (exclude constructors) which contains no statements.
 	
 	// Solved. how to recognize the global relationship, eclipse jdt offers? append to tails of irs of that ije.
-	// TODO how to recognize relationships including code snippet not on the execution path from main root?.
+	// TODO how to recognize relationships including code snippet not on the execution path from main root?
 	
 	// Comment: the below two are the same.
 	// Solved. the total IJavaElement temp_statement_expression_environment_set and temp_statement_environment_set need to be changed to Stack, former stack element gain all ijes of later stack element. do it in HandleIJavaElement.
