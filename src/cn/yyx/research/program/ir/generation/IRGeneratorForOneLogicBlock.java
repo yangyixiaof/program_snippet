@@ -50,7 +50,7 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodBarrier;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 
-public class IRGeneratorForOneLogicBlock extends ASTVisitor {
+public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 
 	public static int max_level = Integer.MAX_VALUE; // Integer.MAX_VALUE partly
 														// means infinite.
@@ -226,7 +226,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				irc.GetScopeIElement().getElementName().toString() + "&clogic");
 		this.irc.SetSourceMethodElement(this.source_method_virtual_holder_element);
 		this.irc.SetControlLogicHolderElement(this.control_logic_holder_element);
-
 	}
 
 	@Override
@@ -274,6 +273,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(MethodDeclaration node) {
+		super.Validation(node);
 		List<SimpleName> sns = new LinkedList<SimpleName>();
 		@SuppressWarnings("unchecked")
 		List<SingleVariableDeclaration> svds = node.parameters();
@@ -496,6 +496,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(MethodInvocation node) {
+		super.Validation(node);
 		@SuppressWarnings("unchecked")
 		List<Expression> exprs = (List<Expression>) node.arguments();
 		PreMethodInvocation(exprs, node.getExpression());
@@ -512,6 +513,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(SuperMethodInvocation node) {
+		super.Validation(node);
 		@SuppressWarnings("unchecked")
 		List<Expression> exprs = (List<Expression>) node.arguments();
 		PreMethodInvocation(exprs, null);
@@ -558,6 +560,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(ClassInstanceCreation node) {
+		super.Validation(node);
 		@SuppressWarnings("unchecked")
 		List<Expression> nlist = (List<Expression>) node.arguments();
 		PreMethodInvocation(nlist, node.getExpression());
@@ -1352,6 +1355,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(VariableDeclarationStatement node) {
+		super.Validation(node);
 		// no need to do anything, all things are in
 		// VariableDeclarationFragment.
 		return super.visit(node);
@@ -1360,6 +1364,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// closely related expressions stumbled into.
 	@Override
 	public boolean visit(VariableDeclarationExpression node) {
+		super.Validation(node);
 		// no need to do anything, all things are in
 		// VariableDeclarationFragment.
 		return super.visit(node);
@@ -1445,9 +1450,16 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		// StatementOverHandle();
 		super.endVisit(node);
 	}
+	
+	@Override
+	public boolean visit(FieldDeclaration node) {
+		super.Validation(node);
+		return super.visit(node);
+	}
 
 	@Override
 	public boolean visit(SingleVariableDeclaration node) {
+		super.Validation(node);
 		// Solved. how to redirect? same as assignment.
 		HandleAssign(node.getName(), node.getInitializer());
 		// IRGeneratorForOneLogicBlock this_ref = this;
@@ -1683,7 +1695,10 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	public boolean visit(SimpleName node) {
 		IBinding ib = node.resolveBinding();
 		// IJavaElementState state = null;
-		HandleBinding(ib, node);
+		IJavaElementState bind_state = HandleBinding(ib, node);
+		if (bind_state == IJavaElementState.HandledWrong) {
+			HandleIJavaElement(new UnresolvedNameOrFieldAccessElement(node.toString()), node);
+		}
 //		handle_binding_state.put(node, state);
 		return super.visit(node);
 	}
@@ -1902,6 +1917,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(PackageDeclaration node) {
+		super.Validation(node);
 		// do not need to handle.
 		return super.visit(node);
 	}
@@ -2092,18 +2108,21 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(ImportDeclaration node) {
+		super.Validation(node);
 		// do not need to handle.
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(EnumDeclaration node) {
+		super.Validation(node);
 		// do not need handle it.
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(EnumConstantDeclaration node) {
+		super.Validation(node);
 		HandleBinding(node.resolveVariable(), node);
 		return super.visit(node);
 	}
@@ -2325,6 +2344,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
+		super.Validation(node);
 		@SuppressWarnings("unchecked")
 		List<BodyDeclaration> bodys = node.bodyDeclarations();
 		HandleTypeDeclaration(bodys);
@@ -2355,6 +2375,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(Modifier node) {
+		super.Validation(node);
 		// do not need to handle.
 		return super.visit(node);
 	}
@@ -2433,6 +2454,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(AnnotationTypeDeclaration node) {
+		super.Validation(node);
 		// will do in the future.
 		return super.visit(node);
 	}
@@ -2451,18 +2473,21 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public boolean visit(SingleMemberAnnotation node) {
+		super.Validation(node);
 		// will do in the future.
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(AnnotationTypeMemberDeclaration node) {
+		super.Validation(node);
 		// will do in the future.
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(MarkerAnnotation node) {
+		super.Validation(node);
 		// will do in the future.
 		return super.visit(node);
 	}
