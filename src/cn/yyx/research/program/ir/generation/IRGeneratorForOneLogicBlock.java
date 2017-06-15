@@ -183,10 +183,6 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		return node_element_stack.Peek().GetIJavaElementSet();
 	}
 
-	protected Map<IJavaElement, IRForOneInstruction> GetBranchInstructions() {
-		return irc.CopyEnvironment();
-	}
-
 	protected void PushBranchInstructionOrder(Map<IJavaElement, IRForOneInstruction> branch_instrs) {
 		HashMap<IJavaElement, IRForOneInstruction> t_hash = new HashMap<IJavaElement, IRForOneInstruction>(
 				branch_instrs);
@@ -676,7 +672,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				IRGeneratorHelper.GenerateGeneralIR(this_ref, judge, branch_code);
 				switch_record.put(all_in_control, irc.CopyEnvironment());
 
-				Map<IJavaElement, IRForOneInstruction> branch_instrs = GetBranchInstructions();
+				Map<IJavaElement, IRForOneInstruction> branch_instrs = irc.CopyEnvironment(CurrentElements());
 				PushBranchInstructionOrder(branch_instrs);
 
 				IRTreeForOneControlElement holder_ir = irc.GetControlLogicHolderElementIR();
