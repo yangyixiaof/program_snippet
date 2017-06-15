@@ -2123,8 +2123,13 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	@Override
 	public boolean visit(EnumConstantDeclaration node) {
 		super.Validation(node);
-		HandleBinding(node.resolveVariable(), node);
+		// HandleBinding(node.resolveVariable(), node);
 		return super.visit(node);
+	}
+	
+	@Override
+	public void endVisit(EnumConstantDeclaration node) {
+		super.endVisit(node);
 	}
 
 	@Override
