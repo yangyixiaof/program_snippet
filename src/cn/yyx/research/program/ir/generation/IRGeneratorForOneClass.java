@@ -70,7 +70,7 @@ public class IRGeneratorForOneClass extends IRGeneratorForOneLogicBlock {
 				IRGeneratorForOneProject.GetInstance().FetchITypeIR((it)).SetFieldLevel((IRForOneField)irc);
 			}
 		}
-		super.postVisit(node);
+		// super.postVisit(node);
 	}
 	
 	private IType NodeBinding(ASTNode node) {
