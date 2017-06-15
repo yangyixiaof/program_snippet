@@ -213,7 +213,7 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	protected IRASTNodeTask post_visit_task = new IRASTNodeTask();
 	protected IRASTNodeTask pre_visit_task = new IRASTNodeTask();
 
-	protected Map<ASTNode, HashSet<IJavaElement>> ast_block_bind = new HashMap<ASTNode, HashSet<IJavaElement>>();
+	// protected Map<ASTNode, HashSet<IJavaElement>> ast_block_bind = new HashMap<ASTNode, HashSet<IJavaElement>>();
 
 	// protected Stack<HashSet<IBinding>> switch_case_bind = new
 	// Stack<HashSet<IBinding>>();
@@ -235,9 +235,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 
 	@Override
 	public void preVisit(ASTNode node) {
-		if (node instanceof Block) {
-			ast_block_bind.put(node, new HashSet<IJavaElement>());
-		}
+//		if (node instanceof Block) {
+//			ast_block_bind.put(node, new HashSet<IJavaElement>());
+//		}
 
 		pre_visit_task.ProcessAndRemoveTask(node);
 		PushNodeIJavaElementStack(node, null);
@@ -247,9 +247,9 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// post handling statements.
 	@Override
 	public void postVisit(ASTNode node) {
-		if (node instanceof Block) {
-			ast_block_bind.remove(node);
-		}
+//		if (node instanceof Block) {
+//			ast_block_bind.remove(node);
+//		}
 		if (node instanceof Statement) {
 			StatementOverHandle();
 		}
@@ -626,17 +626,17 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 				@Override
 				public void run() {
 					PreVisitToGoNewBranchInSwitch(all_in_control);
-					ast_block_bind.put(branch_first_stat, new HashSet<IJavaElement>());
+					node_element_memory.put(branch_first_stat, null);
+					// ast_block_bind.put(branch_first_stat, new HashSet<IJavaElement>());
 				}
 			});
 			post_visit_task.Put(branch_last_stat, new Runnable() {
 				@Override
 				public void run() {
-					HashSet<IJavaElement> eles = ast_block_bind.get(branch_first_stat);
-
+					Set<IJavaElement> eles = node_element_memory.get(branch_first_stat);
 					PostVisitToHandleMergeListInSwitch(all_in_control, eles);
-
-					ast_block_bind.remove(branch_first_stat);
+					node_element_memory.remove(branch_first_stat);
+					
 					if (clear) {
 						StatementOverHandle();
 					}
@@ -1236,13 +1236,13 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 	// future.
 
 	private void HandleBreakContinueStatement(ASTNode node, SimpleName label, String code) {
-		ASTNode n = ASTSearch.FindMostCloseLoopNode(node);
-		if (n != null && ast_block_bind.containsKey(n)) {
-			HashSet<IJavaElement> elements = ast_block_bind.get(n);
+		// ASTNode n = ASTSearch.FindMostCloseLoopNode(node);
+		ASTNode break_scope = SearchForLiveScopeOfBreakContinue(node, label);
+		// n != null && ast_block_bind.containsKey(n)
+		if (break_scope != null) {
+			Set<IJavaElement> elements = node_element_stack.GetIJavaElementsFromTopDownToSpecified(break_scope);
+			// HashSet<IJavaElement> elements = ast_block_bind.get(n);
 			Map<IJavaElement, IRForOneInstruction> eles = irc.CopyEnvironment(elements);
-
-			ASTNode break_scope = SearchForLiveScopeOfBreakContinue(node, label);
-
 			IRGeneratorForOneLogicBlock this_ref = this;
 			post_visit_task.Put(break_scope, new Runnable() {
 				@Override
@@ -1609,14 +1609,14 @@ public class IRGeneratorForOneLogicBlock extends ASTVisitor {
 		}
 		irc.GetIRTreeForOneElement(jele);
 		
-		// TODO ast_block_bind be replaced by memory.
-		Set<ASTNode> ks = ast_block_bind.keySet();
-		Iterator<ASTNode> kitr = ks.iterator();
-		while (kitr.hasNext()) {
-			ASTNode an = kitr.next();
-			HashSet<IJavaElement> set = ast_block_bind.get(an);
-			set.add(jele);
-		}
+		// Solved. ast_block_bind be replaced by merge of stack or memory if convenient.
+//		Set<ASTNode> ks = ast_block_bind.keySet();
+//		Iterator<ASTNode> kitr = ks.iterator();
+//		while (kitr.hasNext()) {
+//			ASTNode an = kitr.next();
+//			HashSet<IJavaElement> set = ast_block_bind.get(an);
+//			set.add(jele);
+//		}
 
 		// handle switch_case_bind
 		// if (!switch_case_bind.isEmpty()) {

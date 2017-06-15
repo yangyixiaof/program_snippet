@@ -34,5 +34,21 @@ public class NodeIJavaElementStack {
 	public boolean IsEmpty() {
 		return nodes.isEmpty();
 	}
+
+	public Set<IJavaElement> GetIJavaElementsFromTopDownToSpecified(ASTNode specified) {
+		Set<IJavaElement> result = new HashSet<IJavaElement>();
+		int nidx = nodes.size()-1;
+		ASTNode s = null;
+		while (s != specified) {
+			if (nidx == -1) {
+				System.err.println("Strange! astnode null!");
+				System.exit(1);
+			}
+			s = nodes.get(nidx);
+			result.addAll(node_ijes.get(nidx));
+			nidx--;
+		}
+		return result;
+	}
 	
 }
