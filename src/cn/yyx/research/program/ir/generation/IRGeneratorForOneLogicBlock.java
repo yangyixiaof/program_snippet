@@ -127,7 +127,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	// protected HashMap<ASTNode, IJavaElement> source_method_return_element =
 	// new HashMap<ASTNode, IJavaElement>();
 
-	private Set<IJavaElement> SearchAndRememberAllElementsInASTNodeInJustEnvironment(Expression expr) {
+	private Set<IJavaElement> SearchAllElementsInASTNode(Expression expr) {
 		// HashSet<IJavaElement> result = new HashSet<IJavaElement>();
 		// result.addAll(temp_statement_expression_environment_set);
 		// Set<ASTNode> tkeys = node_element_memory.keySet();
@@ -400,7 +400,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 				// method_parameter_element_instr_is_self.put(expr,
 				// new_is_self_env);
 				Map<IJavaElement, IRForOneInstruction> new_env = new HashMap<IJavaElement, IRForOneInstruction>();
-				Iterator<IJavaElement> titr = SearchAndRememberAllElementsInASTNodeInJustEnvironment(expr)
+				Iterator<IJavaElement> titr = SearchAllElementsInASTNode(expr)
 						.iterator();
 				// temp_statement_expression_environment_set.iterator()
 				while (titr.hasNext()) {
@@ -1123,7 +1123,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		Iterator<Expression> eitr = exp_list.iterator();
 		while (eitr.hasNext()) {
 			Expression expr = eitr.next();
-			Set<IJavaElement> one_ele_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(expr);
+			Set<IJavaElement> one_ele_set = SearchAllElementsInASTNode(expr);
 			if (one_ele_set != null) {
 				ele_set.addAll(one_ele_set);
 			}
@@ -1180,7 +1180,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 						// this_ref.temp_statement_environment_set =
 						// SearchAndRememberAllElementsInASTNodeInJustEnvironment(
 						// temp_last_expr);
-						Set<IJavaElement> ele_set = SearchAndRememberAllElementsInASTNodeInJustEnvironment(
+						Set<IJavaElement> ele_set = SearchAllElementsInASTNode(
 								temp_last_expr);
 						// this_ref.temp_statement_expression_environment_set;
 
@@ -1378,21 +1378,21 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		// HashSet<IJavaElement>(temp_statement_environment_set);
 		// temp_statement_environment_set.clear();
 		node_element_memory.put(right, null);
-		preVisit(right);
+		// preVisit(right);
 		right.accept(this);
-		postVisit(right);
+		// postVisit(right);
 		Map<IJavaElement, IRForOneInstruction> env = irc
-				.CopyEnvironment(SearchAndRememberAllElementsInASTNodeInJustEnvironment(right));
+				.CopyEnvironment(SearchAllElementsInASTNode(right));
 		node_element_memory.remove(right);
 		// temp_copy.addAll(temp_statement_environment_set);
 
 		StatementOverHandle();
 
 		node_element_memory.put(left, null);
-		preVisit(left);
+		// preVisit(left);
 		left.accept(this);
-		postVisit(left);
-		Set<IJavaElement> left_ijes = SearchAndRememberAllElementsInASTNodeInJustEnvironment(left);
+		// postVisit(left);
+		Set<IJavaElement> left_ijes = SearchAllElementsInASTNode(left);
 		node_element_memory.remove(left);
 		IRGeneratorHelper.GenerateGeneralIR(this, left_ijes, left, IRMeta.LeftHandAssign, SkipSelfTask.class);
 
@@ -2040,7 +2040,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 			post_visit_task.Put(expr, new IndexInfoRunner(index) {
 				@Override
 				public void run() {
-					Set<IJavaElement> all_elements = SearchAndRememberAllElementsInASTNodeInJustEnvironment(expr);
+					Set<IJavaElement> all_elements = SearchAllElementsInASTNode(expr);
 					PrepareCurrentEnvironmentToMerge(all_elements, merge, new InfixExpressionIndexConnection(expr, this.getIndex()));
 					ExpressionOverHandle();
 					node_element_memory.remove(expr);
