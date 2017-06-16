@@ -47,5 +47,6 @@ public class IRMeta {
 	public static final String VirtualSentinel = "@Sentinel_";
 	
 	public static final String BranchOver = "@BranchOver";
+	public static final String VirtualBranch = "@VirtualBranch";
 	
 }

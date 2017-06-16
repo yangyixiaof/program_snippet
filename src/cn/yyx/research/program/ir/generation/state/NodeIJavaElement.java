@@ -1,6 +1,5 @@
 package cn.yyx.research.program.ir.generation.state;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
@@ -32,7 +31,7 @@ public class NodeIJavaElement {
 		this.ijes = ijes;
 	}
 	
-	public void Merge(NodeIJavaElement nije, Map<IJavaElement, ASTNode> all_happen) {
+	public void Merge(NodeIJavaElement nije) {
 //		Set<IJavaElement> remove = new HashSet<IJavaElement>();
 //		if (!(nije.GetNode() instanceof Statement)) {
 //			// need to do contains judge.

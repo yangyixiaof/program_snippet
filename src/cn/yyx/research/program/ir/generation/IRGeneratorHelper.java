@@ -202,33 +202,33 @@ public class IRGeneratorHelper {
 		HandleEachElementInSameOperationDependency(ops);
 	}
 
-	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, 
 			String code) {
-		return GenerateGeneralIR(irgfob, node, code, DefaultINodeTask.class);
+		return GenerateGeneralIR(irgfob, code, DefaultINodeTask.class);
 	}
 	
-	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, ASTNode node,
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, 
 			String code) {
-		return GenerateGeneralIR(irgfob, temp_statement_set, node, code, DefaultINodeTask.class);
+		return GenerateGeneralIR(irgfob, temp_statement_set, code, DefaultINodeTask.class);
 	}
 
-	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, 
 			String code, Class<? extends IIRNodeTask> task_class) {
-		return GenerateGeneralIR(irgfob, node, code, task_class, IRForOneOperation.class);
+		return GenerateGeneralIR(irgfob, code, task_class, IRForOneOperation.class);
 	}
 	
-	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, ASTNode node,
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, 
 			String code, Class<? extends IIRNodeTask> task_class) {
-		return GenerateGeneralIR(irgfob, temp_statement_set, node, code, task_class, IRForOneOperation.class);
+		return GenerateGeneralIR(irgfob, temp_statement_set, code, task_class, IRForOneOperation.class);
 	}
 	
-	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, 
 			String code, Class<? extends IIRNodeTask> task_class,
 			Class<? extends IRForOneInstruction> operation_class) {
-		return GenerateGeneralIR(irgfob, irgfob.CurrentElements(), node, code, task_class, operation_class);
+		return GenerateGeneralIR(irgfob, irgfob.CurrentElements(), code, task_class, operation_class);
 	}
 	
-	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, ASTNode node,
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, 
 			String code, Class<? extends IIRNodeTask> task_class,
 			Class<? extends IRForOneInstruction> operation_class) {
 		IRCode irc = irgfob.irc;
