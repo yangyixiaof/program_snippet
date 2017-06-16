@@ -339,7 +339,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		while (titr.hasNext()) {
 			IJavaElement ije = titr.next();
 			ASTNode happen = all_happen.get(ije);
-			if (expr.equals(happen)) {
+			if (happen != null && expr.equals(happen)) {
 				return ije;
 			}
 		}

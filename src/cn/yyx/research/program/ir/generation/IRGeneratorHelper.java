@@ -175,7 +175,7 @@ public class IRGeneratorHelper {
 	public static void GenerateNoVariableBindingIR(IRGeneratorForOneLogicBlock irgfob, ASTNode node,
 			Set<IJavaElement> member_set, String code) {
 		IRCode irc = irgfob.irc;
-		HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
+		// HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
 		HashMap<IJavaElement, IRForOneInstruction> branch_dependency = irgfob.branch_var_instr_order.peek();
 
 		Set<IJavaElement> temp_bindings = member_set;
@@ -184,9 +184,9 @@ public class IRGeneratorHelper {
 		List<IRForOneInstruction> ops = new LinkedList<IRForOneInstruction>();
 		while (titr.hasNext()) {
 			IJavaElement ije = titr.next();
-			ASTNode im_node = all_happen.get(ije);
+			// ASTNode im_node = all_happen.get(ije);
 			//  && ASTSearch.ASTNodeContainsAnASTNode(node, im_node)
-			if (im_node != null) {
+			// if (im_node != null) {
 				// int start = exact_node.getStartPosition();
 				// int end = start + exact_node.getLength() - 1;
 				// IRInstrKind ir_kind = IRInstrKind.ComputeKind(1);
@@ -197,7 +197,7 @@ public class IRGeneratorHelper {
 				HandleNodeSelfAndSourceMethodAndBranchDependency(irc, ije, now, branch_dependency,
 						irgfob.source_invocation_barrier.peek(), irgfob.element_has_set_branch,
 						irgfob.element_has_set_source_method_barrier);
-			}
+			// }
 		}
 		HandleEachElementInSameOperationDependency(ops);
 	}
@@ -233,7 +233,7 @@ public class IRGeneratorHelper {
 			Class<? extends IRForOneInstruction> operation_class) {
 		IRCode irc = irgfob.irc;
 		// Map<IJavaElement, Integer> all_count = irgfob.all_count;
-		HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
+		// HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
 		HashMap<IJavaElement, IRForOneInstruction> branch_dependency = null;
 		if (!irgfob.branch_var_instr_order.isEmpty()) {
 			branch_dependency = irgfob.branch_var_instr_order.peek();
@@ -257,16 +257,16 @@ public class IRGeneratorHelper {
 		List<IRForOneInstruction> ops = new LinkedList<IRForOneInstruction>();
 		while (titr.hasNext()) {
 			IJavaElement im = titr.next();
-			ASTNode im_node = all_happen.get(im);
+			// ASTNode im_node = all_happen.get(im);
 			// && ASTSearch.ASTNodeContainsAnASTNode(node, im_node)
-			if (im_node != null) {
+			// if (im_node != null) {
 				IRForOneInstruction now = (IRForOneInstruction) CreateIRInstruction(irgfob, operation_class,
 						new Object[] { irc, im, code, task_class });
 				ops.add(now);
 				HandleNodeSelfAndSourceMethodAndBranchDependency(irc, im, now, branch_dependency,
 						irgfob.source_invocation_barrier.peek(), irgfob.element_has_set_branch,
 						irgfob.element_has_set_source_method_barrier);
-			}
+			// }
 		}
 		HandleEachElementInSameOperationDependency(ops);
 		return ops;
