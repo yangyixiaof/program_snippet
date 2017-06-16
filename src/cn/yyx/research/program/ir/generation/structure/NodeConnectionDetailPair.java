@@ -31,7 +31,7 @@ public class NodeConnectionDetailPair {
 	
 	@Override
 	public String toString() {
-		return irfoi.toString() + ";" + detail;
+		return irfoi + "&" + detail;
 	}
 	
 }

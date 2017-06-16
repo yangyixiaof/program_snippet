@@ -592,13 +592,23 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	private void PreVisitToGoNewBranchInSwitch(ASTNode all_in_control) {
 		IRTreeForOneControlElement holder_ir = irc.GetControlLogicHolderElementIR();
 		holder_ir.GoToOneBranch(all_in_control);
+		Map<IJavaElement, IRForOneInstruction> all_control_eles = switch_record.get(all_in_control);
+		Set<IJavaElement> eles = all_control_eles.keySet();
+		Iterator<IJavaElement> eitr = eles.iterator();
+		while (eitr.hasNext()) {
+			IJavaElement ije = eitr.next();
+			irc.SwitchDirection(ije, all_control_eles.get(ije));
+		}
 	}
 
 	private void PostVisitToHandleMergeListInSwitch(ASTNode all_in_control, Set<IJavaElement> eles) {
 		Iterator<IJavaElement> eitr = eles.iterator();
 		while (eitr.hasNext()) {
 			IJavaElement ije = eitr.next();
-			irc.SwitchDirection(ije, switch_record.get(all_in_control).get(ije));
+			
+			// the following code is moved to PreVisitToGoNewBranchInSwitch and I think the logic is right.
+			// irc.SwitchDirection(ije, switch_record.get(all_in_control).get(ije));
+			
 			Map<IJavaElement, List<NodeConnectionDetailPair>> merge = node_to_merge.get(all_in_control);
 			if (merge == null) {
 				merge = new HashMap<IJavaElement, List<NodeConnectionDetailPair>>();
