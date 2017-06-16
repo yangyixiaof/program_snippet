@@ -1381,8 +1381,14 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		// preVisit(right);
 		right.accept(this);
 		// postVisit(right);
+		Set<IJavaElement> right_ijes = SearchAllElementsInASTNode(right);
+		
+		if (right_ijes == null) {
+			System.err.println(left + "=" + right + ";parent:" + left.getParent().getParent().getParent());
+		}
+		
 		Map<IJavaElement, IRForOneInstruction> env = irc
-				.CopyEnvironment(SearchAllElementsInASTNode(right));
+				.CopyEnvironment(right_ijes);
 		node_element_memory.remove(right);
 		// temp_copy.addAll(temp_statement_environment_set);
 
@@ -1924,7 +1930,6 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		return super.visit(node);
 	}
 	
-	// TODO
 	@Override
 	public boolean visit(InstanceofExpression node) {
 		IRGeneratorForOneLogicBlock this_ref = this;
