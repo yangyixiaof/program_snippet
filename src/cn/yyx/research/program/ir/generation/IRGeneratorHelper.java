@@ -324,6 +324,9 @@ public class IRGeneratorHelper {
 				Iterator<IJavaElement> bitr = bkeys.iterator();
 				while (bitr.hasNext()) {
 					IJavaElement bim = bitr.next();
+					if (bim == ije) {
+						continue;
+					}
 					IRForOneInstruction pt = branch_dependency.get(bim);
 					if (pt != null) {
 						IRGeneratorForOneProject.GetInstance()
