@@ -86,7 +86,7 @@ public class IRTreeForOneControlElement {
 		LinkedList<IRForOneBranchControl> list = inner_level_branch.get(irbc);
 		IRForOneBranchControl irbc_bc = new IRForOneBranchControl(ije, parent_env, IgnoreSelfTask.class, IRBranchControlType.Branch);
 		list.add(irbc_bc);
-		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc_bc, irbc_bc, new ConnectionInfo(EdgeBaseType.BranchControl.Value())));
+		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc, irbc_bc, new ConnectionInfo(EdgeBaseType.BranchControl.Value())));
 	}
 	
 	public void ExitOneLogicBlock(ASTNode logic_block) {
