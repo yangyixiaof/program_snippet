@@ -3,11 +3,12 @@ package cn.yyx.research.program.ir.storage.node.lowlevel;
 import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.program.ir.storage.node.IIRNodeTask;
+import cn.yyx.research.program.ir.storage.node.execution.IgnoreSelfTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 
 public class IRForOneBranchControl extends IRForOneInstruction {
 	
-	private static IRForOneBranchControl empty_branch_control = new IRForOneBranchControl(null, null, null, null);
+	private static IRForOneBranchControl empty_branch_control = new IRForOneBranchControl(null, null, IgnoreSelfTask.class, null);
 	public static IRForOneBranchControl GetEmptyControlHolder() {
 		return empty_branch_control;
 	}
