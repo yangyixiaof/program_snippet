@@ -7,6 +7,11 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 
 public class IRForOneBranchControl extends IRForOneInstruction {
 	
+	private static IRForOneBranchControl empty_branch_control = new IRForOneBranchControl(null, null, null, null);
+	public static IRForOneBranchControl GetEmptyControlHolder() {
+		return empty_branch_control;
+	}
+	
 	protected IRBranchControlType branch_type = null;
 	
 	public IRForOneBranchControl(IJavaElement im, IRCode parent_env, Class<? extends IIRNodeTask> task_class, IRBranchControlType branch_type) {
