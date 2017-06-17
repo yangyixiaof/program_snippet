@@ -127,7 +127,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	// protected HashMap<ASTNode, IJavaElement> source_method_return_element =
 	// new HashMap<ASTNode, IJavaElement>();
 
-	private Set<IJavaElement> SearchAllElementsInASTNode(Expression expr) {
+	private Set<IJavaElement> SearchAllElementsInASTNode(ASTNode expr) {
 		// HashSet<IJavaElement> result = new HashSet<IJavaElement>();
 		// result.addAll(temp_statement_expression_environment_set);
 		// Set<ASTNode> tkeys = node_element_memory.keySet();
@@ -327,7 +327,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		}
 		if (!handled) {
 			HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchUnresolvedLambdaUniqueElement(
-					node.toString(), (IMember) irc.GetScopeIElement(), irc.CopyEnvironment()), node);
+					node.toString(), (IMember) irc.GetScopeIElement()), node);
 		}
 		return false;
 	}
@@ -585,6 +585,23 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	// handling statements.
 
 	// handling branches.
+	
+	private void HandleRestoreDirection(Map<IJavaElement, IRForOneInstruction> stored_direction) {
+		Map<IJavaElement, IRForOneInstruction> curr_direction = irc.CopyEnvironment();
+		Set<IJavaElement> curr_keys = curr_direction.keySet();
+		Set<IJavaElement> stored_keys = stored_direction.keySet();
+		curr_keys.removeAll(stored_keys);
+		Iterator<IJavaElement> eitr = stored_keys.iterator();
+		while (eitr.hasNext()) {
+			IJavaElement ije = eitr.next();
+			irc.SwitchDirection(ije, stored_direction.get(ije));
+		}
+		Iterator<IJavaElement> citr = curr_keys.iterator();
+		while (citr.hasNext()) {
+			IJavaElement ije = citr.next();
+			irc.SwitchToRoot(ije);
+		}
+	}
 
 	// Solved. all branches and loops should handle parallel connections.
 	protected Map<ASTNode, Map<IJavaElement, IRForOneInstruction>> switch_record = new HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>>();
@@ -593,12 +610,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		IRTreeForOneControlElement holder_ir = irc.GetControlLogicHolderElementIR();
 		holder_ir.GoToOneBranch(all_in_control);
 		Map<IJavaElement, IRForOneInstruction> all_control_eles = switch_record.get(all_in_control);
-		Set<IJavaElement> eles = all_control_eles.keySet();
-		Iterator<IJavaElement> eitr = eles.iterator();
-		while (eitr.hasNext()) {
-			IJavaElement ije = eitr.next();
-			irc.SwitchDirection(ije, all_control_eles.get(ije));
-		}
+		HandleRestoreDirection(all_control_eles);
 	}
 
 	private void PostVisitToHandleMergeListInSwitch(ASTNode all_in_control, Set<IJavaElement> eles) {
@@ -668,8 +680,15 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		}
 	}
 	
-	private void HandleTaskPostVisitJudge(IRGeneratorForOneLogicBlock irgfob, ASTNode all_in_control, String branch_code) {
+	private void HandleTaskPostVisitJudge(IRGeneratorForOneLogicBlock irgfob, ASTNode all_in_control, String branch_code, LinkedList<LinkedList<ASTNode>> branch_first_to_last) {
 		IRGeneratorHelper.GenerateGeneralIR(irgfob, branch_code);
+		
+		Set<ASTNode> nodes = new HashSet<ASTNode>();
+		for (LinkedList<ASTNode> lls: branch_first_to_last) {
+			for (ASTNode n : lls) {
+				nodes.add(n);
+			}
+		}
 		switch_record.put(all_in_control, irc.CopyEnvironment());
 
 		Map<IJavaElement, IRForOneInstruction> branch_instrs = irc.CopyEnvironment(CurrentElements());
@@ -686,12 +705,12 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 			post_visit_task.Put(judge, new Runnable() {
 				@Override
 				public void run() {
-					HandleTaskPostVisitJudge(this_ref, all_in_control, branch_code);
+					HandleTaskPostVisitJudge(this_ref, all_in_control, branch_code, branch_first_to_last);
 				}
 			});
 		} else {
 			HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchConstantUniqueElement(IRConstantMeta.BooleanConstant + "$" + "true"), null);
-			HandleTaskPostVisitJudge(this, all_in_control, branch_code);
+			HandleTaskPostVisitJudge(this, all_in_control, branch_code, branch_first_to_last);
 		}
 		Iterator<ASTNode> bfitr = branch_first_stats.iterator();
 		Iterator<ASTNode> blitr = branch_last_stats.iterator();
@@ -2027,20 +2046,22 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		HashMap<IJavaElement, List<NodeConnectionDetailPair>> merge = new HashMap<IJavaElement, List<NodeConnectionDetailPair>>();
 		node_to_merge.put(node, merge);
 
-		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment();
+		// irc.CopyEnvironment();
 
-		List<Expression> expr_list = new LinkedList<Expression>();
+		List<ASTNode> expr_list = new LinkedList<ASTNode>();
 		expr_list.add(node.getLeftOperand());
 		expr_list.add(node.getRightOperand());
 		@SuppressWarnings("unchecked")
 		List<Expression> exprs = (List<Expression>) node.extendedOperands();
 		expr_list.addAll(exprs);
 		
+		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment();
+		
 		int index = 0;
-		Iterator<Expression> eitr = expr_list.iterator();
+		Iterator<ASTNode> eitr = expr_list.iterator();
 		while (eitr.hasNext()) {
 			index++;
-			Expression expr = eitr.next();
+			ASTNode expr = eitr.next();
 			pre_visit_task.Put(expr, new Runnable() {
 				@Override
 				public void run() {
@@ -2048,13 +2069,15 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 					//just for debugging.
 					expr.getFlags();
 					
-					Set<IJavaElement> ekeys = env.keySet();
-					Iterator<IJavaElement> eijeitr = ekeys.iterator();
-					while (eijeitr.hasNext()) {
-						IJavaElement ije = eijeitr.next();
-						IRForOneInstruction irtree_node = env.get(ije);
-						irc.SwitchDirection(ije, irtree_node);
-					}
+					HandleRestoreDirection(env);
+					
+//					Set<IJavaElement> ekeys = env.keySet();
+//					Iterator<IJavaElement> eijeitr = ekeys.iterator();
+//					while (eijeitr.hasNext()) {
+//						IJavaElement ije = eijeitr.next();
+//						IRForOneInstruction irtree_node = env.get(ije);
+//						irc.SwitchDirection(ije, irtree_node);
+//					}
 				}
 			});
 			node_element_memory.put(expr, null);
@@ -2529,6 +2552,27 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		// will do in the future.
 		return super.visit(node);
 	}
+	
+//	public Map<IJavaElement, IRForOneInstruction> CopyEnvironment() {
+//		return irc.CopyEnvironment();
+//	}
+	
+//	public Map<IJavaElement, IRForOneInstruction> CopyEnvironmentWithPredict(Collection<ASTNode> predicts) {
+//		Set<IJavaElement> result = new HashSet<IJavaElement>();
+//		Iterator<ASTNode> pitr = predicts.iterator();
+//		while (pitr.hasNext()) {
+//			ASTNode node = pitr.next();
+//			IRGeneratorForIJavaElement gen = new IRGeneratorForIJavaElement(parent_im);
+//			node.accept(gen);
+//			result.addAll(gen.GetFoundElements());
+//		}
+//		Iterator<IJavaElement> ritr = result.iterator();
+//		while (ritr.hasNext()) {
+//			IJavaElement ije = ritr.next();
+//			irc.GetIRTreeForOneElement(ije);
+//		}
+//		return irc.CopyEnvironment();
+//	}
 
 	// Solved. switch such branch, how to model? dependencies on branches have
 	// been considered.

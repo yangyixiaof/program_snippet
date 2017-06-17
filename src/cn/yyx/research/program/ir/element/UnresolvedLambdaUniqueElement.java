@@ -1,8 +1,5 @@
 package cn.yyx.research.program.ir.element;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -25,18 +22,18 @@ import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.JavaModelException;
 
 import cn.yyx.research.program.ir.IRElementMeta;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public class UnresolvedLambdaUniqueElement extends VirtualDefinedElement implements IMethod {
 	
 	String represent = null;
 	IMember parent_im = null;
-	Map<IJavaElement, IRForOneInstruction> env = new HashMap<IJavaElement, IRForOneInstruction>();
+	// Map<IJavaElement, IRForOneInstruction> env = new HashMap<IJavaElement, IRForOneInstruction>();
 	
-	public UnresolvedLambdaUniqueElement(String represent, IMember parent_im, Map<IJavaElement, IRForOneInstruction> env) {
+	public UnresolvedLambdaUniqueElement(String represent, IMember parent_im) {
+		// , Map<IJavaElement, IRForOneInstruction> env
 		this.represent = represent;
 		this.parent_im = parent_im;
-		this.env.putAll(env);
+		// this.env.putAll(env);
 	}
 	
 	@Override

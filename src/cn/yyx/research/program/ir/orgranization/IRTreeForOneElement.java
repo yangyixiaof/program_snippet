@@ -48,6 +48,11 @@ public class IRTreeForOneElement {
 		this.SetLastNode(switch_to_last_node);
 	}
 	
+	public void SwitchToRoot()
+	{
+		this.SetLastNode(root_node);
+	}
+	
 	public void GoForwardANode(IRForOneInstruction child)
 	{
 		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last_node, child, new ConnectionInfo(EdgeBaseType.Self.Value())));

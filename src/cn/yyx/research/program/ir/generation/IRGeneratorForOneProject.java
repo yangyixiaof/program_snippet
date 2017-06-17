@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
@@ -214,11 +213,11 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		return yce;
 	}
 
-	public UnresolvedLambdaUniqueElement FetchUnresolvedLambdaUniqueElement(String represent, IMember parent_im,
-			Map<IJavaElement, IRForOneInstruction> env) {
+	public UnresolvedLambdaUniqueElement FetchUnresolvedLambdaUniqueElement(String represent, IMember parent_im) {
+		// Map<IJavaElement, IRForOneInstruction> env
 		UnresolvedLambdaUniqueElement yce = unresolved_lambda_unique_element_cache.get(represent);
 		if (yce == null) {
-			yce = new UnresolvedLambdaUniqueElement(represent, parent_im, env);
+			yce = new UnresolvedLambdaUniqueElement(represent, parent_im);// , env
 			unresolved_lambda_unique_element_cache.put(represent, yce);
 		}
 		return yce;

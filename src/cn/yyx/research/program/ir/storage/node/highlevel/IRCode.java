@@ -109,6 +109,14 @@ public abstract class IRCode {
 			irtree.SwitchDirection(switch_to_last_node);
 		}
 	}
+	
+	public void SwitchToRoot(IJavaElement ije)
+	{
+		IRTreeForOneElement irtree = irs.get(ije);
+		if (irtree != null) {
+			irtree.SwitchToRoot();
+		}
+	}
 
 	public void GoForwardOneIRTreeNode(IJavaElement ije, IRForOneInstruction irfou) {
 		IRTreeForOneElement ir_ele = irs.get(ije);
