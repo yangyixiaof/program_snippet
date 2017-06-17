@@ -46,7 +46,6 @@ public class IRTreeForOneControlElement {
 			inner_level_branchover.remove(branch_judge_stack.peek());
 		}
 		IRForOneBranchControl judge = new IRForOneBranchControl(ije, parent_env, IgnoreSelfTask.class, IRBranchControlType.Branch_Judge);
-		IRForOneBranchControl last = null;
 		if (!branch_judge_stack.isEmpty())
 		{
 			IRForOneBranchControl last_judge = branch_judge_stack.peek();
@@ -56,9 +55,9 @@ public class IRTreeForOneControlElement {
 				System.err.println("What the fuck! judge without branches?");
 				System.exit(1);
 			}
-			last = list.getLast();
+			IRForOneBranchControl last = list.getLast();
+			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last, judge, new ConnectionInfo(EdgeBaseType.BranchControl.Value())));
 		}
-		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last, judge, new ConnectionInfo(EdgeBaseType.BranchControl.Value())));
 		
 		if (branch_judge_stack.isEmpty())
 		{

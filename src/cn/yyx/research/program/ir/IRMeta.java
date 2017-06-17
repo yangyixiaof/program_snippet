@@ -49,4 +49,8 @@ public class IRMeta {
 	public static final String BranchOver = "@BranchOver";
 	public static final String VirtualBranch = "@VirtualBranch";
 	
+	public static final String ControlBranchJudge = "@VControlBranchJudge";
+	public static final String ControlBranch = "@ControlBranch";
+	public static final String ControlBranchOver = "@ControlBranchOver";
+	
 }

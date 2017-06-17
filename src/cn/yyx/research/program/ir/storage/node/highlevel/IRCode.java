@@ -16,10 +16,10 @@ import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 
 public abstract class IRCode {
 	
-	final static IRCode root_irc_holder = new IRCode(null) {
-		public void AddParameter(IJavaElement im) {}
-		public List<IJavaElement> GetParameters() {return null;}
-	};
+//	final static IRCode root_irc_holder = new IRCode(null) {
+//		public void AddParameter(IJavaElement im) {}
+//		public List<IJavaElement> GetParameters() {return null;}
+//	};
 
 	// protected Map<IJavaElement, Set<IJavaElement>> deps = new HashMap<IJavaElement, Set<IJavaElement>>();
 	protected Map<IJavaElement, IRTreeForOneElement> irs = new HashMap<IJavaElement, IRTreeForOneElement>();

@@ -21,7 +21,7 @@ public class IRForOneBranchControl extends IRForOneInstruction {
 
 	@Override
 	public String ToVisual() {
-		return im.getElementName() + "^Branch:" + branch_type.name();
+		return im.getElementName() + "^Branch:" + branch_type.Value();
 	}
 	
 	@Override
