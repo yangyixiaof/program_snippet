@@ -198,7 +198,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 				branch_instrs);
 		branch_var_instr_order.push(t_hash);
 		source_invocation_barrier.add(null);
-		element_has_set_branch.pop().Clear();
+		element_has_set_branch.push(new ElementBranchInfo());
 	}
 
 	protected void PopBranchInstructionOrder() {
@@ -2137,6 +2137,8 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 				}
 			}
 			// handle connection.
+			// TODO what if element_has_set_branch is null.
+			// TODO element_has_set_source_method_barrier does not need a stack?
 			IRGeneratorHelper.HandleSourceMethodAndBranchDependency(irc, ije, irfop,
 					branch_var_instr_order.empty() ? null : branch_var_instr_order.peek(),
 					source_invocation_barrier.peek(), element_has_set_branch.peek(), element_has_set_source_method_barrier);

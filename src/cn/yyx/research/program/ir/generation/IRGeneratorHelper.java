@@ -337,15 +337,17 @@ public class IRGeneratorHelper {
 				element_has_set_branch.SetElementMainBranch(ije);
 			}
 		}
-		if (element_has_set_branch.ElementChanged()) {
-			if (!element_has_set_branch.ChangeIsApplied(ije)) {
-				element_has_set_branch.SetChangeApplied(ije);
-				Collection<IRForOneInstruction> chgd_instrs = element_has_set_branch.ChangedElements();
-				Iterator<IRForOneInstruction> citr = chgd_instrs.iterator();
-				while (citr.hasNext()) {
-					IRForOneInstruction instr = citr.next();
-					IRGeneratorForOneProject.GetInstance()
-						.RegistConnection(new StaticConnection(instr, now, new ConnectionInfo(EdgeBaseType.Branch.Value())));
+		if (element_has_set_branch != null) {
+			if (element_has_set_branch.ElementChanged()) {
+				if (!element_has_set_branch.ChangeIsApplied(ije)) {
+					element_has_set_branch.SetChangeApplied(ije);
+					Collection<IRForOneInstruction> chgd_instrs = element_has_set_branch.ChangedElements();
+					Iterator<IRForOneInstruction> citr = chgd_instrs.iterator();
+					while (citr.hasNext()) {
+						IRForOneInstruction instr = citr.next();
+						IRGeneratorForOneProject.GetInstance()
+							.RegistConnection(new StaticConnection(instr, now, new ConnectionInfo(EdgeBaseType.Branch.Value())));
+					}
 				}
 			}
 		}
