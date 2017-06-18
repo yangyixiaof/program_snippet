@@ -2137,11 +2137,11 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 				}
 			}
 			// handle connection.
-			// TODO what if element_has_set_branch is null.
-			// TODO element_has_set_source_method_barrier does not need a stack?
+			// Solved. what if element_has_set_branch is null. add check.
+			// Solved. element_has_set_source_method_barrier does not need a stack? a stack is not needed.
 			IRGeneratorHelper.HandleSourceMethodAndBranchDependency(irc, ije, irfop,
-					branch_var_instr_order.empty() ? null : branch_var_instr_order.peek(),
-					source_invocation_barrier.peek(), element_has_set_branch.peek(), element_has_set_source_method_barrier);
+					branch_var_instr_order,
+					source_invocation_barrier, element_has_set_branch, element_has_set_source_method_barrier);
 			new_creation.add(irfop);
 			MergeListParallelToOne(list, ije, irfop);
 		}
