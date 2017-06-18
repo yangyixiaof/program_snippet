@@ -213,26 +213,53 @@ public class IRGeneratorHelper {
 			String code) {
 		return GenerateGeneralIR(irgfob, temp_statement_set, code, DefaultINodeTask.class);
 	}
+	
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, 
+			String code, boolean handle_same_operations) {
+		return GenerateGeneralIR(irgfob, temp_statement_set, code, DefaultINodeTask.class, handle_same_operations);
+	}
 
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, 
+			String code, Class<? extends IIRNodeTask> task_class, boolean handle_same_operations) {
+		return GenerateGeneralIR(irgfob, code, task_class, IRForOneOperation.class, handle_same_operations);
+	}
+	
 	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, 
 			String code, Class<? extends IIRNodeTask> task_class) {
 		return GenerateGeneralIR(irgfob, code, task_class, IRForOneOperation.class);
 	}
 	
 	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, 
+			String code, Class<? extends IIRNodeTask> task_class, boolean handle_same_operations) {
+		return GenerateGeneralIR(irgfob, temp_statement_set, code, task_class, IRForOneOperation.class, handle_same_operations);
+	}
+	
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, 
 			String code, Class<? extends IIRNodeTask> task_class) {
-		return GenerateGeneralIR(irgfob, temp_statement_set, code, task_class, IRForOneOperation.class);
+		return GenerateGeneralIR(irgfob, temp_statement_set, code, task_class, IRForOneOperation.class, true);
+	}
+	
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, 
+			String code, Class<? extends IIRNodeTask> task_class,
+			Class<? extends IRForOneInstruction> operation_class, boolean handle_same_operations) {
+		return GenerateGeneralIR(irgfob, irgfob.CurrentElements(), code, task_class, operation_class, handle_same_operations);
 	}
 	
 	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, 
 			String code, Class<? extends IIRNodeTask> task_class,
 			Class<? extends IRForOneInstruction> operation_class) {
-		return GenerateGeneralIR(irgfob, irgfob.CurrentElements(), code, task_class, operation_class);
+		return GenerateGeneralIR(irgfob, irgfob.CurrentElements(), code, task_class, operation_class, true);
 	}
 	
 	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, 
 			String code, Class<? extends IIRNodeTask> task_class,
 			Class<? extends IRForOneInstruction> operation_class) {
+		return GenerateGeneralIR(irgfob, temp_statement_set, code, task_class, operation_class, true);
+	}
+	
+	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, 
+			String code, Class<? extends IIRNodeTask> task_class,
+			Class<? extends IRForOneInstruction> operation_class, boolean handle_same_operations) {
 		IRCode irc = irgfob.irc;
 		// Map<IJavaElement, Integer> all_count = irgfob.all_count;
 		// HashMap<IJavaElement, ASTNode> all_happen = irgfob.all_happen;
@@ -270,7 +297,9 @@ public class IRGeneratorHelper {
 						irgfob.element_has_set_source_method_barrier);
 			// }
 		}
-		HandleEachElementInSameOperationDependency(ops);
+		if (handle_same_operations) {
+			HandleEachElementInSameOperationDependency(ops);
+		}
 		return ops;
 	}
 	

@@ -35,7 +35,6 @@ import cn.yyx.research.program.ir.generation.structure.IndexInfoRunner;
 import cn.yyx.research.program.ir.generation.structure.NodeConnectionDetailPair;
 import cn.yyx.research.program.ir.generation.traversal.task.IRASTNodeTask;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
-import cn.yyx.research.program.ir.orgranization.IRTreeForOneElement;
 import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.connection.StaticConnection;
@@ -185,6 +184,8 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	}
 	
 	private void UpdateIRControlBranchInstructionOrder() {
+		source_invocation_barrier.pop();
+		source_invocation_barrier.add(null);
 		element_has_set_branch.peek().ClearElementChanged();
 		IRTreeForOneControlElement holder_ir = irc.GetControlLogicHolderElementIR();
 		IRForOneBranchControl control_node = holder_ir.GetControlNode();
@@ -196,7 +197,9 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	protected void PushBranchInstructionOrder(Map<IJavaElement, IRForOneInstruction> branch_instrs) {
 		HashMap<IJavaElement, IRForOneInstruction> t_hash = new HashMap<IJavaElement, IRForOneInstruction>(
 				branch_instrs);
+		// this just represent the whole judge, no need to be handled in each branch.
 		branch_var_instr_order.push(t_hash);
+		// these two need to be handled in each branch.
 		source_invocation_barrier.add(null);
 		element_has_set_branch.push(new ElementBranchInfo());
 	}
@@ -662,15 +665,16 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 					// add virtual branch and virtual corresponding node.
 					if (just_one_branch) {
 						PreVisitToGoNewBranchInSwitch(all_in_control);
-						Iterator<IJavaElement> eleitr = eles.iterator();
-						while (eleitr.hasNext()) {
-							IJavaElement eije = eleitr.next();
-							IRForOneOperation irfop = (IRForOneOperation) IRGeneratorHelper.CreateIRInstruction(
-									this_ref, IRForOneOperation.class,
-									new Object[] { irc, eije, IRMeta.VirtualBranch, SkipSelfTask.class });
-							IRTreeForOneElement itree = irc.GetIRTreeForOneElement(eije);
-							itree.GoForwardANode(irfop);
-						}
+						IRGeneratorHelper.GenerateGeneralIR(this_ref, eles, IRMeta.VirtualBranch, false);
+//						Iterator<IJavaElement> eleitr = eles.iterator();
+//						while (eleitr.hasNext()) {
+//							IJavaElement eije = eleitr.next();
+//							IRForOneOperation irfop = (IRForOneOperation) IRGeneratorHelper.CreateIRInstruction(
+//									this_ref, IRForOneOperation.class,
+//									new Object[] { irc, eije, IRMeta.VirtualBranch, SkipSelfTask.class });
+//							IRTreeForOneElement itree = irc.GetIRTreeForOneElement(eije);
+//							itree.GoForwardANode(irfop);
+//						}
 						PostVisitToHandleMergeListInSwitch(all_in_control, eles);
 					}
 				}
