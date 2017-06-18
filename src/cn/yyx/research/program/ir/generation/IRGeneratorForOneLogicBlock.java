@@ -186,6 +186,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	private void UpdateIRControlBranchInstructionOrder() {
 		source_invocation_barrier.pop();
 		source_invocation_barrier.add(null);
+		
 		element_has_set_branch.peek().ClearElementChanged();
 		IRTreeForOneControlElement holder_ir = irc.GetControlLogicHolderElementIR();
 		IRForOneBranchControl control_node = holder_ir.GetControlNode();
