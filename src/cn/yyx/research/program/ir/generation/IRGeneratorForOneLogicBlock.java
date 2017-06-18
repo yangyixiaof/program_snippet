@@ -30,6 +30,7 @@ import cn.yyx.research.program.ir.element.VirtualDefinedElement;
 import cn.yyx.research.program.ir.generation.state.IJavaElementState;
 import cn.yyx.research.program.ir.generation.state.NodeIJavaElement;
 import cn.yyx.research.program.ir.generation.state.NodeIJavaElementStack;
+import cn.yyx.research.program.ir.generation.structure.ElementBranchInfo;
 import cn.yyx.research.program.ir.generation.structure.IndexInfoRunner;
 import cn.yyx.research.program.ir.generation.structure.NodeConnectionDetailPair;
 import cn.yyx.research.program.ir.generation.traversal.task.IRASTNodeTask;
@@ -171,7 +172,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		// temp_statement_environment_set.clear();
 //	}
 
-	protected HashMap<IJavaElement, Boolean> element_has_set_branch = new HashMap<IJavaElement, Boolean>();
+	protected Stack<ElementBranchInfo> element_has_set_branch = new Stack<ElementBranchInfo>();
 	protected HashMap<IJavaElement, Boolean> element_has_set_source_method_barrier = new HashMap<IJavaElement, Boolean>();
 	protected Stack<HashMap<IJavaElement, IRForOneInstruction>> branch_var_instr_order = new Stack<HashMap<IJavaElement, IRForOneInstruction>>();
 	protected Stack<IRForOneInstruction> source_invocation_barrier = new Stack<IRForOneInstruction>();
@@ -182,24 +183,27 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	public Set<IJavaElement> CurrentElements() {
 		return node_element_stack.Peek().GetIJavaElementSet();
 	}
+	
+	private void UpdateIRControlBranchInstructionOrder() {
+		IRTreeForOneControlElement holder_ir = irc.GetControlLogicHolderElementIR();
+		IRForOneBranchControl control_node = holder_ir.GetControlNode();
+		if (control_node != null) {
+			element_has_set_branch.peek().PutElementChanged(control_logic_holder_element, control_node);
+		}
+	}
 
 	protected void PushBranchInstructionOrder(Map<IJavaElement, IRForOneInstruction> branch_instrs) {
 		HashMap<IJavaElement, IRForOneInstruction> t_hash = new HashMap<IJavaElement, IRForOneInstruction>(
 				branch_instrs);
-		IRTreeForOneControlElement holder_ir = irc.GetControlLogicHolderElementIR();
-		IRForOneBranchControl control_node = holder_ir.GetControlNode();
-		if (control_node != null) {
-			t_hash.put(control_logic_holder_element, control_node);
-		}
 		branch_var_instr_order.push(t_hash);
 		source_invocation_barrier.add(null);
-		element_has_set_branch.clear();
+		element_has_set_branch.pop().Clear();
 	}
 
 	protected void PopBranchInstructionOrder() {
 		branch_var_instr_order.pop();
 		source_invocation_barrier.pop();
-		element_has_set_branch.clear();
+		element_has_set_branch.pop().Clear();
 	}
 
 	protected IRCode irc = null;
@@ -230,10 +234,6 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 
 	@Override
 	public void preVisit(ASTNode node) {
-//		if (node instanceof Block) {
-//			ast_block_bind.put(node, new HashSet<IJavaElement>());
-//		}
-
 		pre_visit_task.ProcessAndRemoveTask(node);
 		PushNodeIJavaElementStack(node, null);
 		super.preVisit(node);
@@ -242,10 +242,6 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	// post handling statements.
 	@Override
 	public void postVisit(ASTNode node) {
-//		if (node instanceof Block) {
-//			ast_block_bind.remove(node);
-//		}
-		
 		PopNodeIJavaElementStack();
 		post_visit_task.ProcessAndRemoveTask(node);
 		super.postVisit(node);
@@ -609,6 +605,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	private void PreVisitToGoNewBranchInSwitch(ASTNode all_in_control) {
 		IRTreeForOneControlElement holder_ir = irc.GetControlLogicHolderElementIR();
 		holder_ir.GoToOneBranch(all_in_control);
+		UpdateIRControlBranchInstructionOrder();
 		Map<IJavaElement, IRForOneInstruction> all_control_eles = switch_record.get(all_in_control);
 		HandleRestoreDirection(all_control_eles);
 	}
@@ -2141,7 +2138,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 			// handle connection.
 			IRGeneratorHelper.HandleSourceMethodAndBranchDependency(irc, ije, irfop,
 					branch_var_instr_order.empty() ? null : branch_var_instr_order.peek(),
-					source_invocation_barrier.peek(), element_has_set_branch, element_has_set_source_method_barrier);
+					source_invocation_barrier.peek(), element_has_set_branch.peek(), element_has_set_source_method_barrier);
 			new_creation.add(irfop);
 			MergeListParallelToOne(list, ije, irfop);
 		}
