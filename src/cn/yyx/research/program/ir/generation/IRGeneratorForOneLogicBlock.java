@@ -2039,69 +2039,91 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	// <=  LESS_EQUALS
 	// >=  GREATER_EQUALS
 	
+	private Set<InfixExpression> should_not_execute = new HashSet<InfixExpression>();
+	
+	public void FindRealShouldExecuteInfixExpression(Expression expr, List<ASTNode> expr_list, InfixExpression parent) {
+		if (expr instanceof InfixExpression) {
+			InfixExpression node = (InfixExpression)expr;
+			if (parent == null || node.getOperator().equals(parent.getOperator())) {
+				if (parent != null) {
+					should_not_execute.add(node);
+				}
+				Expression left_opd = node.getLeftOperand();
+				FindRealShouldExecuteInfixExpression(left_opd, expr_list, node);
+				Expression right_opd = node.getRightOperand();
+				FindRealShouldExecuteInfixExpression(right_opd, expr_list, node);
+				@SuppressWarnings("unchecked")
+				List<Expression> exprs = (List<Expression>) node.extendedOperands();
+				if (exprs != null) {
+					Iterator<Expression> eitr = exprs.iterator();
+					while (eitr.hasNext()) {
+						Expression exp = eitr.next();
+						FindRealShouldExecuteInfixExpression(exp, expr_list, node);
+					}
+				}
+			} else {
+				expr_list.add(node);
+			}
+		} else {
+			expr_list.add(expr);
+		}
+	}
+	
 	@Override
 	public boolean visit(InfixExpression node) {
-		if (most_parent_infix == null) {
-			most_parent_infix = node;
-			instrs_under_most_parent_infix.clear();
+		if (!should_not_execute.contains(node)) {
+			if (most_parent_infix == null) {
+				most_parent_infix = node;
+				instrs_under_most_parent_infix.clear();
+			}
+
+			HashMap<IJavaElement, List<NodeConnectionDetailPair>> merge = new HashMap<IJavaElement, List<NodeConnectionDetailPair>>();
+			node_to_merge.put(node, merge);
+
+			// irc.CopyEnvironment();
+
+			List<ASTNode> expr_list = new LinkedList<ASTNode>();
+			FindRealShouldExecuteInfixExpression(node, expr_list, null);
+//			Expression left_opd = node.getLeftOperand();
+//			if (left_opd instanceof InfixExpression) {
+//				
+//			}
+//			expr_list.add();
+//			expr_list.add(node.getRightOperand());
+//			@SuppressWarnings("unchecked")
+//			List<Expression> exprs = (List<Expression>) node.extendedOperands();
+//			expr_list.addAll(exprs);
+			
+			Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment();
+			
+			int index = 0;
+			Iterator<ASTNode> eitr = expr_list.iterator();
+			while (eitr.hasNext()) {
+				index++;
+				ASTNode expr = eitr.next();
+				pre_visit_task.Put(expr, new Runnable() {
+					@Override
+					public void run() {
+						
+						//just for debugging.
+						expr.getFlags();
+						
+						HandleRestoreDirection(env);
+					}
+				});
+				node_element_memory.put(expr, null);
+				post_visit_task.Put(expr, new IndexInfoRunner(index) {
+					@Override
+					public void run() {
+						Set<IJavaElement> all_elements = SearchAllElementsInASTNode(expr);
+						PrepareCurrentEnvironmentToMerge(all_elements, merge, new InfixExpressionIndexConnection(expr, this.getIndex()));
+						node_element_memory.remove(expr);
+					}
+				});
+			}
+		} else{
+			should_not_execute.remove(node);
 		}
-
-		HashMap<IJavaElement, List<NodeConnectionDetailPair>> merge = new HashMap<IJavaElement, List<NodeConnectionDetailPair>>();
-		node_to_merge.put(node, merge);
-
-		// irc.CopyEnvironment();
-
-		List<ASTNode> expr_list = new LinkedList<ASTNode>();
-		expr_list.add(node.getLeftOperand());
-		expr_list.add(node.getRightOperand());
-		@SuppressWarnings("unchecked")
-		List<Expression> exprs = (List<Expression>) node.extendedOperands();
-		expr_list.addAll(exprs);
-		
-		Map<IJavaElement, IRForOneInstruction> env = irc.CopyEnvironment();
-		
-		int index = 0;
-		Iterator<ASTNode> eitr = expr_list.iterator();
-		while (eitr.hasNext()) {
-			index++;
-			ASTNode expr = eitr.next();
-			pre_visit_task.Put(expr, new Runnable() {
-				@Override
-				public void run() {
-					
-					//just for debugging.
-					expr.getFlags();
-					
-					HandleRestoreDirection(env);
-					
-//					Set<IJavaElement> ekeys = env.keySet();
-//					Iterator<IJavaElement> eijeitr = ekeys.iterator();
-//					while (eijeitr.hasNext()) {
-//						IJavaElement ije = eijeitr.next();
-//						IRForOneInstruction irtree_node = env.get(ije);
-//						irc.SwitchDirection(ije, irtree_node);
-//					}
-				}
-			});
-			node_element_memory.put(expr, null);
-			post_visit_task.Put(expr, new IndexInfoRunner(index) {
-				@Override
-				public void run() {
-					Set<IJavaElement> all_elements = SearchAllElementsInASTNode(expr);
-					PrepareCurrentEnvironmentToMerge(all_elements, merge, new InfixExpressionIndexConnection(expr, this.getIndex()));
-					node_element_memory.remove(expr);
-				}
-			});
-		}
-
-		// IRGeneratorForOneLogicBlock this_ref = this;
-		// post_visit_task.Put(node.getLeftOperand(), new Runnable() {
-		// @Override
-		// public void run() {
-		// IRGeneratorHelper.GenerateGeneralIR(this_ref, node.getLeftOperand(),
-		// IRMeta.InfixLeftExpression + node.getOperator().toString());
-		// }
-		// });
 		return super.visit(node);
 	}
 
