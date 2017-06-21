@@ -671,6 +671,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 					// add virtual branch and virtual corresponding node.
 					if (just_one_branch) {
 						PreVisitToGoNewBranchInSwitch(all_in_control);
+						// TODO wait to add SkipSelfTask.class, .
 						IRGeneratorHelper.GenerateGeneralIR(this_ref, eles, IRMeta.VirtualBranch, false);
 						// Iterator<IJavaElement> eleitr = eles.iterator();
 						// while (eleitr.hasNext()) {

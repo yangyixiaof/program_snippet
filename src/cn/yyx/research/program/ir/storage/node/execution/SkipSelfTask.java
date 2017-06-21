@@ -8,6 +8,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
+import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.exception.ConflictConnectionDetailException;
 import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
@@ -25,7 +26,11 @@ public class SkipSelfTask extends IIRNodeTask {
 			FullTrace ft) {
 		// Solved. need to handle IRForOneRawMethodBarrier.
 		
+		
 		// debugging.
+		if (source.toString().trim().endsWith(IRMeta.VirtualBranch + "#1")) {
+			System.currentTimeMillis();
+		}
 		if (source.toString().trim().startsWith("y^Op:@LeftAssign")) {
 			System.currentTimeMillis();
 		}
@@ -35,6 +40,7 @@ public class SkipSelfTask extends IIRNodeTask {
 		if (target.toString().trim().startsWith("y^Op:*")) {
 			System.currentTimeMillis();
 		}
+		
 		
 		int final_type = TaskExecutionHelper.ComputeFinalType(source, target, connect_info);
 		

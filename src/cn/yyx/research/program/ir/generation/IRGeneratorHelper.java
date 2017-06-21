@@ -218,6 +218,11 @@ public class IRGeneratorHelper {
 			String code, boolean handle_same_operations) {
 		return GenerateGeneralIR(irgfob, temp_statement_set, code, DefaultINodeTask.class, handle_same_operations);
 	}
+	
+//	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement> temp_statement_set, 
+//			String code, Class<? extends IIRNodeTask> task_class, boolean handle_same_operations) {
+//		return GenerateGeneralIR(irgfob, temp_statement_set, code, task_class, handle_same_operations);
+//	}
 
 	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, 
 			String code, Class<? extends IIRNodeTask> task_class, boolean handle_same_operations) {

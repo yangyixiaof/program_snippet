@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.IJavaElement;
 
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
+import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.connection.EdgeTypeUtil;
@@ -177,6 +178,12 @@ public class FullTrace implements IVNodeContainer {
 	
 	public void NodeCreated(IJavaElement ije, DynamicNode source_dn, DynamicNode new_dn, BranchControlForOneIRCode bcfir)
 	{
+		
+		// debugging.
+		if (new_dn.toString().trim().endsWith(IRMeta.VirtualBranch + "#1")) {
+			System.currentTimeMillis();
+		}
+		
 		IRForOneInstruction instr = new_dn.getInstr();
 		if (instr instanceof IRForOneBranchControl) {
 			return;

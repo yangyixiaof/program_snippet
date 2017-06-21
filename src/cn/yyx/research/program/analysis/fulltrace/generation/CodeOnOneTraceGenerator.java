@@ -169,8 +169,15 @@ public class CodeOnOneTraceGenerator {
 				System.exit(1);
 			}
 			IRForOneBranchControl ir_control = (IRForOneBranchControl) irfoi;
+			ExecutionMemory execution_memory_clone = null;
+			try {
+				execution_memory_clone = (ExecutionMemory)execution_memory.clone();
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 			DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, ir_control, irfom,
-					execution_memory, env_idx, false, null);
+					execution_memory_clone, env_idx, false, null);
 		}
 		branch_control.Pop();
 	}
