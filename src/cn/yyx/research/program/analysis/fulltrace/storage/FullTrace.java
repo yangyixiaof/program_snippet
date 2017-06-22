@@ -135,10 +135,11 @@ public class FullTrace implements IVNodeContainer {
 			System.err.println("Strange! created_nodes do not contain source_dn:" + source_dn);
 			System.exit(1);
 		}
+		
+		// IRForOneBranchControl is not needed to be handled.
 		if (instr instanceof IRForOneBranchControl) {
 			return;
 		}
-		
 		// real logics.
 		HandleAddConnection(conn.GetTarget(), conn.GetSource(), conn, in_conns);
 		HandleAddConnection(conn.GetSource(), conn.GetTarget(), conn, out_conns);
@@ -180,6 +181,12 @@ public class FullTrace implements IVNodeContainer {
 	{
 		
 		// debugging.
+		if (new_dn.toString().trim().endsWith("System.out" + "#1")) {
+			System.currentTimeMillis();
+		}
+		if (source_dn != null && source_dn.toString().trim().endsWith("System.out" + "#1")) {
+			System.currentTimeMillis();
+		}
 		if (new_dn.toString().trim().endsWith(IRMeta.VirtualBranch + "#1")) {
 			System.currentTimeMillis();
 		}

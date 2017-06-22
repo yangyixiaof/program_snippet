@@ -179,15 +179,15 @@ public class CodeOnOneTraceGenerator {
 				System.exit(1);
 			}
 			IRForOneBranchControl ir_control = (IRForOneBranchControl) irfoi;
-			ExecutionMemory execution_memory_clone = null;
-			try {
-				execution_memory_clone = (ExecutionMemory)execution_memory.clone();
-			} catch (CloneNotSupportedException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+//			ExecutionMemory execution_memory_clone = null;
+//			try {
+//				execution_memory_clone = (ExecutionMemory)execution_memory.clone();
+//			} catch (CloneNotSupportedException e) {
+//				e.printStackTrace();
+//				System.exit(1);
+//			}
 			DepthFirstToVisitControlLogic(ft, ir_control, irfom,
-					execution_memory_clone, env_idx, false, null);
+					execution_memory, env_idx, false, null);
 			// branch_control_stack_copy, branch_control, 
 		}
 		branch_control.Pop();
@@ -246,7 +246,7 @@ public class CodeOnOneTraceGenerator {
 						System.currentTimeMillis();
 					}
 					
-					Set<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory);
+					List<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory);
 					boolean current_could_continue = (in_conns != null);
 					could_continue = could_continue || current_could_continue;
 					if (in_conns != null) {
@@ -387,16 +387,24 @@ public class CodeOnOneTraceGenerator {
 		System.currentTimeMillis();
 	}
 
-	private Set<StaticConnection> ObtainExecutionPermission(IRForOneInstruction one_instr_pc, ExecutionMemory memory) {
+	private List<StaticConnection> ObtainExecutionPermission(IRForOneInstruction one_instr_pc, ExecutionMemory memory) {
+		List<StaticConnection> result = new LinkedList<StaticConnection>();
 		Set<StaticConnection> in_conns = IRGeneratorForOneProject.GetInstance().GetInConnections(one_instr_pc);
 		Iterator<StaticConnection> iitr = in_conns.iterator();
+		LinkedList<StaticConnection> same_element_conns = new LinkedList<StaticConnection>();
 		while (iitr.hasNext()) {
 			StaticConnection iirn = iitr.next();
 			if (!memory.executed_conns.contains(iirn)) {
 				return null;
 			}
+			if (iirn.getSource().HasSameElement(iirn.getTarget())) {
+				same_element_conns.add(iirn);
+			}
 		}
-		return in_conns;
+		in_conns.removeAll(same_element_conns);
+		result.addAll(same_element_conns);
+		result.addAll(in_conns);
+		return result;
 	}
 
 	private void HandleCallerToCallee(IRCode irc, IRForOneSourceMethodInvocation wrap_node, FullTrace ft_run,

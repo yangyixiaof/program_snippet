@@ -91,4 +91,8 @@ public abstract class IRForOneInstruction implements IIREnergyNode, IVNode {
 		this.group = group;
 	}
 	
+	public boolean HasSameElement(IRForOneInstruction irfoi) {
+		return im.equals(irfoi.im);
+	}
+	
 }

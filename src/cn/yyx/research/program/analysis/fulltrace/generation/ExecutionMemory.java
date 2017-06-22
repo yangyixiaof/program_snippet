@@ -2,7 +2,6 @@ package cn.yyx.research.program.analysis.fulltrace.generation;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,18 +20,18 @@ public class ExecutionMemory {
 	public ExecutionMemory() {
 	}
 	
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		ExecutionMemory em = new ExecutionMemory();
-		em.executed_conns.addAll(executed_conns);
-		em.executed_conns.addAll(executed_conns);
-		Set<IJavaElement> lkeys = last_waiting_execution.keySet();
-		Iterator<IJavaElement> lkitr = lkeys.iterator();
-		while (lkitr.hasNext()) {
-			IJavaElement lk_ije = lkitr.next();
-			em.last_waiting_execution.put(lk_ije, new HashSet<IRForOneInstruction>(last_waiting_execution.get(lk_ije)));
-		}
-		return em;
-	}
+//	@Override
+//	public Object clone() throws CloneNotSupportedException {
+//		ExecutionMemory em = new ExecutionMemory();
+//		em.executed_conns.addAll(executed_conns);
+//		em.executed_conns.addAll(executed_conns);
+//		Set<IJavaElement> lkeys = last_waiting_execution.keySet();
+//		Iterator<IJavaElement> lkitr = lkeys.iterator();
+//		while (lkitr.hasNext()) {
+//			IJavaElement lk_ije = lkitr.next();
+//			em.last_waiting_execution.put(lk_ije, new HashSet<IRForOneInstruction>(last_waiting_execution.get(lk_ije)));
+//		}
+//		return em;
+//	}
 
 }
