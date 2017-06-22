@@ -27,6 +27,6 @@ public class TodoList {
 	// Solved. designs such as temp_statement_expression_environment_set do have problems.
 	
 	// Solved. what is op:nothing.????? This has been changed to @VirtualBranch.
-	// TODO full trace branch codes are not right.
+	// Solved. full trace branch codes are not right.
 	
 }
