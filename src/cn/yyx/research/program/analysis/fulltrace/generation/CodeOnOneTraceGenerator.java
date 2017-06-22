@@ -95,35 +95,45 @@ public class CodeOnOneTraceGenerator {
 		// List<IRForOneBranchControl> new_list =
 		// branch_control_stack.subList(0, last_size);
 		
+		ExecutionMemory memory = new ExecutionMemory();
+		
+		DepthFirstToVisitControlLogic(ft, control_root, irfom, memory,
+				env_idx, true, now_instruction);
+
+		
+		method_id.get(irfom).pop();
+	}
+	
+	private Stack<BranchControlForOneIRCode> EnterOneBranch(IRCode irfom) {
 		Stack<BranchControlForOneIRCode> branch_control_stack = branch_control_stack_foreach_ircode.get(irfom);
 		if (branch_control_stack == null) {
 			branch_control_stack = new Stack<BranchControlForOneIRCode>();
 			branch_control_stack_foreach_ircode.put(irfom, branch_control_stack);
 		}
-
-		Stack<BranchControlForOneIRCode> branch_control_stack_copy = new Stack<BranchControlForOneIRCode>();
-		branch_control_stack_copy.addAll(branch_control_stack);
+		
 		BranchControlForOneIRCode branch_control = new BranchControlForOneIRCode(irfom);
 		branch_control_stack.push(branch_control);
 		branch_control_stack_total.push(branch_control);
-		
-		ExecutionMemory memory = new ExecutionMemory();
-		
-		DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, control_root, irfom, memory,
-				env_idx, true, now_instruction);
-
+		return branch_control_stack;
+	}
+	
+	private void ExitOneBranch(Stack<BranchControlForOneIRCode> branch_control_stack) {
 		BranchControlForOneIRCode pop = branch_control_stack_total.pop();
 		if (!branch_control_stack_total.isEmpty()) {
 			branch_control_stack_total.peek().InheritFromExecutedIRCode(pop);
 		}
 		branch_control_stack.pop();
-		method_id.get(irfom).pop();
 	}
 
-	private void DepthFirstToVisitControlLogic(FullTrace ft, Stack<BranchControlForOneIRCode> branch_control_stack_copy,
-			BranchControlForOneIRCode branch_control, IRForOneBranchControl now_control_root, IRCode irfom,
+	private void DepthFirstToVisitControlLogic(FullTrace ft, IRForOneBranchControl now_control_root, IRCode irfom,
 			ExecutionMemory execution_memory, int env_idx, boolean first_level, IRForOneSourceMethodInvocation now_instruction) {
 		Set<IRForOneBranchControl> already_visited = new HashSet<IRForOneBranchControl>();
+
+		Stack<BranchControlForOneIRCode> branch_control_stack = EnterOneBranch(irfom);
+		Stack<BranchControlForOneIRCode> branch_control_stack_copy = new Stack<BranchControlForOneIRCode>();
+		branch_control_stack_copy.addAll(branch_control_stack.subList(0, branch_control_stack.size()-1));
+		BranchControlForOneIRCode branch_control = branch_control_stack.peek();
+		
 		branch_control.Push(now_control_root);
 		
 		// judge whether we should continue, mainly for recursive functions.
@@ -176,10 +186,12 @@ public class CodeOnOneTraceGenerator {
 				e.printStackTrace();
 				System.exit(1);
 			}
-			DepthFirstToVisitControlLogic(ft, branch_control_stack_copy, branch_control, ir_control, irfom,
+			DepthFirstToVisitControlLogic(ft, ir_control, irfom,
 					execution_memory_clone, env_idx, false, null);
+			// branch_control_stack_copy, branch_control, 
 		}
 		branch_control.Pop();
+		ExitOneBranch(branch_control_stack);
 	}
 	
 	private void HandleFieldIRCode(IType it, FullTrace ft) {
