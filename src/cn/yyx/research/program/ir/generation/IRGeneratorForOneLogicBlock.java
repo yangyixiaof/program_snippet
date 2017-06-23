@@ -753,13 +753,13 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		while (itr.hasNext()) {
 			IJavaElement ije = itr.next();
 			IRForOneInstruction irfop = (IRForOneInstruction) IRGeneratorHelper.CreateIRInstruction(this,
-					// here SkipSelfTask.class no need to handle same operations. the code has been commented.
+					// here SkipSelfTask.class no need to handle same operations. the code has been commented as below-l.
 					IRForOneOperation.class, new Object[] { irc, ije, IRMeta.BranchOver, SkipSelfTask.class });
 			ops.add(irfop);
 			List<NodeConnectionDetailPair> merge_list = merge.get(ije);
 			MergeListParallelToOne(merge_list, ije, irfop);
 		}
-		// IRGeneratorHelper.HandleEachElementInSameOperationDependency(ops);
+		// below-l: IRGeneratorHelper.HandleEachElementInSameOperationDependency(ops);
 		merge.clear();
 	}
 
