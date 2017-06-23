@@ -24,7 +24,6 @@ import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.element.ControlLogicHolderElement;
 import cn.yyx.research.program.ir.element.SourceMethodHolderElement;
 import cn.yyx.research.program.ir.element.UncertainReferenceElement;
-import cn.yyx.research.program.ir.element.UnresolvedNameOrFieldAccessElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.element.VirtualDefinedElement;
 import cn.yyx.research.program.ir.generation.state.IJavaElementState;
@@ -1761,7 +1760,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		// IJavaElementState state = null;
 		IJavaElementState bind_state = HandleBinding(ib, node);
 		if (bind_state == IJavaElementState.HandledWrong) {
-			HandleIJavaElement(new UnresolvedNameOrFieldAccessElement(node.toString()), node);
+			HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchUnresolvedNameOrFieldAccessElement(node.toString()), node);
 		}
 		// handle_binding_state.put(node, state);
 		return super.visit(node);
@@ -1787,7 +1786,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		// state == IJavaElementState.HandledSuccessful || state ==
 		// IJavaElementState.NoNeedToHandle
 		if (state == IJavaElementState.HandledWrong) {
-			HandleIJavaElement(new UnresolvedNameOrFieldAccessElement(node.toString()), node);
+			HandleIJavaElement(IRGeneratorForOneProject.GetInstance().FetchUnresolvedNameOrFieldAccessElement(node.toString()), node);
 		}
 		// HandleType(node.resolveBinding(), node.toString(), node);
 		super.visit(node);
