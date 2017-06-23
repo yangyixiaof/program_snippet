@@ -19,6 +19,7 @@ import cn.yyx.research.program.analysis.fulltrace.storage.BranchControlForOneIRC
 import cn.yyx.research.program.analysis.fulltrace.storage.FullTrace;
 import cn.yyx.research.program.analysis.fulltrace.storage.connection.DynamicConnection;
 import cn.yyx.research.program.analysis.fulltrace.storage.node.DynamicNode;
+import cn.yyx.research.program.ir.IRMeta;
 import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
@@ -380,6 +381,12 @@ public class CodeOnOneTraceGenerator {
 				precise_task.HandleOutConnection(precise_source_dn, target_dn, sc_info, ft);
 			}
 		} else {
+			
+			// debugging.
+			if (source.toString().endsWith(IRMeta.BranchOver)) {
+				System.currentTimeMillis();
+			}
+			
 			out_task.HandleOutConnection(source_dn, target_dn, sc_info, ft);
 		}
 		

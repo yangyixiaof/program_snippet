@@ -315,6 +315,7 @@ public class IRGeneratorHelper {
 	 * @return
 	 */
 	public static void GenerateBinaryORUnResolvedMethodIR(IRGeneratorForOneLogicBlock irgfob, List<Expression> new_all_list, List<IRForOneInstruction> ops) {
+		// this method just add connections.
 		Map<IJavaElement, IRForOneInstruction> last_op = new HashMap<IJavaElement, IRForOneInstruction>();
 		Iterator<IRForOneInstruction> opsitr = ops.iterator();
 		while (opsitr.hasNext()) {

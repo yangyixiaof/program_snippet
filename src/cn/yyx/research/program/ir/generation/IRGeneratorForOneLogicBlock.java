@@ -30,6 +30,7 @@ import cn.yyx.research.program.ir.generation.state.IJavaElementState;
 import cn.yyx.research.program.ir.generation.state.NodeIJavaElement;
 import cn.yyx.research.program.ir.generation.state.NodeIJavaElementStack;
 import cn.yyx.research.program.ir.generation.structure.ElementBranchInfo;
+import cn.yyx.research.program.ir.generation.structure.IElementASTNodeHappen;
 import cn.yyx.research.program.ir.generation.structure.IndexInfoRunner;
 import cn.yyx.research.program.ir.generation.structure.NodeConnectionDetailPair;
 import cn.yyx.research.program.ir.generation.traversal.task.IRASTNodeTask;
@@ -108,7 +109,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	// HashSet<IJavaElement>();
 	// protected HashMap<IJavaElement, Integer> all_count = new
 	// HashMap<IJavaElement, Integer>();
-	protected HashMap<IJavaElement, ASTNode> all_happen = new HashMap<IJavaElement, ASTNode>();
+	protected IElementASTNodeHappen all_happen = new IElementASTNodeHappen();
 
 	protected InfixExpression most_parent_infix = null;
 	protected Map<IJavaElement, Set<IRForOneInstruction>> instrs_under_most_parent_infix = new HashMap<IJavaElement, Set<IRForOneInstruction>>();
@@ -335,17 +336,22 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	}
 
 	// method invocation.
+	
+	private ASTNode WholeElementIsAnExpression(IJavaElement ije) {
+		return all_happen.GetASTNodeByIElement(ije);
+	}
 
 	private IJavaElement WholeExpressionIsAnElement(ASTNode expr) {
-		Iterator<IJavaElement> titr = CurrentElements().iterator();
-		while (titr.hasNext()) {
-			IJavaElement ije = titr.next();
-			ASTNode happen = all_happen.get(ije);
-			if (happen != null && expr.equals(happen)) {
-				return ije;
-			}
-		}
-		return null;
+		return all_happen.GetIElementByASTNode(expr);
+//		Iterator<IJavaElement> titr = CurrentElements().iterator();
+//		while (titr.hasNext()) {
+//			IJavaElement ije = titr.next();
+//			ASTNode happen = all_happen.get(ije);
+//			if (happen != null && expr.equals(happen)) {
+//				return ije;
+//			}
+//		}
+//		return null;
 	}
 
 	protected HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>> method_parameter_element_instr_order = new HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>>();
@@ -461,7 +467,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 
 			// add barriers and corresponding sequential edges.
 			List<IRForOneInstruction> ops = IRGeneratorHelper.GenerateGeneralIR(this, curr_eles,
-					IRMeta.MethodInvocation + identifier, SkipSelfTask.class, IRForOneMethodBarrier.class);
+					IRMeta.MethodInvocation + identifier, SkipSelfTask.class, IRForOneMethodBarrier.class, false);
 			Iterator<IRForOneInstruction> opitr = ops.iterator();
 			while (opitr.hasNext()) {
 				IRForOneInstruction irfop = opitr.next();
@@ -471,7 +477,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		} else {
 			// add binary or unresolved method-invoke.
 			List<IRForOneInstruction> ops = IRGeneratorHelper.GenerateGeneralIR(this, curr_eles,
-					IRMeta.MethodInvocation + identifier, SkipSelfTask.class);
+					IRMeta.MethodInvocation + identifier);
 			List<Expression> new_all_list = new LinkedList<Expression>();
 			new_all_list.add(expr);
 			new_all_list.addAll(nlist);
@@ -743,7 +749,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		while (itr.hasNext()) {
 			IJavaElement ije = itr.next();
 			IRForOneInstruction irfop = (IRForOneInstruction) IRGeneratorHelper.CreateIRInstruction(this,
-					IRForOneOperation.class, new Object[] { irc, ije, IRMeta.BranchOver, SkipSelfTask.class });
+					IRForOneOperation.class, new Object[] { irc, ije, IRMeta.BranchOver, SkipSelfTask.class, false });
 			ops.add(irfop);
 			List<NodeConnectionDetailPair> merge_list = merge.get(ije);
 			MergeListParallelToOne(merge_list, ije, irfop);
@@ -1457,8 +1463,11 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		// postVisit(left);
 		Set<IJavaElement> left_ijes = SearchAllElementsInASTNode(left);
 		node_element_memory.remove(left);
-		IRGeneratorHelper.GenerateGeneralIR(this, left_ijes, IRMeta.LeftHandAssign, SkipSelfTask.class);
-
+		if (left_ijes != null && left_ijes.size() == 1 && (WholeElementIsAnExpression(left_ijes.iterator().next()) != null)) {
+			IRGeneratorHelper.GenerateGeneralIR(this, left_ijes, IRMeta.LeftHandAssign, SkipSelfTask.class, false);
+		} else {
+			IRGeneratorHelper.GenerateGeneralIR(this, left_ijes, IRMeta.LeftHandAssign);
+		}
 		// System.err.println("============= start =============");
 		// System.err.println(temp_statement_environment_set);
 		// System.err.println("============= over =============");
@@ -1747,7 +1756,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 
 		// next isolated tasks.
 		// all_count.put(jele, -1);
-		all_happen.put(jele, happen);
+		all_happen.PutHappen(jele, happen);
 		// temp_statement_environment_set.add(jele);
 		// temp_statement_expression_environment_set.add(jele);
 		CurrentElements().add(jele);
