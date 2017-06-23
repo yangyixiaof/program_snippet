@@ -337,8 +337,12 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 
 	// method invocation.
 	
-	private ASTNode WholeElementIsAnExpression(IJavaElement ije) {
-		return all_happen.GetASTNodeByIElement(ije);
+	private boolean WholeElementIsAnExpression(IJavaElement ije, ASTNode node) {
+		ASTNode n = all_happen.GetASTNodeByIElement(ije);
+		if (n != null && n.equals(node)) {
+			return true;
+		}
+		return false;
 	}
 
 	private IJavaElement WholeExpressionIsAnElement(ASTNode expr) {
@@ -1463,7 +1467,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		// postVisit(left);
 		Set<IJavaElement> left_ijes = SearchAllElementsInASTNode(left);
 		node_element_memory.remove(left);
-		if (left_ijes != null && left_ijes.size() == 1 && (WholeElementIsAnExpression(left_ijes.iterator().next()) != null)) {
+		if (left_ijes != null && left_ijes.size() == 1 && (WholeElementIsAnExpression(left_ijes.iterator().next(), left))) {
 			IRGeneratorHelper.GenerateGeneralIR(this, left_ijes, IRMeta.LeftHandAssign, SkipSelfTask.class, false);
 		} else {
 			IRGeneratorHelper.GenerateGeneralIR(this, left_ijes, IRMeta.LeftHandAssign);
