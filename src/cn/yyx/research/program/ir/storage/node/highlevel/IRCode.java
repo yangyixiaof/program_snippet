@@ -23,7 +23,8 @@ public abstract class IRCode {
 
 	// protected Map<IJavaElement, Set<IJavaElement>> deps = new HashMap<IJavaElement, Set<IJavaElement>>();
 	protected Map<IJavaElement, IRTreeForOneElement> irs = new HashMap<IJavaElement, IRTreeForOneElement>();
-	protected Map<IJavaElement, IRForOneInstruction> out_nodes = new HashMap<IJavaElement, IRForOneInstruction>();
+	protected Map<IJavaElement, Set<IRForOneInstruction>> return_nodes = new HashMap<IJavaElement, Set<IRForOneInstruction>>();
+	protected Map<IJavaElement, Set<IRForOneInstruction>> out_control_nodes = new HashMap<IJavaElement, Set<IRForOneInstruction>>();
 	
 	protected IJavaElement source_method_receiver_element = null;
 	
@@ -45,12 +46,36 @@ public abstract class IRCode {
 		this.setIm(im);
 	}
 	
-	public void PutOutNodes(IJavaElement ijele, IRForOneInstruction irfoi) {
-		out_nodes.put(ijele, irfoi);
+	private void HandlePutOutData(IJavaElement ijele, IRForOneInstruction irfoi, Map<IJavaElement, Set<IRForOneInstruction>> nodes) {
+		Set<IRForOneInstruction> irset = nodes.get(ijele);
+		if (irset == null) {
+			irset = new HashSet<IRForOneInstruction>();
+			nodes.put(ijele, irset);
+		}
+		irset.add(irfoi);
 	}
 	
-	public Map<IJavaElement, IRForOneInstruction> GetOutNodes() {
-		return out_nodes;
+	public void PutReturnNodes(IJavaElement ijele, IRForOneInstruction irfoi) {
+		HandlePutOutData(ijele, irfoi, return_nodes);
+	}
+	
+	public Map<IJavaElement, Set<IRForOneInstruction>> GetReturnNodes() {
+		return return_nodes;
+	}
+	
+	public void PutOutControlNodesByCurrentAllEnvironment() {
+		Map<IJavaElement, IRForOneInstruction> env = CopyEnvironment();
+		Set<IJavaElement> ekeys = env.keySet();
+		Iterator<IJavaElement> eitr = ekeys.iterator();
+		while (eitr.hasNext()) {
+			IJavaElement ije = eitr.next();
+			IRForOneInstruction instr = env.get(ije);
+			HandlePutOutData(ije, instr, out_control_nodes);
+		}
+	}
+	
+	public Map<IJavaElement, Set<IRForOneInstruction>> GetOutControlNodes() {
+		return out_control_nodes;
 	}
 	
 	public Set<IJavaElement> GetAllElements() {

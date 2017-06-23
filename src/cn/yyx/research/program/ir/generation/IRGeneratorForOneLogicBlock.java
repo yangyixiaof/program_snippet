@@ -40,7 +40,6 @@ import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.connection.StaticConnection;
 import cn.yyx.research.program.ir.storage.connection.detail.InfixExpressionIndexConnection;
 import cn.yyx.research.program.ir.storage.node.execution.DefaultINodeTask;
-import cn.yyx.research.program.ir.storage.node.execution.RequireHandleTask;
 import cn.yyx.research.program.ir.storage.node.execution.SkipSelfTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
@@ -1577,47 +1576,60 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 
 	@Override
 	public boolean visit(ReturnStatement node) {
-		Expression expr = node.getExpression();
-		if (expr != null) {
+//		Expression expr = node.getExpression();
+//		if (expr != null) {
 			// pre_visit_task.put(expr, new Runnable() {
 			// @Override
 			// public void run() {
 			// RecordASTNodePreEnvironment(expr);
 			// }
 			// });
-			post_visit_task.Put(expr, new Runnable() {
-				@Override
-				public void run() {
-					IJavaElement ije = WholeExpressionIsAnElement(expr);
-					if (ije != null) {
-						Iterator<IJavaElement> titr = CurrentElements().iterator();
-						while (titr.hasNext()) {
-							IJavaElement t_ije = titr.next();
-							IRForOneInstruction iru = irc.GetLastIRTreeNode(t_ije);
-							if (iru != null) {
-								iru.SetAcceptType(EdgeBaseType.Self.Value());
-								iru.SetOutConnectionMergeTask(new RequireHandleTask(iru));
-							}
-						}
-					}
-				}
-			});
-		}
+//			post_visit_task.Put(expr, new Runnable() {
+//				@Override
+//				public void run() {
+//					IJavaElement ije = WholeExpressionIsAnElement(expr);
+//					if (ije != null) {
+//						Iterator<IJavaElement> titr = CurrentElements().iterator();
+//						while (titr.hasNext()) {
+//							IJavaElement t_ije = titr.next();
+//							IRForOneInstruction iru = irc.GetLastIRTreeNode(t_ije);
+//							if (iru != null) {
+//								iru.SetAcceptType(EdgeBaseType.Self.Value());
+//								iru.SetOutConnectionMergeTask(new RequireHandleTask(iru));
+//							}
+//						}
+//					}
+//				}
+//			});
+//		}
 		// CompareASTNodePreEnvironmentToJudgeIfDirectTransfer
 		return super.visit(node);
 	}
 
 	@Override
 	public void endVisit(ReturnStatement node) {
+		IRGeneratorHelper.GenerateGeneralIR(this, IRMeta.Return, SkipSelfTask.class);
+		Expression expr = node.getExpression();
+		if (expr != null) {
+			IJavaElement ije = WholeExpressionIsAnElement(expr);
+			if (ije != null) {
+				IRForOneInstruction iru = irc.GetLastIRTreeNode(ije);
+				if (iru != null) {
+					iru.SetAcceptType(EdgeBaseType.Self.Value());
+				}
+			}
+		}
 		// IRGeneratorHelper.GenerateGeneralIR(this, node, IRMeta.Return);
 		Iterator<IJavaElement> titr = CurrentElements().iterator();
 		while (titr.hasNext()) {
 			IJavaElement ije = titr.next();
 			IRForOneInstruction iru = irc.GetLastIRTreeNode(ije);
 			if (iru != null) {
-				irc.PutOutNodes(ije, iru);
+				irc.PutReturnNodes(ije, iru);
 			}
 		}
+		
+		irc.PutOutControlNodesByCurrentAllEnvironment();
 	}
 
 	// need to handle data_dependency.
