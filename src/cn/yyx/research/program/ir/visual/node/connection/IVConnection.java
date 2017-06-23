@@ -18,6 +18,12 @@ public class IVConnection {
 	@Override
 	public int hashCode() {
 		int result = getSource().hashCode();
+		
+		// debugging.
+		if (getTarget() == null) {
+			System.err.println("source:" + source + ";target:" + target + ";info:" + info);
+		}
+		
 		result = result*31 + getTarget().hashCode();
 		result = result*31 + getInfo().hashCode();
 		return result;
@@ -39,7 +45,7 @@ public class IVConnection {
 		return source;
 	}
 
-	public void setSource(IVNode source) {
+	private void setSource(IVNode source) {
 		this.source = source;
 	}
 
@@ -47,7 +53,7 @@ public class IVConnection {
 		return target;
 	}
 
-	public void setTarget(IVNode target) {
+	private void setTarget(IVNode target) {
 		this.target = target;
 	}
 
@@ -55,7 +61,7 @@ public class IVConnection {
 		return info;
 	}
 
-	public void setInfo(ConnectionInfo info) {
+	private void setInfo(ConnectionInfo info) {
 		this.info = info;
 	}
 	

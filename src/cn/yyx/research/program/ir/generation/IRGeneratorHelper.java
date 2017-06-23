@@ -60,6 +60,13 @@ public class IRGeneratorHelper {
 
 	public static Object CreateIRInstruction(IRGeneratorForOneLogicBlock irgfob, Class<?> cls, Object[] objs) {
 		IRForOneInstruction now = (IRForOneInstruction) ReflectionInvoke.InvokeConstructor(cls, objs);
+		
+		// checking.
+		if (now == null) {
+			System.err.println("Instruction Creation is null! Serious error, the system will exit.");
+			System.exit(1);
+		}
+		
 		HandleInstructionsUnderParentInfix(irgfob, now);
 		return now;
 	}

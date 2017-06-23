@@ -199,6 +199,12 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 	public void RegistConnection(StaticConnection conn) {
 		IRForOneInstruction source = conn.getSource();
 		IRForOneInstruction target = conn.getTarget();
+		
+		// debugging.
+		if (target == null) {
+			Math.abs(0);
+		}
+		
 		OneDirectionRegist(conn, target, source, in_connects);
 		OneDirectionRegist(conn, source, target, out_connects);
 	}

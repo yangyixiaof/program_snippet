@@ -746,19 +746,20 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		}
 	}
 
-	private void HandleMerge(ASTNode all_in_control) {
+	private void HandleMergeInBranch(ASTNode all_in_control) {
 		List<IRForOneInstruction> ops = new LinkedList<IRForOneInstruction>();
 		Map<IJavaElement, List<NodeConnectionDetailPair>> merge = node_to_merge.remove(all_in_control);
 		Iterator<IJavaElement> itr = merge.keySet().iterator();
 		while (itr.hasNext()) {
 			IJavaElement ije = itr.next();
 			IRForOneInstruction irfop = (IRForOneInstruction) IRGeneratorHelper.CreateIRInstruction(this,
-					IRForOneOperation.class, new Object[] { irc, ije, IRMeta.BranchOver, SkipSelfTask.class, false });
+					// here SkipSelfTask.class no need to handle same operations. the code has been commented.
+					IRForOneOperation.class, new Object[] { irc, ije, IRMeta.BranchOver, SkipSelfTask.class });
 			ops.add(irfop);
 			List<NodeConnectionDetailPair> merge_list = merge.get(ije);
 			MergeListParallelToOne(merge_list, ije, irfop);
 		}
-		IRGeneratorHelper.HandleEachElementInSameOperationDependency(ops);
+		// IRGeneratorHelper.HandleEachElementInSameOperationDependency(ops);
 		merge.clear();
 	}
 
@@ -767,7 +768,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		control_ir.ExitOneLogicBlock(all_in_control);
 		PopBranchInstructionOrder();
 		switch_record.remove(all_in_control);
-		HandleMerge(all_in_control);
+		HandleMergeInBranch(all_in_control);
 	}
 
 	@Override
