@@ -281,6 +281,15 @@ public abstract class IRCode {
 			irs.remove(ije);
 		}
 	}
+
+	public boolean IsOutControl(IRForOneInstruction instr) {
+		IJavaElement ije = instr.getIm();
+		Set<IRForOneInstruction> out_instrs = out_control_nodes.get(ije);
+		if (out_instrs != null && out_instrs.contains(instr)) {
+			return true;
+		}
+		return false;
+	}
 	
 //	private void AddDependency(IIRNode source, IIRNode target, EdgeConnectionType et) {
 //		Set<StaticConnection> rset = in_connects.get(target);

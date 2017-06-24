@@ -96,5 +96,18 @@ public class BranchControlForOneIRCode {
 	public void InheritFromExecutedIRCode(BranchControlForOneIRCode executed) {
 		MapSetUtil.HandleTwoMapSet(last_instrs.peek(), executed.out_last_instrs);
 	}
+
+	public void HandleOutControl(DynamicNode new_dn) {
+		IRForOneInstruction instr = new_dn.getInstr();
+		if (parent_env.IsOutControl(instr)) {
+			IJavaElement ije = instr.getIm();
+			Set<DynamicNode> out_nodes = out_last_instrs.get(ije);
+			if (out_nodes == null) {
+				out_nodes = new HashSet<DynamicNode>();
+			}
+			out_last_instrs.put(ije, out_nodes);
+			out_nodes.add(new_dn);
+		}
+	}
 	
 }

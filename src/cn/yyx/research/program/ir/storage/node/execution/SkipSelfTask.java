@@ -29,16 +29,16 @@ public class SkipSelfTask extends IIRNodeTask {
 		
 		// debugging.
 		if (source.toString().trim().endsWith(IRMeta.VirtualBranch + "#1")) {
-			System.currentTimeMillis();
+			Math.abs(0);
 		}
 		if (source.toString().trim().startsWith("y^Op:@LeftAssign")) {
-			System.currentTimeMillis();
+			Math.abs(0);
 		}
 		if (source.toString().trim().startsWith("y^Op:+")) {
-			System.currentTimeMillis();
+			Math.abs(0);
 		}
 		if (target.toString().trim().startsWith("y^Op:*")) {
-			System.currentTimeMillis();
+			Math.abs(0);
 		}
 		
 		
@@ -106,7 +106,7 @@ public class SkipSelfTask extends IIRNodeTask {
 //			}
 //			ft.RemoveConnection(conn);
 		}
-		System.currentTimeMillis();
+		Math.abs(0);
 	}
 	
 }

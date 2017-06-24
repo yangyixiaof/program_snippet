@@ -77,7 +77,7 @@ public class CodeOnOneTraceGenerator {
 		// Debugging.
 		DebugLogger.Error("FullTrace Generation, is_root:" + is_root + ";irfom:" + irfom.getIm().getElementName() + ";is_field_code:" + (!is_root && now_instruction == null)
 				+ ";env_idx:" + env_idx);
-		System.currentTimeMillis();
+		Math.abs(0);
 
 		Stack<Map<IRForOneSourceMethodInvocation, Integer>> id_stack = method_id.get(irfom);
 		if (id_stack == null) {
@@ -191,6 +191,12 @@ public class CodeOnOneTraceGenerator {
 					execution_memory, env_idx, false, null);
 			// branch_control_stack_copy, branch_control, 
 		}
+		
+		if (first_level) {
+			// TODO handle out control nodes related to return.
+			
+		}
+		
 		branch_control.Pop();
 		ExitOneBranch(branch_control_stack);
 	}
@@ -240,11 +246,11 @@ public class CodeOnOneTraceGenerator {
 					
 					//debugging.
 					if (inode.toString().startsWith("@Sentinel_URE#")) {
-						System.currentTimeMillis();
+						Math.abs(0);
 					}
 					// debugging.
 					if (inode.toString().startsWith("y^Op:@LeftAssign")) {
-						System.currentTimeMillis();
+						Math.abs(0);
 					}
 					
 					List<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory);
@@ -254,7 +260,7 @@ public class CodeOnOneTraceGenerator {
 						
 						// debugging.
 						if (inode.toString().startsWith("y^Op:*")) {
-							System.currentTimeMillis();
+							Math.abs(0);
 						}
 						
 						if (inode instanceof IRForOneSourceMethodInvocation) {
@@ -271,7 +277,7 @@ public class CodeOnOneTraceGenerator {
 						
 						// debugging.
 						if (inode.toString().startsWith("x^Op:*") || inode.toString().startsWith("y^Op:*")) {
-							System.currentTimeMillis();
+							Math.abs(0);
 						}
 						
 						Set<StaticConnection> inode_out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(inode);
@@ -287,7 +293,7 @@ public class CodeOnOneTraceGenerator {
 							
 							// debugging.
 							if (oiri.toString().startsWith("y^Op:*")) {
-								System.currentTimeMillis();
+								Math.abs(0);
 							}
 							
 							if (!memory.executed_nodes.contains(oiri)) {
@@ -370,8 +376,12 @@ public class CodeOnOneTraceGenerator {
 			IRForOneSourceMethodInvocation irmethod_source = (IRForOneSourceMethodInvocation) source;
 			IMethod select_im = method_selection.GetMethodSelection(irmethod_source);
 			IRForOneMethod im = IRGeneratorForOneProject.GetInstance().FetchIMethodIR(select_im);
-			Map<IJavaElement, IRForOneInstruction> out_nodes = im.GetOutNodes();
-			Collection<IRForOneInstruction> ovals = out_nodes.values();
+			Set<IRForOneInstruction> ovals = new HashSet<IRForOneInstruction>();
+			Map<IJavaElement, Set<IRForOneInstruction>> out_nodes = im.GetReturnNodes();
+			Collection<Set<IRForOneInstruction>> ovals_set = out_nodes.values();
+			for (Set<IRForOneInstruction> one_ovals : ovals_set) {
+				ovals.addAll(one_ovals);
+			}
 			Iterator<IRForOneInstruction> oitr = ovals.iterator();
 			while (oitr.hasNext()) {
 				IRForOneInstruction irfoi = oitr.next();
@@ -384,14 +394,14 @@ public class CodeOnOneTraceGenerator {
 			
 			// debugging.
 			if (source.toString().endsWith(IRMeta.BranchOver)) {
-				System.currentTimeMillis();
+				Math.abs(0);
 			}
 			
 			out_task.HandleOutConnection(source_dn, target_dn, sc_info, ft);
 		}
 		
 		DebugShowDotPic.ShowPicForTrace(ft);
-		System.currentTimeMillis();
+		Math.abs(0);
 	}
 
 	private List<StaticConnection> ObtainExecutionPermission(IRForOneInstruction one_instr_pc, ExecutionMemory memory) {

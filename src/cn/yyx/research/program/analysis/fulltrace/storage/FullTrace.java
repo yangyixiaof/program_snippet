@@ -182,13 +182,13 @@ public class FullTrace implements IVNodeContainer {
 		
 		// debugging.
 		if (new_dn.toString().trim().endsWith("System.out" + "#1")) {
-			System.currentTimeMillis();
+			Math.abs(0);
 		}
 		if (source_dn != null && source_dn.toString().trim().endsWith("System.out" + "#1")) {
-			System.currentTimeMillis();
+			Math.abs(0);
 		}
 		if (new_dn.toString().trim().endsWith(IRMeta.VirtualBranch + "#1")) {
-			System.currentTimeMillis();
+			Math.abs(0);
 		}
 		
 		IRForOneInstruction instr = new_dn.getInstr();
@@ -201,6 +201,7 @@ public class FullTrace implements IVNodeContainer {
 			ele_nodes.put(ije, nset);
 		}
 		if (!nset.contains(new_dn)) {
+			bcfir.HandleOutControl(new_dn);
 			nset.add(new_dn);
 			Set<DynamicNode> last_dns = bcfir.LastLastInstructions(ije);
 			if (!last_dns.isEmpty()) {
