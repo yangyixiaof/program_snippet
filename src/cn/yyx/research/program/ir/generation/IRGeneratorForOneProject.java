@@ -39,6 +39,7 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneField;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneReturn;
 import cn.yyx.research.program.ir.visual.node.IVNode;
 import cn.yyx.research.program.ir.visual.node.connection.IVConnection;
 import cn.yyx.research.program.ir.visual.node.container.IVNodeContainer;
@@ -200,6 +201,11 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 
 	public void RegistConnection(StaticConnection conn) {
 		IRForOneInstruction source = conn.getSource();
+		
+		if (source instanceof IRForOneReturn) {
+			return;
+		}
+		
 		IRForOneInstruction target = conn.getTarget();
 		
 		// debugging.

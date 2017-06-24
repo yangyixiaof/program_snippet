@@ -44,6 +44,7 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
+import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneReturn;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 
 public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
@@ -1613,7 +1614,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 
 	@Override
 	public void endVisit(ReturnStatement node) {
-		IRGeneratorHelper.GenerateGeneralIR(this, IRMeta.Return, SkipSelfTask.class, false);
+		IRGeneratorHelper.GenerateGeneralIR(this, IRMeta.Return, SkipSelfTask.class, IRForOneReturn.class, false);
 		Expression expr = node.getExpression();
 		if (expr != null) {
 			IJavaElement ije = WholeExpressionIsAnElement(expr);
