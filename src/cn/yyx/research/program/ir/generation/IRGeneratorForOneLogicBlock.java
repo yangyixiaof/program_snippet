@@ -23,6 +23,7 @@ import cn.yyx.research.program.ir.ast.ASTSearch;
 import cn.yyx.research.program.ir.bind.BindingManager;
 import cn.yyx.research.program.ir.element.ControlLogicHolderElement;
 import cn.yyx.research.program.ir.element.SourceMethodHolderElement;
+import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
 import cn.yyx.research.program.ir.element.VirtualDefinedElement;
 import cn.yyx.research.program.ir.generation.state.IJavaElementState;
@@ -462,10 +463,23 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		Set<IJavaElement> curr_eles = new HashSet<IJavaElement>(CurrentElements());
 
 		if (now != null) {
-//			UncertainReferenceElement ure = new UncertainReferenceElement(node.toString());
-//			HandleIJavaElement(ure, node);
-//			IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, now);
-
+			boolean handle_return = true;
+			ITypeBinding rt = null;
+			if (imb != null) {
+				rt = imb.getReturnType();
+			}
+			if (rt != null) {
+				if (rt.isPrimitive() && rt.toString().equals("void")) {
+					handle_return = false;
+				}
+			}
+			if (handle_return) {
+				UncertainReferenceElement ure = IRGeneratorForOneProject.GetInstance().FetchUncertainReferenceElementElement(node.toString());
+				// new UncertainReferenceElement();
+				HandleIJavaElement(ure, node);
+				IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, now);
+			}
+			
 			// add barriers and corresponding sequential edges.
 			// List<IRForOneInstruction> ops = IRGeneratorHelper.GenerateGeneralIR(this, curr_eles,
 			// 		IRMeta.MethodInvocation + identifier, SkipSelfTask.class, IRForOneMethodBarrier.class, false);

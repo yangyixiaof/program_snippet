@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import cn.yyx.research.program.eclipse.jdtutil.JDTParser;
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForICompilationUnits;
 import cn.yyx.research.program.ir.element.ConstantUniqueElement;
+import cn.yyx.research.program.ir.element.UncertainReferenceElement;
 import cn.yyx.research.program.ir.element.UnresolvedLambdaUniqueElement;
 import cn.yyx.research.program.ir.element.UnresolvedNameOrFieldAccessElement;
 import cn.yyx.research.program.ir.element.UnresolvedTypeElement;
@@ -53,6 +54,7 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 	private HashMap<IMethod, IRForOneMethod> method_irs = new HashMap<IMethod, IRForOneMethod>();
 
 	private Map<String, UnresolvedTypeElement> unresolved_type_element_cache = new TreeMap<String, UnresolvedTypeElement>();
+	private Map<String, UncertainReferenceElement> uncertain_reference_element_cache = new TreeMap<String, UncertainReferenceElement>();
 	private Map<String, UnresolvedNameOrFieldAccessElement> unresolved_name_or_field_access_element_cache = new TreeMap<String, UnresolvedNameOrFieldAccessElement>();
 	private Map<String, UnresolvedLambdaUniqueElement> unresolved_lambda_unique_element_cache = new TreeMap<String, UnresolvedLambdaUniqueElement>();
 	private Map<String, ConstantUniqueElement> constant_unique_element_cache = new TreeMap<String, ConstantUniqueElement>();
@@ -236,6 +238,15 @@ public class IRGeneratorForOneProject implements IVNodeContainer {
 		if (yce == null) {
 			yce = new UnresolvedTypeElement(represent);
 			unresolved_type_element_cache.put(represent, yce);
+		}
+		return yce;
+	}
+	
+	public UncertainReferenceElement FetchUncertainReferenceElementElement(String represent) {
+		UncertainReferenceElement yce = uncertain_reference_element_cache.get(represent);
+		if (yce == null) {
+			yce = new UncertainReferenceElement(represent);
+			uncertain_reference_element_cache.put(represent, yce);
 		}
 		return yce;
 	}

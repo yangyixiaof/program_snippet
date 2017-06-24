@@ -389,6 +389,8 @@ public class IRGeneratorHelper {
 				element_has_set_branch.SetElementMainBranch(ije);
 			}
 		}
+		
+		// handle one or two branch change.
 		if (element_has_set_branch != null) {
 			if (element_has_set_branch.ElementChanged()) {
 				if (!element_has_set_branch.ChangeIsApplied(ije)) {
