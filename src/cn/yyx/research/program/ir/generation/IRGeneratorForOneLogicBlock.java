@@ -177,6 +177,10 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	public Set<IJavaElement> CurrentElements() {
 		return node_element_stack.Peek().GetIJavaElementSet();
 	}
+	
+	public Set<IJavaElement> AllElements() {
+		return irc.CopyEnvironment().keySet();
+	}
 
 // 	private void UpdateIRControlBranchInstructionOrder() {
 //		source_invocation_barrier.pop();
@@ -1614,7 +1618,7 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 
 	@Override
 	public void endVisit(ReturnStatement node) {
-		IRGeneratorHelper.GenerateGeneralIR(this, IRMeta.Return, SkipSelfTask.class, IRForOneReturn.class, false);
+		IRGeneratorHelper.GenerateGeneralIR(this, AllElements(), IRMeta.Return, SkipSelfTask.class, IRForOneReturn.class, false);
 		Expression expr = node.getExpression();
 		if (expr != null) {
 			IJavaElement ije = WholeExpressionIsAnElement(expr);
@@ -1636,6 +1640,9 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		}
 		
 		irc.PutOutControlNodesByCurrentAllEnvironment();
+		
+		// here is the vital step to handle return, the position to put this statement is just right.
+		CurrentElements().addAll(AllElements());
 	}
 
 	// need to handle data_dependency.
