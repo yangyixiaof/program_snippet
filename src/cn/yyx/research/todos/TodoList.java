@@ -29,4 +29,6 @@ public class TodoList {
 	// Solved. what is op:nothing.????? This has been changed to @VirtualBranch.
 	// Solved. full trace branch codes are not right.
 	
+	// Solved. handle out control nodes related to return. Solved in BranchControlForOneIRCode's Pop and FullTrace's Node Creation.
+	
 }

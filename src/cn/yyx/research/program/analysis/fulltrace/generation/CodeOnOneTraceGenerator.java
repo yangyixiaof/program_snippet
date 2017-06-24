@@ -35,7 +35,6 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneEmptyConstructorInvocation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodBarrier;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSentinel;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 import cn.yyx.research.program.ir.util.IMemberDescriptionHelper;
@@ -192,11 +191,6 @@ public class CodeOnOneTraceGenerator {
 			// branch_control_stack_copy, branch_control, 
 		}
 		
-		if (first_level) {
-			// TODO handle out control nodes related to return.
-			
-		}
-		
 		branch_control.Pop();
 		ExitOneBranch(branch_control_stack);
 	}
@@ -212,105 +206,114 @@ public class CodeOnOneTraceGenerator {
 	}
 
 	private void BreadthFirstToVisitIR(FullTrace ft, ExecutionMemory memory, int env_idx, IRCode irfom) {
+		IJavaElement source_mi = irfom.GetSourceMethodReceiverElement();
+		Set<IJavaElement> source_mi_exe_key = new HashSet<IJavaElement>();
+		Set<IJavaElement> exe_keys = new HashSet<IJavaElement>(memory.last_waiting_execution.keySet());
+		if (memory.last_waiting_execution.containsKey(source_mi)) {
+			source_mi_exe_key.add(source_mi);
+			exe_keys.remove(source_mi);
+		}
 		while (true) {
 			boolean could_continue = false;
-			IJavaElement source_mi = irfom.GetSourceMethodReceiverElement();
-			Set<IJavaElement> exe_key_list = new HashSet<IJavaElement>();
-			Set<IJavaElement> exe_keys = new HashSet<IJavaElement>(memory.last_waiting_execution.keySet());
-			if (memory.last_waiting_execution.containsKey(source_mi)) {
-				exe_key_list.add(source_mi);
-				exe_keys.remove(source_mi);
+			boolean temp_could = false;
+			while (temp_could = BreadthFirstToVisitIRForExecutionIJavaElements(ft, memory, env_idx, source_mi_exe_key)) {
+				could_continue = could_continue || temp_could;
 			}
-			exe_key_list.addAll(exe_keys);
-			Iterator<IJavaElement> exe_itr = exe_key_list.iterator();
-			while (exe_itr.hasNext()) {
-				IJavaElement ije = exe_itr.next();
-				Set<IRForOneInstruction> inodes = memory.last_waiting_execution.get(ije);
-				
-				// debugging code.
-				if (inodes == null) {
-					System.err.println("What!!!!!! inodes is null??????");
-					System.exit(1);
-
-					inodes = new HashSet<IRForOneInstruction>();
-					memory.last_waiting_execution.put(ije, inodes);
-				}
-
-				// Solved. handle operations first, remember to handle
-				// IRForMethodInvocation which is totally different.
-				Set<IRForOneInstruction> inodes_remove = new HashSet<IRForOneInstruction>();
-				Set<IRForOneInstruction> inodes_add = new HashSet<IRForOneInstruction>();
-				Iterator<IRForOneInstruction> iitr = inodes.iterator();
-				while (iitr.hasNext()) {
-					IRForOneInstruction inode = iitr.next();
-					
-					//debugging.
-					if (inode.toString().startsWith("@Sentinel_URE#")) {
-						Math.abs(0);
-					}
-					// debugging.
-					if (inode.toString().startsWith("y^Op:@LeftAssign")) {
-						Math.abs(0);
-					}
-					
-					List<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory);
-					boolean current_could_continue = (in_conns != null);
-					could_continue = could_continue || current_could_continue;
-					if (in_conns != null) {
-						
-						// debugging.
-						if (inode.toString().startsWith("y^Op:*")) {
-							Math.abs(0);
-						}
-						
-						if (inode instanceof IRForOneSourceMethodInvocation) {
-							HandleStaticConnectionForTargetMethod(ft, (IRForOneSourceMethodInvocation) inode);
-						} else {
-							Iterator<StaticConnection> in_itr = in_conns.iterator();
-							while (in_itr.hasNext()) {
-								StaticConnection sc = in_itr.next();
-								HandleStaticConnectionForSource(ft, sc.getSource(), sc.getTarget(),
-										sc.GetStaticConnectionInfo(), env_idx);
-							}
-						}
-						HandleStaticConnectionForTheSameOperation(ft, memory, inode, env_idx);
-						
-						// debugging.
-						if (inode.toString().startsWith("x^Op:*") || inode.toString().startsWith("y^Op:*")) {
-							Math.abs(0);
-						}
-						
-						Set<StaticConnection> inode_out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(inode);
-						memory.executed_conns.addAll(inode_out_conns);
-						// inodes.remove(inode);
-						inodes_remove.add(inode);
-						memory.executed_nodes.add(inode);
-						Set<IRForOneInstruction> outinodes = IRGeneratorForOneProject.GetInstance()
-								.GetOutINodesByContainingSpecificType(inode, EdgeBaseType.Self.Value());
-						Iterator<IRForOneInstruction> oitr = outinodes.iterator();
-						while (oitr.hasNext()) {
-							IRForOneInstruction oiri = oitr.next();
-							
-							// debugging.
-							if (oiri.toString().startsWith("y^Op:*")) {
-								Math.abs(0);
-							}
-							
-							if (!memory.executed_nodes.contains(oiri)) {
-								inodes_add.add(oiri);
-								// inodes.add(oiri);
-							}
-						}
-					}
-				}
-				inodes.addAll(inodes_add);
-				inodes.removeAll(inodes_remove);
-			}
-
+			could_continue = could_continue || BreadthFirstToVisitIRForExecutionIJavaElements(ft, memory, env_idx, exe_keys);
 			if (!could_continue) {
 				break;
 			}
 		}
+	}
+	
+	private boolean BreadthFirstToVisitIRForExecutionIJavaElements(FullTrace ft, ExecutionMemory memory, int env_idx, Set<IJavaElement> exe_key_list) {
+		boolean could_continue = false;
+		Iterator<IJavaElement> exe_itr = exe_key_list.iterator();
+		while (exe_itr.hasNext()) {
+			IJavaElement ije = exe_itr.next();
+			Set<IRForOneInstruction> inodes = memory.last_waiting_execution.get(ije);
+			
+			// debugging code.
+			if (inodes == null) {
+				System.err.println("What!!!!!! inodes is null??????");
+				System.exit(1);
+
+				inodes = new HashSet<IRForOneInstruction>();
+				memory.last_waiting_execution.put(ije, inodes);
+			}
+
+			// Solved. handle operations first, remember to handle
+			// IRForMethodInvocation which is totally different.
+			Set<IRForOneInstruction> inodes_remove = new HashSet<IRForOneInstruction>();
+			Set<IRForOneInstruction> inodes_add = new HashSet<IRForOneInstruction>();
+			Iterator<IRForOneInstruction> iitr = inodes.iterator();
+			while (iitr.hasNext()) {
+				IRForOneInstruction inode = iitr.next();
+				
+				//debugging.
+				if (inode.toString().startsWith("@Sentinel_URE#")) {
+					Math.abs(0);
+				}
+				// debugging.
+				if (inode.toString().startsWith("y^Op:@LeftAssign")) {
+					Math.abs(0);
+				}
+				
+				List<StaticConnection> in_conns = ObtainExecutionPermission(inode, memory);
+				boolean current_could_continue = (in_conns != null);
+				could_continue = could_continue || current_could_continue;
+				if (in_conns != null) {
+					
+					// debugging.
+					if (inode.toString().startsWith("y^Op:*")) {
+						Math.abs(0);
+					}
+					
+					if (inode instanceof IRForOneSourceMethodInvocation) {
+						HandleStaticConnectionForTargetMethod(ft, (IRForOneSourceMethodInvocation) inode);
+					} else {
+						Iterator<StaticConnection> in_itr = in_conns.iterator();
+						while (in_itr.hasNext()) {
+							StaticConnection sc = in_itr.next();
+							HandleStaticConnectionForSource(ft, sc.getSource(), sc.getTarget(),
+									sc.GetStaticConnectionInfo(), env_idx);
+						}
+					}
+					HandleStaticConnectionForTheSameOperation(ft, memory, inode, env_idx);
+					
+					// debugging.
+					if (inode.toString().startsWith("x^Op:*") || inode.toString().startsWith("y^Op:*")) {
+						Math.abs(0);
+					}
+					
+					Set<StaticConnection> inode_out_conns = IRGeneratorForOneProject.GetInstance().GetOutConnections(inode);
+					memory.executed_conns.addAll(inode_out_conns);
+					// inodes.remove(inode);
+					inodes_remove.add(inode);
+					memory.executed_nodes.add(inode);
+					Set<IRForOneInstruction> outinodes = IRGeneratorForOneProject.GetInstance()
+							.GetOutINodesByContainingSpecificType(inode, EdgeBaseType.Self.Value());
+					Iterator<IRForOneInstruction> oitr = outinodes.iterator();
+					while (oitr.hasNext()) {
+						IRForOneInstruction oiri = oitr.next();
+						
+						// debugging.
+						if (oiri.toString().startsWith("y^Op:*")) {
+							Math.abs(0);
+						}
+						
+						if (!memory.executed_nodes.contains(oiri)) {
+							inodes_add.add(oiri);
+							// inodes.add(oiri);
+						}
+					}
+				}
+			}
+			inodes.addAll(inodes_add);
+			inodes.removeAll(inodes_remove);
+		}
+
+		return could_continue;
 	}
 
 	private void HandleStaticConnectionForTheSameOperation(FullTrace ft, ExecutionMemory memory,
@@ -320,7 +323,7 @@ public class CodeOnOneTraceGenerator {
 		Iterator<StaticConnection> iitr = in_conns.iterator();
 		while (iitr.hasNext()) {
 			StaticConnection iirn = iitr.next();
-			if (!(iirn.getSource() instanceof IRForOneMethodBarrier && iirn.getTarget() instanceof IRForOneMethodBarrier)) {
+			// if (!(iirn.getSource() instanceof IRForOneMethodBarrier && iirn.getTarget() instanceof IRForOneMethodBarrier)) {
 				if (!memory.executed_conns.contains(iirn)) {
 					IRForOneInstruction source = iirn.getSource();
 					if (memory.executed_nodes.contains(source)) {
@@ -343,7 +346,7 @@ public class CodeOnOneTraceGenerator {
 						}
 					}
 				}
-			}
+			// }
 		}
 	}
 

@@ -44,7 +44,6 @@ import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRForOneMethod;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneInstruction;
-import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneMethodBarrier;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneOperation;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneSourceMethodInvocation;
 
@@ -468,14 +467,14 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 //			IRGeneratorHelper.AddMethodReturnVirtualReceiveDependency(irc, ure, now);
 
 			// add barriers and corresponding sequential edges.
-			List<IRForOneInstruction> ops = IRGeneratorHelper.GenerateGeneralIR(this, curr_eles,
-					IRMeta.MethodInvocation + identifier, SkipSelfTask.class, IRForOneMethodBarrier.class, false);
-			Iterator<IRForOneInstruction> opitr = ops.iterator();
-			while (opitr.hasNext()) {
-				IRForOneInstruction irfop = opitr.next();
-				IRGeneratorForOneProject.GetInstance().RegistConnection(
-						new StaticConnection(now, irfop, new ConnectionInfo(EdgeBaseType.Sequential.Value())));
-			}
+			// List<IRForOneInstruction> ops = IRGeneratorHelper.GenerateGeneralIR(this, curr_eles,
+			// 		IRMeta.MethodInvocation + identifier, SkipSelfTask.class, IRForOneMethodBarrier.class, false);
+			// Iterator<IRForOneInstruction> opitr = ops.iterator();
+			// while (opitr.hasNext()) {
+			//	IRForOneInstruction irfop = opitr.next();
+			//	IRGeneratorForOneProject.GetInstance().RegistConnection(
+			//			new StaticConnection(now, irfop, new ConnectionInfo(EdgeBaseType.Sequential.Value())));
+			// }
 		} else {
 			// add binary or unresolved method-invoke.
 			List<IRForOneInstruction> ops = IRGeneratorHelper.GenerateGeneralIR(this, curr_eles,
