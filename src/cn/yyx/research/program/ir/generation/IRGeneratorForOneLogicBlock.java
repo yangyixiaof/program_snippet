@@ -169,20 +169,20 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 	// }
 
 	protected Stack<ElementBranchInfo> element_has_set_branch = new Stack<ElementBranchInfo>();
-	protected HashMap<IJavaElement, Boolean> element_has_set_source_method_barrier = new HashMap<IJavaElement, Boolean>();
+//	protected HashMap<IJavaElement, Boolean> element_has_set_source_method_barrier = new HashMap<IJavaElement, Boolean>();
 	protected Stack<HashMap<IJavaElement, IRForOneInstruction>> branch_var_instr_order = new Stack<HashMap<IJavaElement, IRForOneInstruction>>();
-	protected Stack<IRForOneInstruction> source_invocation_barrier = new Stack<IRForOneInstruction>();
-	{
-		source_invocation_barrier.add(null);
-	}
+//	protected Stack<IRForOneInstruction> source_invocation_barrier = new Stack<IRForOneInstruction>();
+//	{
+//		source_invocation_barrier.add(null);
+//	}
 
 	public Set<IJavaElement> CurrentElements() {
 		return node_element_stack.Peek().GetIJavaElementSet();
 	}
 
 	private void UpdateIRControlBranchInstructionOrder() {
-		source_invocation_barrier.pop();
-		source_invocation_barrier.add(null);
+//		source_invocation_barrier.pop();
+//		source_invocation_barrier.add(null);
 
 		element_has_set_branch.peek().ClearElementChanged();
 		IRTreeForOneControlElement holder_ir = irc.GetControlLogicHolderElementIR();
@@ -199,13 +199,13 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		// branch.
 		branch_var_instr_order.push(t_hash);
 		// these two need to be handled in each branch.
-		source_invocation_barrier.add(null);
+//		source_invocation_barrier.add(null);
 		element_has_set_branch.push(new ElementBranchInfo());
 	}
 
 	protected void PopBranchInstructionOrder() {
 		branch_var_instr_order.pop();
-		source_invocation_barrier.pop();
+//		source_invocation_barrier.pop();
 		element_has_set_branch.pop().Clear();
 	}
 
@@ -2222,8 +2222,10 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 				// Solved. what if element_has_set_branch is null. add check.
 				// Solved. element_has_set_source_method_barrier does not need a
 				// stack? a stack is not needed.
-				IRGeneratorHelper.HandleSourceMethodAndBranchDependency(irc, ije, irfop, branch_var_instr_order,
-						source_invocation_barrier, element_has_set_branch, element_has_set_source_method_barrier);
+				// IRGeneratorHelper.HandleSourceMethodAndBranchDependency(irc, ije, irfop, branch_var_instr_order,
+				//		source_invocation_barrier, element_has_set_branch, element_has_set_source_method_barrier);
+				IRGeneratorHelper.HandleSourceMethodAndBranchDependency(irc, ije, irfop, 
+						branch_var_instr_order, element_has_set_branch);
 				new_creation.add(irfop);
 				MergeListParallelToOne(list, ije, irfop);
 			}
