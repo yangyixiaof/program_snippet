@@ -77,16 +77,6 @@ public class IRGeneratorHelper {
 		IRForOneSourceMethodInvocation now = null;
 		IRCode irc = irgfob.irc;
 		HashMap<ASTNode, Map<IJavaElement, IRForOneInstruction>> temp_statement_instr_order = irgfob.method_parameter_element_instr_order;
-		// HashMap<ASTNode, Map<IJavaElement, Boolean>>
-		// temp_statement_instr_is_self =
-		// irgfob.method_parameter_element_instr_is_self;
-		// Set<IJavaElement> temp_statement_environment_set =
-		// irgfob.temp_statement_environment_set;
-		// Map<IJavaElement, Integer> all_count = irgfob.all_count;
-		// HashMap<IJavaElement, IRForOneInstruction> branch_dependency = null;
-		// if (!irgfob.branch_var_instr_order.isEmpty()) {
-		// branch_dependency = irgfob.branch_var_instr_order.peek();
-		// }
 		IJavaElement source_method_receiver_element = irgfob.source_method_virtual_holder_element;
 
 		ITypeBinding itb = imb.getDeclaringClass();
@@ -197,12 +187,6 @@ public class IRGeneratorHelper {
 		List<IRForOneInstruction> ops = new LinkedList<IRForOneInstruction>();
 		while (titr.hasNext()) {
 			IJavaElement ije = titr.next();
-			// ASTNode im_node = all_happen.get(ije);
-			// && ASTSearch.ASTNodeContainsAnASTNode(node, im_node)
-			// if (im_node != null) {
-			// int start = exact_node.getStartPosition();
-			// int end = start + exact_node.getLength() - 1;
-			// IRInstrKind ir_kind = IRInstrKind.ComputeKind(1);
 			IRForOneInstruction now = (IRForOneInstruction) CreateIRInstruction(irgfob, IRForOneOperation.class,
 					new Object[] { irc, ije, code, DefaultINodeTask.class });
 			ops.add(now);
@@ -228,16 +212,7 @@ public class IRGeneratorHelper {
 			Set<IJavaElement> temp_statement_set, String code, boolean handle_same_operations) {
 		return GenerateGeneralIR(irgfob, temp_statement_set, code, DefaultINodeTask.class, handle_same_operations);
 	}
-
-	// public static List<IRForOneInstruction>
-	// GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, Set<IJavaElement>
-	// temp_statement_set,
-	// String code, Class<? extends IIRNodeTask> task_class, boolean
-	// handle_same_operations) {
-	// return GenerateGeneralIR(irgfob, temp_statement_set, code, task_class,
-	// handle_same_operations);
-	// }
-
+	
 	public static List<IRForOneInstruction> GenerateGeneralIR(IRGeneratorForOneLogicBlock irgfob, String code,
 			Class<? extends IIRNodeTask> task_class, boolean handle_same_operations) {
 		return GenerateGeneralIR(irgfob, code, task_class, IRForOneOperation.class, handle_same_operations);
@@ -300,10 +275,10 @@ public class IRGeneratorHelper {
 		// }
 		// }
 		Iterator<IJavaElement> titr = concern.iterator();
-		if (!titr.hasNext()) {
+		// if (!titr.hasNext()) {
 			// ConstantUniqueElement.FetchConstantElement(code);
 			// do nothing.
-		}
+		// }
 
 		List<IRForOneInstruction> ops = new LinkedList<IRForOneInstruction>();
 		while (titr.hasNext()) {
@@ -452,36 +427,7 @@ public class IRGeneratorHelper {
 		}
 		// irfomi.PutConnectionMergeTask(conn, new MethodReturnPassTask());
 	}
-
-	// private static void GenerateSourceMethodInvocationIR(IBinding ib,
-	// IMethodBinding imb, ASTNode node,
-	// ASTNode exact_node, IRForOneMethod irfom, Map<IBinding, Integer>
-	// temp_statement_set, String code) {
-	// int start = exact_node.getStartPosition();
-	// int end = start + exact_node.getLength() - 1;
-	// Integer count = temp_statement_set.get(ib);
-	// count++;
-	// IRInstrKind ir_kind = IRInstrKind.ComputeKind(count);
-	// temp_statement_set.put(ib, count);
-	// IJavaElement jele = imb.getJavaElement();
-	// Collection<IRForOneMethod> methods = null;
-	// if (jele != null && jele instanceof IMethod) {
-	// IMethod imethod = (IMethod) jele;
-	// try {
-	// IRSearchRequestor sr = new IRSearchRequestor();
-	// JavaSearch.SearchForWhereTheMethodIsInvoked(imethod, true, sr);
-	// methods = sr.GetMethods();
-	// } catch (CoreException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// if (methods != null && methods.size() > 0) {
-	// IRForOneMethodInvocation irfoe = new
-	// IRForOneMethodInvocation(irfom.getIm(), start, end, methods, ir_kind);
-	// irfom.AddOneIRUnit(ib, irfoe);
-	// }
-	// }
-
+	
 	public static void HandleEachElementInSameOperationDependency(List<IRForOneInstruction> ops) {
 		Iterator<IRForOneInstruction> oitr = ops.iterator();
 		while (oitr.hasNext()) {
