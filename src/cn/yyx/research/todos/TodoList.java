@@ -32,6 +32,6 @@ public class TodoList {
 	// Solved. handle out control nodes related to return. Solved in BranchControlForOneIRCode's Pop and FullTrace's Node Creation.
 	
 	// Solved. some structures to show all_eles have been returned must be introduced which means all_eles have involved in that branch.
-	// TODO what if some nodes are not connected, due to unlink of IRForOneReturn nodes.
+	// Solved. do not consider this case because this is the compilation error. what if some nodes are not connected, due to unlink of IRForOneReturn nodes.
 	
 }
