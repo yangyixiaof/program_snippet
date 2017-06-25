@@ -152,6 +152,8 @@ public class IRTreeForOneControlElement {
 //			}
 			return inner_level_branch.get(now_bc_judge).peek();
 		}
+		System.err.println("Strange! Control node should not be null!");
+		System.exit(1);
 		return null;
 	}
 	
