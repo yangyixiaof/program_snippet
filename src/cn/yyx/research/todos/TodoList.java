@@ -35,4 +35,6 @@ public class TodoList {
 	// Solved. do not consider this case because this is the compilation error. what if some nodes are not connected, due to unlink of IRForOneReturn nodes.
 	
 	// TODO now branch_control has become independent systems, skip-self-tasks need to consider these special nodes.
+	// TODO full_trace generation has ignored branch_control nodes but now the situation has changed. branch_control nodes should be taken into consideration.
+	
 }
