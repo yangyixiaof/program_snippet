@@ -69,7 +69,7 @@ public class IRTreeForOneControlElement {
 				System.exit(1);
 			}
 			IRForOneBranchControl last = list.peek();
-			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last, judge, new ConnectionInfo(EdgeBaseType.BranchControl.Value())));
+			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(last, judge, new ConnectionInfo(EdgeBaseType.Self.Value())));
 		}
 		
 		branch_judge_stack.push(judge);
@@ -94,7 +94,7 @@ public class IRTreeForOneControlElement {
 		Stack<IRForOneBranchControl> list = inner_level_branch.get(irbc);
 		IRForOneBranchControl irbc_bc = new IRForOneBranchControl(control_logic_holder_element, parent_env, IgnoreSelfTask.class, IRBranchControlType.Branch);
 		list.add(irbc_bc);
-		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc, irbc_bc, new ConnectionInfo(EdgeBaseType.Sequential.Value())));
+		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc, irbc_bc, new ConnectionInfo(EdgeBaseType.Self.Value())));
 		UpdateIRControlBranchInstructionOrder();
 		// inner_level_branch_overs_memory.put(irbc, null);
 	}
@@ -109,7 +109,7 @@ public class IRTreeForOneControlElement {
 		while (itr.hasNext())
 		{
 			IRForOneBranchControl irbc_bc = itr.next();
-			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc_bc, branch_over, new ConnectionInfo(EdgeBaseType.Sequential.Value())));
+			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc_bc, branch_over, new ConnectionInfo(EdgeBaseType.Self.Value())));
 		}
 		list.clear();
 		IRForOneBranchControl now_irbc = branch_judge_stack.peek();
