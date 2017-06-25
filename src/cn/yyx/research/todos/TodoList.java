@@ -34,4 +34,5 @@ public class TodoList {
 	// Solved. some structures to show all_eles have been returned must be introduced which means all_eles have involved in that branch.
 	// Solved. do not consider this case because this is the compilation error. what if some nodes are not connected, due to unlink of IRForOneReturn nodes.
 	
+	// TODO now branch_control has become independent systems, skip-self-tasks need to consider these special nodes.
 }

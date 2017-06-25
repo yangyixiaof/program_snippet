@@ -6,9 +6,11 @@ public enum EdgeBaseType {
 	SequentialSameOperation(1 << 1),
 	Sequential(1 << 2),
 	Self(1 << 3 | 1 << 2),
-	Branch(1 << 4 | 1 << 2),
 	// Barrier(1 << 5 | 1 << 2),
-	// this type is just for branch control and is isolated from previous edge types.
+	// these two types are for branch control irs.
+	// Branch means BranchControl to IR.
+	Branch(1 << 4),
+	// BranchControl means IR to BranchControl.
 	BranchControl(1 << 6);
 	
 	private int type = 0;

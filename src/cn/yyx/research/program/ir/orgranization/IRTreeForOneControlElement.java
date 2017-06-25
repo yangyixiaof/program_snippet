@@ -11,7 +11,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
-import cn.yyx.research.program.ir.generation.structure.ElementBranchInfo;
 import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.connection.StaticConnection;
@@ -32,9 +31,9 @@ public class IRTreeForOneControlElement {
 	
 	protected Map<IRForOneBranchControl, Stack<IRForOneBranchControl>> inner_level_branch = new HashMap<IRForOneBranchControl, Stack<IRForOneBranchControl>>();
 	
-	protected Map<IRForOneBranchControl, ElementBranchInfo> element_has_set_branch = new HashMap<IRForOneBranchControl, ElementBranchInfo>();
-	protected Map<IRForOneBranchControl, Map<IJavaElement, IRForOneInstruction>> branch_var_instr_order = new HashMap<IRForOneBranchControl, Map<IJavaElement, IRForOneInstruction>>();
-	protected Map<IRForOneBranchControl, Map<IJavaElement, IRForOneInstruction>> inner_level_branch_overs_memory = new HashMap<IRForOneBranchControl, Map<IJavaElement, IRForOneInstruction>>();
+//	protected Map<IRForOneBranchControl, ElementBranchInfo> element_has_set_branch = new HashMap<IRForOneBranchControl, ElementBranchInfo>();
+//	protected Map<IRForOneBranchControl, Map<IJavaElement, IRForOneInstruction>> branch_var_instr_order = new HashMap<IRForOneBranchControl, Map<IJavaElement, IRForOneInstruction>>();
+//	protected Map<IRForOneBranchControl, Map<IJavaElement, IRForOneInstruction>> inner_level_branch_overs_memory = new HashMap<IRForOneBranchControl, Map<IJavaElement, IRForOneInstruction>>();
 	
 	protected Stack<IRForOneBranchControl> branch_judge_stack = new Stack<IRForOneBranchControl>();
 	
@@ -46,11 +45,11 @@ public class IRTreeForOneControlElement {
 		this.root = new IRForOneBranchControl(control_logic_holder_element, parent_env, IgnoreSelfTask.class, IRBranchControlType.Branch_Over);
 		IRForOneBranchControl empty_holder = IRForOneBranchControl.GetEmptyControlHolder();
 		this.branch_judge_stack.push(empty_holder);
-		this.element_has_set_branch.put(empty_holder, new ElementBranchInfo());
+		// this.element_has_set_branch.put(empty_holder, new ElementBranchInfo());
 		Stack<IRForOneBranchControl> irbc_list = new Stack<IRForOneBranchControl>();
 		irbc_list.push(this.root);
 		this.inner_level_branch.put(empty_holder, irbc_list);
-		this.branch_var_instr_order.put(empty_holder, new HashMap<IJavaElement, IRForOneInstruction>());
+		// this.branch_var_instr_order.put(empty_holder, new HashMap<IJavaElement, IRForOneInstruction>());
 	}
 	
 	public void EnteredOneLogicBlock(ASTNode logic_block, Map<IJavaElement, IRForOneInstruction> logic_env) {
@@ -74,8 +73,8 @@ public class IRTreeForOneControlElement {
 		}
 		
 		branch_judge_stack.push(judge);
-		element_has_set_branch.put(judge, new ElementBranchInfo());
-		branch_var_instr_order.put(judge, logic_env);
+		// element_has_set_branch.put(judge, new ElementBranchInfo());
+		// branch_var_instr_order.put(judge, logic_env);
 		inner_level_branch.put(judge, new Stack<IRForOneBranchControl>());
 		
 		// add connections from ir-eles_tokens to branch_control_judge.
@@ -95,9 +94,9 @@ public class IRTreeForOneControlElement {
 		Stack<IRForOneBranchControl> list = inner_level_branch.get(irbc);
 		IRForOneBranchControl irbc_bc = new IRForOneBranchControl(control_logic_holder_element, parent_env, IgnoreSelfTask.class, IRBranchControlType.Branch);
 		list.add(irbc_bc);
-		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc, irbc_bc, new ConnectionInfo(EdgeBaseType.BranchControl.Value())));
+		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc, irbc_bc, new ConnectionInfo(EdgeBaseType.Sequential.Value())));
 		UpdateIRControlBranchInstructionOrder();
-		inner_level_branch_overs_memory.put(irbc, null);
+		// inner_level_branch_overs_memory.put(irbc, null);
 	}
 	
 	public void ExitOneLogicBlock(ASTNode logic_block, List<IRForOneInstruction> branch_overs) {
@@ -110,7 +109,7 @@ public class IRTreeForOneControlElement {
 		while (itr.hasNext())
 		{
 			IRForOneBranchControl irbc_bc = itr.next();
-			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc_bc, branch_over, new ConnectionInfo(EdgeBaseType.BranchControl.Value())));
+			IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc_bc, branch_over, new ConnectionInfo(EdgeBaseType.Sequential.Value())));
 		}
 		list.clear();
 		IRForOneBranchControl now_irbc = branch_judge_stack.peek();
@@ -130,7 +129,15 @@ public class IRTreeForOneControlElement {
 				IRForOneInstruction irfoi = boitr.next();
 				branch_instr_order.put(irfoi.getIm(), irfoi);
 			}
-			inner_level_branch_overs_memory.put(now_irbc, branch_instr_order);
+			Set<IJavaElement> lkeys = branch_instr_order.keySet();
+			Iterator<IJavaElement> litr = lkeys.iterator();
+			while (litr.hasNext())
+			{
+				IJavaElement lje = litr.next();
+				IRForOneInstruction ir = branch_instr_order.get(lje);
+				IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(ir, branch_over, new ConnectionInfo(EdgeBaseType.BranchControl.Value())));
+			}
+			// inner_level_branch_overs_memory.put(now_irbc, branch_instr_order);
 		}
 	}
 	
@@ -153,28 +160,30 @@ public class IRTreeForOneControlElement {
 	}
 
 	private void UpdateIRControlBranchInstructionOrder() {
-		IRForOneBranchControl irbc = branch_judge_stack.peek();
-		ElementBranchInfo element_branch_info = element_has_set_branch.get(irbc);
-		element_branch_info.ClearElementChanged();
-		IRForOneBranchControl control_node = GetControlNode();
-		if (control_node != null) {
-			element_branch_info.PutElementChanged(control_logic_holder_element, control_node);
-		}
+		// IRForOneBranchControl irbc = branch_judge_stack.peek();
+		// ElementBranchInfo element_branch_info = element_has_set_branch.get(irbc);
+		// element_branch_info.ClearElementChanged();
+		// IRForOneBranchControl control_node = GetControlNode();
+		// if (control_node != null) {
+		//	element_branch_info.PutElementChanged(control_logic_holder_element, control_node);
+		// }
 	}
 	
 	public Map<IJavaElement, IRForOneInstruction> GetBranchInstructionOrder() {
-		IRForOneBranchControl irbc = branch_judge_stack.peek();
-		Map<IJavaElement, IRForOneInstruction> branch_instr_order = inner_level_branch_overs_memory.get(irbc);
-		if (branch_instr_order == null) {
-			branch_instr_order = branch_var_instr_order.get(irbc);
-		}
+		// IRForOneBranchControl irbc = branch_judge_stack.peek();
+		Map<IJavaElement, IRForOneInstruction> branch_instr_order = new HashMap<IJavaElement, IRForOneInstruction>();
+		branch_instr_order.put(control_logic_holder_element, GetControlNode());
+		// inner_level_branch_overs_memory.get(irbc);
+		// if (branch_instr_order == null) {
+		//	branch_instr_order = branch_var_instr_order.get(irbc);
+		// }
 		return branch_instr_order;
 	}
 	
-	public ElementBranchInfo GetElementBranchInfo() {
-		IRForOneBranchControl irbc = branch_judge_stack.peek();
-		ElementBranchInfo element_branch_info = element_has_set_branch.get(irbc);
-		return element_branch_info;
-	}
+//	public ElementBranchInfo GetElementBranchInfo() {
+//		IRForOneBranchControl irbc = branch_judge_stack.peek();
+//		ElementBranchInfo element_branch_info = element_has_set_branch.get(irbc);
+//		return element_branch_info;
+//	}
 	
 }

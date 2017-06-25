@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 import cn.yyx.research.program.eclipse.searchutil.EclipseSearchForIMember;
-import cn.yyx.research.program.ir.generation.structure.ElementBranchInfo;
 import cn.yyx.research.program.ir.orgranization.IRTreeForOneControlElement;
 import cn.yyx.research.program.ir.search.IRSearchMethodRequestor;
 import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
@@ -356,8 +355,8 @@ public class IRGeneratorHelper {
 			) {
 		IRTreeForOneControlElement control_element = irc.GetControlLogicHolderElementIR();
 		HandleSourceMethodAndBranchDependencyRefined(irc, ije, now,
-				control_element.GetBranchInstructionOrder(),
-				control_element.GetElementBranchInfo()
+				control_element.GetBranchInstructionOrder()
+				// control_element.GetElementBranchInfo()
 				// branch_dependency.isEmpty() ? null : branch_dependency.peek(),
 				// source_method_barrier.isEmpty() ? null : source_method_barrier.peek(),
 				// element_has_set_branch.isEmpty() ? null : element_has_set_branch.peek()
@@ -366,15 +365,14 @@ public class IRGeneratorHelper {
 	}
 
 	private static void HandleSourceMethodAndBranchDependencyRefined(IRCode irc, IJavaElement ije,
-			IRForOneInstruction now
-			, Map<IJavaElement, IRForOneInstruction> branch_dependency,
+			IRForOneInstruction now, Map<IJavaElement, IRForOneInstruction> branch_dependency
 			// IRForOneInstruction source_method_barrier, 
-			ElementBranchInfo element_has_set_branch
+			// ElementBranchInfo element_has_set_branch
 			// HashMap<IJavaElement, Boolean> element_has_set_source_method_barrier
 			) {
 		if (branch_dependency != null) {
-			Boolean has_set = element_has_set_branch.ElementMainBranchHasSet(ije);
-			if (has_set == null) {
+			// Boolean has_set = element_has_set_branch.ElementMainBranchHasSet(ije);
+			// if (has_set == null) {
 				Set<IJavaElement> bkeys = branch_dependency.keySet();
 				Iterator<IJavaElement> bitr = bkeys.iterator();
 				while (bitr.hasNext()) {
@@ -388,25 +386,26 @@ public class IRGeneratorHelper {
 								new StaticConnection(pt, now, new ConnectionInfo(EdgeBaseType.Branch.Value())));
 					}
 				}
-				element_has_set_branch.SetElementMainBranch(ije);
-			}
+			//	element_has_set_branch.SetElementMainBranch(ije);
+			// }
 		}
 		
 		// handle one or two branch change.
-		if (element_has_set_branch != null) {
-			if (element_has_set_branch.ElementChanged()) {
-				if (!element_has_set_branch.ChangeIsApplied(ije)) {
-					element_has_set_branch.SetChangeApplied(ije);
-					Collection<IRForOneInstruction> chgd_instrs = element_has_set_branch.ChangedElements();
-					Iterator<IRForOneInstruction> citr = chgd_instrs.iterator();
-					while (citr.hasNext()) {
-						IRForOneInstruction instr = citr.next();
-						IRGeneratorForOneProject.GetInstance().RegistConnection(
-								new StaticConnection(instr, now, new ConnectionInfo(EdgeBaseType.Branch.Value())));
-					}
-				}
-			}
-		}
+//		if (element_has_set_branch != null) {
+//			if (element_has_set_branch.ElementChanged()) {
+//				if (!element_has_set_branch.ChangeIsApplied(ije)) {
+//					element_has_set_branch.SetChangeApplied(ije);
+//					Collection<IRForOneInstruction> chgd_instrs = element_has_set_branch.ChangedElements();
+//					Iterator<IRForOneInstruction> citr = chgd_instrs.iterator();
+//					while (citr.hasNext()) {
+//						IRForOneInstruction instr = citr.next();
+//						IRGeneratorForOneProject.GetInstance().RegistConnection(
+//								new StaticConnection(instr, now, new ConnectionInfo(EdgeBaseType.Branch.Value())));
+//					}
+//				}
+//			}
+//		}
+		
 //		if (source_method_barrier != null) {
 //			Boolean has_set = element_has_set_source_method_barrier.get(ije);
 //			if (has_set == null) {
