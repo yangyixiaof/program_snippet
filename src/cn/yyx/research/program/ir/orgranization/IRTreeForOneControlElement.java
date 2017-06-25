@@ -113,7 +113,7 @@ public class IRTreeForOneControlElement {
 		}
 		list.clear();
 		IRForOneBranchControl now_irbc = branch_judge_stack.peek();
-		Stack<IRForOneBranchControl> now_list = inner_level_branch.remove(now_irbc);
+		Stack<IRForOneBranchControl> now_list = inner_level_branch.get(now_irbc);
 		now_list.pop();
 		now_list.push(branch_over);
 //		if (!branch_judge_stack.isEmpty())
@@ -150,7 +150,13 @@ public class IRTreeForOneControlElement {
 //			{
 //				return inner_over;
 //			}
-			return inner_level_branch.get(now_bc_judge).peek();
+			Stack<IRForOneBranchControl> in_level = inner_level_branch.get(now_bc_judge);
+			if (in_level.size() == 0) {
+				new Exception().printStackTrace();
+				System.err.println("Strange! inner_level_branch is null!");
+				System.exit(1);
+			}
+			return in_level.peek();
 		}
 		System.err.println("Strange! Control node should not be null!");
 		System.exit(1);
