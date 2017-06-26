@@ -38,6 +38,6 @@ public class TodoList {
 	// TODO now branch_control has become independent systems, skip-self-tasks need to consider these special nodes.
 	// TODO full_trace generation has ignored branch_control nodes but now the situation has changed. branch_control nodes should be taken into consideration.
 	
-	// TODO ElementBranchInfo needs to be re-designed to Branch-Element-WhetherHasSet classical model.
+	// Solved. ElementBranchInfo needs to be re-designed to Branch-Element-WhetherHasSet classical model.
 	
 }
