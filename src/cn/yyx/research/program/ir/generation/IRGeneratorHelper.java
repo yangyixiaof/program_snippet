@@ -355,7 +355,7 @@ public class IRGeneratorHelper {
 			) {
 		IRTreeForOneControlElement control_element = irc.GetControlLogicHolderElementIR();
 		HandleSourceMethodAndBranchDependencyRefined(irc, ije, now,
-				control_element.GetBranchInstructionOrder()
+				control_element.GetBranchInstructionOrder(ije)
 				// control_element.GetElementBranchInfo()
 				// branch_dependency.isEmpty() ? null : branch_dependency.peek(),
 				// source_method_barrier.isEmpty() ? null : source_method_barrier.peek(),

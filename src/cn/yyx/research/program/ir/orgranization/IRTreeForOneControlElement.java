@@ -177,10 +177,21 @@ public class IRTreeForOneControlElement {
 		// }
 	}
 	
-	public Map<IJavaElement, IRForOneInstruction> GetBranchInstructionOrder() {
+	protected Map<IRForOneBranchControl, Map<IJavaElement, Boolean>> branch_control_has_set = new HashMap<IRForOneBranchControl, Map<IJavaElement, Boolean>>();
+	
+	public Map<IJavaElement, IRForOneInstruction> GetBranchInstructionOrder(IJavaElement ije) {
 		// IRForOneBranchControl irbc = branch_judge_stack.peek();
 		Map<IJavaElement, IRForOneInstruction> branch_instr_order = new HashMap<IJavaElement, IRForOneInstruction>();
-		branch_instr_order.put(control_logic_holder_element, GetControlNode());
+		IRForOneBranchControl control_node = GetControlNode();
+		Map<IJavaElement, Boolean> has_set = branch_control_has_set.get(control_node);
+		if (has_set == null) {
+			has_set = new HashMap<IJavaElement, Boolean>();
+			branch_control_has_set.put(control_node, has_set);
+		}
+		if (has_set.get(ije) == null) {
+			branch_instr_order.put(control_logic_holder_element, control_node);
+			has_set.put(ije, true);
+		}
 		// inner_level_branch_overs_memory.get(irbc);
 		// if (branch_instr_order == null) {
 		//	branch_instr_order = branch_var_instr_order.get(irbc);
