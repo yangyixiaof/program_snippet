@@ -7,6 +7,7 @@ public enum EdgeBaseType {
 	Sequential(1 << 2),
 	Self(1 << 3 | Sequential.Value()),
 	// Barrier(1 << 5 | 1 << 2),
+	
 	// these two types are for branch control irs.
 	// Branch means BranchControl to IR.
 	Branch(1 << 4 | Sequential.Value()),
