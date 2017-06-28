@@ -14,7 +14,8 @@ import cn.yyx.research.program.ir.generation.IRGeneratorForOneProject;
 import cn.yyx.research.program.ir.storage.connection.ConnectionInfo;
 import cn.yyx.research.program.ir.storage.connection.EdgeBaseType;
 import cn.yyx.research.program.ir.storage.connection.StaticConnection;
-import cn.yyx.research.program.ir.storage.node.execution.IgnoreSelfTask;
+import cn.yyx.research.program.ir.storage.node.execution.DefaultINodeTask;
+import cn.yyx.research.program.ir.storage.node.execution.SkipSelfTask;
 import cn.yyx.research.program.ir.storage.node.highlevel.IRCode;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRBranchControlType;
 import cn.yyx.research.program.ir.storage.node.lowlevel.IRForOneBranchControl;
@@ -42,7 +43,7 @@ public class IRTreeForOneControlElement {
 	public IRTreeForOneControlElement(IJavaElement control_logic_holder_element, IRCode parent_env) {
 		this.control_logic_holder_element = control_logic_holder_element;
 		this.parent_env = parent_env;
-		this.root = new IRForOneBranchControl(control_logic_holder_element, parent_env, IgnoreSelfTask.class, IRBranchControlType.Branch_Over);
+		this.root = new IRForOneBranchControl(control_logic_holder_element, parent_env, SkipSelfTask.class, IRBranchControlType.Branch_Over);
 		IRForOneBranchControl empty_holder = IRForOneBranchControl.GetEmptyControlHolder();
 		this.branch_judge_stack.push(empty_holder);
 		// this.element_has_set_branch.put(empty_holder, new ElementBranchInfo());
@@ -57,7 +58,7 @@ public class IRTreeForOneControlElement {
 //		{
 //			inner_level_branchover.put(branch_judge_stack.peek(), null);
 //		}
-		IRForOneBranchControl judge = new IRForOneBranchControl(control_logic_holder_element, parent_env, IgnoreSelfTask.class, IRBranchControlType.Branch_Judge);
+		IRForOneBranchControl judge = new IRForOneBranchControl(control_logic_holder_element, parent_env, DefaultINodeTask.class, IRBranchControlType.Branch_Judge); // IgnoreSelfTask.class
 		// inherit from parent judge.
 		if (!branch_judge_stack.isEmpty())
 		{
@@ -92,7 +93,7 @@ public class IRTreeForOneControlElement {
 		IRForOneBranchControl irbc = branch_judge_stack.peek();
 		// ast_control_map.get(logic_block);
 		Stack<IRForOneBranchControl> list = inner_level_branch.get(irbc);
-		IRForOneBranchControl irbc_bc = new IRForOneBranchControl(control_logic_holder_element, parent_env, IgnoreSelfTask.class, IRBranchControlType.Branch);
+		IRForOneBranchControl irbc_bc = new IRForOneBranchControl(control_logic_holder_element, parent_env, DefaultINodeTask.class, IRBranchControlType.Branch);
 		list.add(irbc_bc);
 		IRGeneratorForOneProject.GetInstance().RegistConnection(new StaticConnection(irbc, irbc_bc, new ConnectionInfo(EdgeBaseType.Self.Value())));
 		UpdateIRControlBranchInstructionOrder();
@@ -101,7 +102,7 @@ public class IRTreeForOneControlElement {
 	
 	public void ExitOneLogicBlock(ASTNode logic_block, List<IRForOneInstruction> branch_overs) {
 		// handle branch_control graph.
-		IRForOneBranchControl branch_over = new IRForOneBranchControl(control_logic_holder_element, parent_env, IgnoreSelfTask.class, IRBranchControlType.Branch_Over);
+		IRForOneBranchControl branch_over = new IRForOneBranchControl(control_logic_holder_element, parent_env, SkipSelfTask.class, IRBranchControlType.Branch_Over);
 		IRForOneBranchControl irbc = branch_judge_stack.pop();
 		// ast_control_map.remove(logic_block);
 		Stack<IRForOneBranchControl> list = inner_level_branch.remove(irbc);

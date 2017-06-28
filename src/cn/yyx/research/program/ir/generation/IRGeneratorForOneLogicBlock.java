@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMember;
@@ -228,8 +229,9 @@ public class IRGeneratorForOneLogicBlock extends IRGeneratorForValidation {
 		this.parent_im = im;
 		this.source_method_virtual_holder_element = new SourceMethodHolderElement(
 				irc.GetScopeIElement().getElementName().toString() + "&mholder");
+		ICompilationUnit resource = irc.GetScopeIElement().getCompilationUnit();
 		this.control_logic_holder_element = new ControlLogicHolderElement(
-				irc.GetScopeIElement().getElementName().toString() + "&clogic");
+				irc.GetScopeIElement().getElementName().toString() + "*" + irc.GetScopeIElement().toString().hashCode() + "*" + (resource == null ? "r_null" : resource.hashCode()) + "&clogic");
 		this.irc.SetSourceMethodElement(this.source_method_virtual_holder_element);
 		this.irc.SetControlLogicHolderElement(this.control_logic_holder_element);
 	}
