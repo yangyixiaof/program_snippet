@@ -45,8 +45,6 @@ public class SkipSelfTask extends IIRNodeTask {
 		int final_type = TaskExecutionHelper.ComputeFinalType(source, target, connect_info);
 		
 		Set<DynamicConnection> in_conns = ft.GetInConnections(source);
-		// TODO
-		
 		if (in_conns.isEmpty()) {
 			try {
 				ft.AddConnection(new DynamicConnection(source, target, (ConnectionInfo)connect_info.clone()));

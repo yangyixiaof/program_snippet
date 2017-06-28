@@ -62,7 +62,7 @@ public class SnippetExtractor implements IApplication {
 						DotMeta.ProjectEachMethodDotDir, DotMeta.ProjectEachMethodPicDir);
 				irproj_local_generation.GenerateDots();
 
-				if (false) {
+				if (true) {
 					// generate for each full trace.
 					IRGeneratorForOneProject irinstance = IRGeneratorForOneProject.GetInstance();
 					Set<IMethod> roots = EclipseSearchForICallGraph
